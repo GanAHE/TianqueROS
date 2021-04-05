@@ -1,0 +1,3 @@
+[submodule "cmake_hexagon"]
+	path = cmake_hexagon
+	url = https://github.com/ATLFlight/cmake_hexagon

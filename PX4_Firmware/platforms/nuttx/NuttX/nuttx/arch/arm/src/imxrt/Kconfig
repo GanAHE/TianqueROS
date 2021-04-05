@@ -1,0 +1,1441 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if ARCH_CHIP_IMXRT
+
+comment "i.MX RT Configuration Options"
+
+choice
+	prompt "i.MX RT Chip Selection"
+	default ARCH_CHIP_MIMXRT1052DVL6A
+	depends on ARCH_CHIP_IMXRT
+
+config ARCH_CHIP_MIMXRT1021CAG4A
+	bool "MIMXRT1021CAG4A"
+	select ARCH_FAMILY_MIMXRT1021C
+
+config ARCH_CHIP_MIMXRT1021CAF4A
+	bool "MIMXRT1021CAF4A"
+	select ARCH_FAMILY_MIMXRT1021C
+
+config ARCH_CHIP_MIMXRT1021DAF5A
+	bool "MIMXRT1021DAF5A"
+	select ARCH_FAMILY_MIMXRT1021D
+
+config ARCH_CHIP_MIMXRT1021DAG5A
+	bool "MIMXRT1021DAG5A"
+	select ARCH_FAMILY_MIMXRT1021D
+
+config ARCH_CHIP_MIMXRT1051DVL6A
+	bool "MIMXRT1051DVL6A"
+	select ARCH_FAMILY_MXRT105xDVL6A
+
+config ARCH_CHIP_MIMXRT1051CVL5A
+	bool "MIMXRT1051CVL5A"
+	select ARCH_FAMILY_IMIMXRT105xCVL5A
+
+config ARCH_CHIP_MIMXRT1052DVL6A
+	bool "MIMXRT1052DVL6A"
+	select ARCH_FAMILY_MXRT105xDVL6A
+
+config ARCH_CHIP_MIMXRT1052CVL5A
+	bool "MIMXRT1052DVL5A"
+	select ARCH_FAMILY_MIMXRT1052CVL5A
+
+config ARCH_CHIP_MIMXRT1061DVL6A
+	bool "MIMXRT1061DVL6A"
+	select ARCH_FAMILY_MXRT106xDVL6A
+
+config ARCH_CHIP_MIMXRT1061CVL5A
+	bool "MIMXRT1061CVL5A"
+	select ARCH_FAMILY_IMIMXRT106xCVL5A
+
+config ARCH_CHIP_MIMXRT1062DVL6A
+	bool "MIMXRT1062DVL6A"
+	select ARCH_FAMILY_MXRT106xDVL6A
+
+config ARCH_CHIP_MIMXRT1062CVL5A
+	bool "MIMXRT1062DVL6A"
+	select ARCH_FAMILY_MIMXRT1062CVL5A
+
+endchoice # i.MX RT Chip Selection
+
+# i.MX RT Families
+
+config ARCH_FAMILY_MIMXRT1021D
+	bool
+	default n
+	select ARCH_FAMILY_IMXRT102x
+	---help---
+		i.MX RT1020 Crossover Processors for Consumer Products
+
+config ARCH_FAMILY_MIMXRT1021C
+	bool
+	default n
+	select ARCH_FAMILY_IMXRT102x
+	---help---
+		i.MX RT1020 Crossover Processors for Industrial Products
+
+config ARCH_FAMILY_IMXRT102x
+	bool
+	default n
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_DPFPU # REVISIT
+	select ARMV7M_HAVE_ICACHE
+	select ARMV7M_HAVE_DCACHE
+	select ARMV7M_HAVE_ITCM
+	select ARMV7M_HAVE_DTCM
+
+config ARCH_FAMILY_MXRT105xDVL6A
+	bool
+	default n
+	select ARCH_FAMILY_IMXRT105x
+	---help---
+		i.MX RT1050 Crossover Processors for Consumer Products
+
+config ARCH_FAMILY_MIMXRT1052CVL5A
+	bool
+	default n
+	select ARCH_FAMILY_IMXRT105x
+	---help---
+		i.MX RT1050 Crossover Processors for Industrial Products
+
+config ARCH_FAMILY_IMXRT105x
+	bool
+	default n
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_DPFPU # REVISIT
+	select ARMV7M_HAVE_ICACHE
+	select ARMV7M_HAVE_DCACHE
+	select ARMV7M_HAVE_ITCM
+	select ARMV7M_HAVE_DTCM
+	select IMXRT_HAVE_LCD
+
+config ARCH_FAMILY_MXRT106xDVL6A
+	bool
+	default n
+	select ARCH_FAMILY_IMXRT106x
+	---help---
+		i.MX RT1060 Crossover Processors for Consumer Products
+
+config ARCH_FAMILY_MIMXRT1062CVL5A
+	bool
+	default n
+	select ARCH_FAMILY_IMXRT106x
+	---help---
+		i.MX RT1056 Crossover Processors for Industrial Products
+
+config ARCH_FAMILY_IMXRT106x
+	bool
+	default n
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_DPFPU # REVISIT
+	select ARMV7M_HAVE_ICACHE
+	select ARMV7M_HAVE_DCACHE
+	select ARMV7M_HAVE_ITCM
+	select ARMV7M_HAVE_DTCM
+	select IMXRT_HIGHSPEED_GPIO
+	select IMXRT_HAVE_LCD
+
+# Peripheral support
+
+config IMXRT_USDHC
+	bool
+	default n
+
+config IMXRT_HAVE_LPUART
+	bool
+	default n
+
+config IMXRT_LPI2C
+	bool
+	default n
+
+config IMXRT_LPSPI
+	bool
+	default n
+
+config IMXRT_ENC
+	bool
+	default n
+
+config IMXRT_HIGHSPEED_GPIO
+	bool
+	default n
+
+config IMXRT_HAVE_LCD
+	bool
+	default n
+
+config IMXRT_SEMC_INIT_DONE
+	bool
+	default n
+
+menu "i.MX RT Peripheral Selection"
+
+config IMXRT_EDMA
+	bool "eDMA"
+	default n
+	select ARCH_DMA
+
+config IMXRT_USBOTG
+	bool "USB EHCI"
+	default n
+	select USBHOST_HAVE_ASYNCH
+	select USBHOST_ASYNCH
+
+config IMXRT_USBDEV
+	bool "USB Device"
+	default n
+
+config IMXRT_ENET
+	bool "Ethernet"
+	default n
+	select ARCH_HAVE_PHY
+	select ARCH_PHY_INTERRUPT
+	select ARCH_HAVE_NETDEV_STATISTICS
+
+config IMXRT_LCD
+	bool "LCD controller"
+	default n
+	depends on IMXRT_HAVE_LCD
+
+menu "FlexIO Peripherals"
+
+endmenu # FlexIO Peripherals
+
+menu "LPUART Peripherals"
+
+config IMXRT_LPUART1
+	bool "LPUART1"
+	default n
+	select LPUART1_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART2
+	bool "LPUART2"
+	default n
+	select LPUART2_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART3
+	bool "LPUART3"
+	default n
+	select LPUART3_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART4
+	bool "LPUART4"
+	default n
+	select LPUART4_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART5
+	bool "LPUART5"
+	default n
+	select LPUART5_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART6
+	bool "LPUART6"
+	default n
+	select LPUART6_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART7
+	bool "LPUART7"
+	default n
+	select LPUART7_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART8
+	bool "LPUART8"
+	default n
+	select LPUART8_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select IMXRT_HAVE_LPUART
+
+endmenu # LPUART Peripherals
+
+menu "LPUART Configuration"
+	depends on IMXRT_HAVE_LPUART
+
+config IMXRT_LPUART_INVERT
+	bool "Signal Invert Support"
+	default n
+	depends on IMXRT_HAVE_LPUART
+	---help---
+		Enable signal inversion UART support. The option enables support for the
+		TIOCSINVERT ioctl in the IMXRT serial driver.
+
+endmenu # LPUART Configuration
+
+menu "LPI2C Peripherals"
+
+menuconfig IMXRT_LPI2C1
+	bool "LPI2C1"
+	default n
+	select IMXRT_LPI2C
+
+if IMXRT_LPI2C1
+
+config LPI2C1_BUSYIDLE
+	int "Bus idle timeout period in clock cycles"
+	default 0
+
+config LPI2C1_FILTSCL
+	int "I2C master digital glitch filters for SCL input in clock cycles"
+	default 0
+
+config LPI2C1_FILTSDA
+	int "I2C master digital glitch filters for SDA input in clock cycles"
+	default 0
+
+endif # IMXRT_LPI2C1
+
+menuconfig IMXRT_LPI2C2
+	bool "LPI2C2"
+	default n
+	select IMXRT_LPI2C
+
+if IMXRT_LPI2C2
+
+config LPI2C2_BUSYIDLE
+	int "Bus idle timeout period in clock cycles"
+	default 0
+
+config LPI2C2_FILTSCL
+	int "I2C master digital glitch filters for SCL input in clock cycles"
+	default 0
+
+config LPI2C2_FILTSDA
+	int "I2C master digital glitch filters for SDA input in clock cycles"
+	default 0
+
+endif # IMXRT_LPI2C2
+
+menuconfig IMXRT_LPI2C3
+	bool "LPI2C3"
+	default n
+	select IMXRT_LPI2C
+
+if IMXRT_LPI2C3
+
+config LPI2C3_BUSYIDLE
+	int "Bus idle timeout period in clock cycles"
+	default 0
+
+config LPI2C3_FILTSCL
+	int "I2C master digital glitch filters for SCL input in clock cycles"
+	default 0
+
+config LPI2C3_FILTSDA
+	int "I2C master digital glitch filters for SDA input in clock cycles"
+	default 0
+
+endif # IMXRT_LPI2C3
+
+menuconfig IMXRT_LPI2C4
+	bool "LPI2C4"
+	default n
+	select IMXRT_LPI2C
+
+if IMXRT_LPI2C4
+
+config LPI2C4_BUSYIDLE
+	int "Bus idle timeout period in clock cycles"
+	default 0
+
+config LPI2C4_FILTSCL
+	int "I2C master digital glitch filters for SCL input in clock cycles"
+	default 0
+
+config LPI2C4_FILTSDA
+	int "I2C master digital glitch filters for SDA input in clock cycles"
+	default 0
+
+endif # IMXRT_LPI2C4
+endmenu # LPI2C Peripherals
+
+menu "LPSPI Peripherals"
+
+menuconfig IMXRT_LPSPI1
+	bool "LPSPI1"
+	default n
+	select IMXRT_LPSPI
+
+config IMXRT_LPSPI2
+	bool "LPSPI2"
+	default n
+	select IMXRT_LPSPI
+
+config IMXRT_LPSPI3
+	bool "LPSPI3"
+	default n
+	select IMXRT_LPSPI
+
+config IMXRT_LPSPI4
+	bool "LPSPI4"
+	default n
+	select IMXRT_LPSPI
+
+endmenu # LPSPI Peripherals
+
+config IMXRT_SEMC
+	bool "Smart External Memory Controller (SEMC)"
+	default n
+
+config IMXRT_SNVS_LPSRTC
+	bool "LP SRTC"
+	default n
+	select IMXRT_SNVS_HPRTC
+
+config IMXRT_SNVS_HPRTC
+	bool "HP RTC"
+	default n
+
+config IMXRT_USDHC1
+	bool "USDHC1"
+	default n
+	select ARCH_HAVE_SDIO
+	select IMXRT_USDHC
+	---help---
+		Support USDHC host controller 1
+
+config IMXRT_USDHC2
+	bool "USDHC2"
+	default n
+	select ARCH_HAVE_SDIO
+	select IMXRT_USDHC
+	---help---
+		Support USDHC host controller 2
+
+menu "ENC Peripherals"
+
+menuconfig IMXRT_ENC1
+	bool "ENC1"
+	default n
+	select IMXRT_ENC
+
+if IMXRT_ENC1
+
+config ENC1_INITVAL
+	int "Initial position counter value"
+	default 0
+
+config ENC1_DIR
+	bool "Reverse positive rotation direction"
+	default n
+	---help---
+		Select if PHASEB leading PHASEA pulses is positive rotation
+
+config ENC1_FILTPER
+	int "Input filter sample period in clock cycles"
+	default 0
+
+config ENC1_FILTCNT
+	int "Number of input samples that filter will compare"
+	default 0
+
+config ENC1_MOD
+	bool "Enable modulo counting"
+	default n
+
+if ENC1_MOD
+
+config ENC1_MODULUS
+	hex "Modulus to wrap around"
+	default 0xffffffff
+
+endif # ENC1_MOD
+
+config ENC1_HIP
+	bool "HOME signal initializes position counter"
+	default n
+
+if ENC1_HIP
+
+config ENC1_HNE
+	bool "Initialize on negedge of HOME"
+	default n
+
+endif # ENC1_HIP
+
+config ENC1_XIP
+	bool "INDEX signal initializes position counter"
+	default n
+
+if ENC1_XIP
+
+config ENC1_XNE
+	bool "Initialize on negedge of INDEX"
+	default n
+
+endif # ENC1_XIP
+
+if DEBUG_SENSORS
+
+config ENC1_TST_DIR
+	bool "Generate negative test counter advances"
+	default n
+
+config ENC1_TST_PER
+	int "Period of test pulses in clock cycles"
+	default 31
+
+endif # DEBUG_SENSORS
+
+endif # IMXRT_ENC1
+
+menuconfig IMXRT_ENC2
+	bool "ENC2"
+	default n
+	select IMXRT_ENC
+
+if IMXRT_ENC2
+
+config ENC2_INITVAL
+	int "Initial position counter value"
+	default 0
+
+config ENC2_DIR
+	bool "Reverse positive rotation direction"
+	default n
+	---help---
+		Select if PHASEB leading PHASEA pulses is positive rotation
+
+config ENC2_FILTPER
+	int "Input filter sample period in clock cycles"
+	default 0
+
+config ENC2_FILTCNT
+	int "Number of input samples that filter will compare"
+	default 0
+
+config ENC2_MOD
+	bool "Enable modulo counting"
+	default n
+
+if ENC2_MOD
+
+config ENC2_MODULUS
+	hex "Modulus to wrap around"
+	default 0xffffffff
+
+endif # ENC2_MOD
+
+config ENC2_HIP
+	bool "HOME signal initializes position counter"
+	default n
+
+if ENC2_HIP
+
+config ENC2_HNE
+	bool "Initialize on negedge of HOME"
+	default n
+
+endif # ENC2_HIP
+
+config ENC2_XIP
+	bool "INDEX signal initializes position counter"
+	default n
+
+if ENC2_XIP
+
+config ENC2_XNE
+	bool "Initialize on negedge of INDEX"
+	default n
+
+endif # ENC2_XIP
+
+if DEBUG_SENSORS
+
+config ENC2_TST_DIR
+	bool "Generate negative test counter advances"
+	default n
+
+config ENC2_TST_PER
+	int "Period of test pulses in clock cycles"
+	default 31
+
+endif # DEBUG_SENSORS
+
+endif # IMXRT_ENC2
+
+if ARCH_FAMILY_IMXRT105x || ARCH_FAMILY_IMXRT106x
+
+menuconfig IMXRT_ENC3
+	bool "ENC3"
+	default n
+	select IMXRT_ENC
+
+if IMXRT_ENC3
+
+config ENC3_INITVAL
+	int "Initial position counter value"
+	default 0
+
+config ENC3_DIR
+	bool "Reverse positive rotation direction"
+	default n
+	---help---
+		Select if PHASEB leading PHASEA pulses is positive rotation
+
+config ENC3_FILTPER
+	int "Input filter sample period in clock cycles"
+	default 0
+
+config ENC3_FILTCNT
+	int "Number of input samples that filter will compare"
+	default 0
+
+config ENC3_MOD
+	bool "Enable modulo counting"
+	default n
+
+if ENC3_MOD
+
+config ENC3_MODULUS
+	hex "Modulus to wrap around"
+	default 0xffffffff
+
+endif # ENC3_MOD
+
+config ENC3_HIP
+	bool "HOME signal initializes position counter"
+	default n
+
+if ENC3_HIP
+
+config ENC3_HNE
+	bool "Initialize on negedge of HOME"
+	default n
+
+endif # ENC3_HIP
+
+config ENC3_XIP
+	bool "INDEX signal initializes position counter"
+	default n
+
+if ENC3_XIP
+
+config ENC3_XNE
+	bool "Initialize on negedge of INDEX"
+	default n
+
+endif # ENC3_XIP
+
+if DEBUG_SENSORS
+
+config ENC3_TST_DIR
+	bool "Generate negative test counter advances"
+	default n
+
+config ENC3_TST_PER
+	int "Period of test pulses in clock cycles"
+	default 31
+
+endif # DEBUG_SENSORS
+
+endif # IMXRT_ENC3
+
+menuconfig IMXRT_ENC4
+	bool "ENC4"
+	default n
+	select IMXRT_ENC
+
+if IMXRT_ENC4
+
+config ENC4_INITVAL
+	int "Initial position counter value"
+	default 0
+
+config ENC4_DIR
+	bool "Reverse positive rotation direction"
+	default n
+	---help---
+		Select if PHASEB leading PHASEA pulses is positive rotation
+
+config ENC4_FILTPER
+	int "Input filter sample period in clock cycles"
+	default 0
+
+config ENC4_FILTCNT
+	int "Number of input samples that filter will compare"
+	default 0
+
+config ENC4_MOD
+	bool "Enable modulo counting"
+	default n
+
+if ENC4_MOD
+
+config ENC4_MODULUS
+	hex "Modulus to wrap around"
+	default 0xffffffff
+
+endif # ENC4_MOD
+
+config ENC4_HIP
+	bool "HOME signal initializes position counter"
+	default n
+
+if ENC4_HIP
+
+config ENC4_HNE
+	bool "Initialize on negedge of HOME"
+	default n
+
+endif # ENC4_HIP
+
+config ENC4_XIP
+	bool "INDEX signal initializes position counter"
+	default n
+
+if ENC4_XIP
+
+config ENC4_XNE
+	bool "Initialize on negedge of INDEX"
+	default n
+
+endif # ENC4_XIP
+
+if DEBUG_SENSORS
+
+config ENC4_TST_DIR
+	bool "Generate negative test counter advances"
+	default n
+
+config ENC4_TST_PER
+	int "Period of test pulses in clock cycles"
+	default 31
+
+endif # DEBUG_SENSORS
+
+endif # IMXRT_ENC4
+
+endif # ARCH_FAMILY_IMXRT105x | ARCH_FAMILY_IMXRT106x
+
+endmenu # ENC Peripherals
+
+endmenu # i.MX RT Peripheral Selection
+
+menuconfig IMXRT_GPIO_IRQ
+	bool "GPIO Interrupt Support"
+	default n
+
+if IMXRT_GPIO_IRQ
+
+config IMXRT_GPIO1_0_15_IRQ
+	bool "GPIO1 Pins 0-15 interrupts"
+	default n
+
+config IMXRT_GPIO1_16_31_IRQ
+	bool "GPIO1 Pins 16-31 interrupts"
+	default n
+
+config IMXRT_GPIO2_0_15_IRQ
+	bool "GPIO2 Pins 0-15 interrupts"
+	default n
+
+config IMXRT_GPIO2_16_31_IRQ
+	bool "GPIO2 Pins 16-31 interrupts"
+	default n
+
+config IMXRT_GPIO3_0_15_IRQ
+	bool "GPIO3 Pins 0-15 interrupts"
+	default n
+
+config IMXRT_GPIO3_16_31_IRQ
+	bool "GPIO3 Pins 16-31 interrupts"
+	default n
+
+config IMXRT_GPIO4_0_15_IRQ
+	bool "GPIO4 Pins 0-15 interrupts"
+	default n
+
+config IMXRT_GPIO4_16_31_IRQ
+	bool "GPIO4 Pins 16-31 interrupts"
+	default n
+
+config IMXRT_GPIO5_0_15_IRQ
+	bool "GPIO5 Pins 0-15 interrupts"
+	default n
+
+config IMXRT_GPIO5_16_31_IRQ
+	bool "GPIO5 Pins 16-31 interrupts"
+	default n
+
+config IMXRT_GPIO6_0_15_IRQ
+	bool "GPIO6 Pins 0-15 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO6_16_31_IRQ
+	bool "GPIO6 Pins 16-31 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO7_0_15_IRQ
+	bool "GPIO7 Pins 0-15 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO7_16_31_IRQ
+	bool "GPIO7 Pins 16-31 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO8_0_15_IRQ
+	bool "GPIO8 Pins 0-15 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO8_16_31_IRQ
+	bool "GPIO8 Pins 16-31 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO9_0_15_IRQ
+	bool "GPIO9 Pins 0-15 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+config IMXRT_GPIO9_16_31_IRQ
+	bool "GPIO9 Pins 16-31 interrupts"
+	default n
+	depends on IMXRT_HIGHSPEED_GPIO
+
+endif # IMXRT_GPIO_IRQ
+
+menu "Ethernet Configuration"
+	depends on IMXRT_ENET
+
+config MXRT_ENET_NRXBUFFERS
+	int "Number Rx buffers"
+	default 6
+
+config IMXRT_ENET_NTXBUFFERS
+	int "Number Tx buffers"
+	default 2
+
+config IMXRT_ENET_ENHANCEDBD
+	bool # not optional
+	default n
+
+config IMXRT_ENET_NETHIFS
+	int  # Not optional
+	default 1
+
+config IMXRT_ENET_PHYINIT
+	bool "Board-specific PHY Initialization"
+	default n
+	---help---
+		Some boards require specialized initialization of the PHY before it
+		can be used.  This may include such things as configuring GPIOs,
+		resetting the PHY, etc.  If CONFIG_IMXRT_ENET_PHYINIT is defined in
+		the configuration then the board specific logic must provide
+		imxrt_phy_boardinitialize();  The i.MXRT ENET driver will call this
+		function one time before it first uses the PHY.
+
+endmenu # IMXRT_ENET
+
+menu "Memory Configuration"
+
+config IMXRT_DTCM
+	int "FLEXRAM DTCM Size in K"
+	default 128
+	depends on ARMV7M_HAVE_DTCM
+
+config IMXRT_ITCM
+	int "FLEXRAM ITCM Size in K"
+	default 128
+	depends on ARMV7M_HAVE_ITCM
+
+config IMXRT_SEMC_SDRAM
+	bool "External SDRAM installed"
+	default n
+	depends on IMXRT_SEMC
+
+if IMXRT_SEMC_SDRAM
+
+config IMXRT_SDRAM_START
+	hex "SDRAM start address"
+	default 0x10000000
+
+config IMXRT_SDRAM_SIZE
+	int "SDRAM size (bytes)"
+	default 268435456
+
+endif # IMXRT_SEMC_SDRAM
+
+config IMXRT_SEMC_SRAM
+	bool "External SRAM installed"
+	default n
+	depends on IMXRT_SEMC
+
+if IMXRT_SEMC_SRAM
+
+config IMXRT_SRAM_START
+	hex "SRAM start address"
+	default 0x10000000
+
+config IMXRT_SRAM_SIZE
+	int "SRAM size (bytes)"
+	default 268435456
+
+endif # IMXRT_SRAM_SIZE
+
+config IMXRT_SEMC_NOR
+	bool "External NOR FLASH installed"
+	default n
+	depends on IMXRT_SEMC
+
+choice
+	prompt "i.MX RT Boot Configuration"
+	default IMXRT_BOOT_NOR if IMXRT_SEMC_NOR
+	default IMXRT_BOOT_SDRAM if IMXRT_SEMC_SDRAM && !IMXRT_SEMC_NOR
+	default IMXRT_BOOT_SRAM if IMXRT_SEMC_SRAM && !IMXRT_SEMC_SDRAM  && !IMXRT_SEMC_NOR
+	default IMXRT_BOOT_OCRAM if !IMXRT_SEMC_SRAM && !IMXRT_SEMC_SDRAM  && !IMXRT_SEMC_NOR
+	---help---
+		The startup code needs to know if the code is running from internal
+		OCRAM, external SDRAM, external NOR, or external SDRAM in order to
+		initialize properly.  Note that the boot device is not known for
+		cases where the code is copied into RAM by a bootloader.
+
+config IMXRT_BOOT_OCRAM
+	bool "Running from internal OCRAM"
+	select BOOT_RUNFROMISRAM
+
+config IMXRT_BOOT_SDRAM
+	bool "Running from external SDRAM"
+	select BOOT_RUNFROMSDRAM
+	depends on IMXRT_SEMC_SDRAM
+
+config IMXRT_BOOT_NOR
+	bool "Running from external NOR FLASH"
+	select BOOT_RUNFROMFLASH
+	depends on IMXRT_SEMC_NOR
+
+config IMXRT_BOOT_SRAM
+	bool "Running from external SRAM"
+	select BOOT_RUNFROMEXTSRAM
+	depends on IMXRT_SEMC_SRAM
+
+endchoice # i.MX RT Boot Configuration
+
+choice
+	prompt "i.MX RT Primary RAM"
+	default IMXRT_OCRAM_PRIMARY
+	---help---
+		The primary RAM is the RAM that contains the system BLOB's .data and
+		.bss.  The unused portion of the primary RAM will automatically be
+		added to the system heap.
+
+config IMXRT_OCRAM_PRIMARY
+	bool "Internal OCRAM primary"
+
+config IMXRT_SDRAM_PRIMARY
+	bool "External SDRAM primary"
+	depends on IMXRT_SEMC_SDRAM
+
+config IMXRT_SRAM_PRIMARY
+	bool "External SRAM primary"
+	depends on IMXRT_SEMC_SRAM
+
+endchoice # i.MX RT Primary RAM
+
+menu "i.MX RT Heap Configuration"
+
+config IMXRT_OCRAM_HEAP
+	bool "Add OCRAM to heap"
+	depends on !IMXRT_OCRAM_PRIMARY
+	---help---
+		Select to add the entire OCRAM to the heap
+
+config IMXRT_DTCM_HEAP
+	bool "Add DTCM to heap"
+	depends on IMXRT_DTCM > 0
+	---help---
+		Select to add the entire DTCM to the heap
+
+config IMXRT_BOOTLOADER_HEAP
+	bool "Add ROM bootloader 40Kib RAM to heap"
+	default false
+	depends on BOOT_RUNFROMISRAM
+	---help---
+		Select to add the memory used by the ROM bootloader to heap
+
+config IMXRT_SDRAM_HEAP
+	bool "Add SDRAM to heap"
+	depends on IMXRT_SEMC_SDRAM && !IMXRT_SDRAM_PRIMARY
+	---help---
+		Add a region of SDRAM to the heap.  A region of SDRAM will be added
+		to the heap that starts at (CONFIG_IMXRT_SDRAM_START +
+		CONFIG_IMXRT_SDRAM_HEAPOFFSET) and extends up to
+		(CONFIG_IMXRT_SDRAM_START + CONFIG_IMXRT_SDRAM_SIZE).  Note that the
+		START is the actual start of SDRAM but SIZE is not necessarily the
+		actual SIZE.
+
+config IMXRT_SDRAM_HEAPOFFSET
+	hex "SDRAM heap offset"
+	default 0x0
+	depends on IMXRT_SDRAM_HEAP
+	---help---
+		Used to reserve memory at the beginning of SDRAM for, as an example,
+		a framebuffer.
+
+config IMXRT_SRAM_HEAP
+	bool "Add SRAM to heap"
+	depends on IMXRT_SEMC_SRAM && !IMXRT_SRAM_PRIMARY
+	---help---
+		Add a region of SRAM to the heap.  A region of SDRAM will be added
+		to the heap that starts at (CONFIG_IMXRT_SRAM_START +
+		CONFIG_IMXRT_SRAM_HEAPOFFSET) and extends up to
+		(CONFIG_IMXRT_SRAM_START + CONFIG_IMXRT_SRAM_SIZE).  Note that the
+		START is the actual start of SRAM but SIZE is not necessarily the
+		actual SIZE.
+
+config IMXRT_SRAM_HEAPOFFSET
+	hex "SRAM heap offset"
+	default 0x0
+	depends on IMXRT_SRAM_HEAP
+	---help---
+		Used to reserve memory at the beginning of SRAM for, as an example,
+		a framebuffer.
+
+endmenu  # i.MX RT Heap Configuration
+endmenu # Memory Configuration
+
+menu "LPI2C Configuration"
+	depends on IMXRT_LPI2C
+
+config IMXRT_LPI2C_DYNTIMEO
+	bool "Use dynamic timeouts"
+	default n
+	depends on IMXRT_LPI2C
+
+config IMXRT_LPI2C_DYNTIMEO_USECPERBYTE
+	int "Timeout Microseconds per Byte"
+	default 500
+	depends on IMXRT_LPI2C_DYNTIMEO
+
+config IMXRT_LPI2C_DYNTIMEO_STARTSTOP
+	int "Timeout for Start/Stop (Milliseconds)"
+	default 1000
+	depends on IMXRT_LPI2C_DYNTIMEO
+
+config IMXRT_LPI2C_TIMEOSEC
+	int "Timeout seconds"
+	default 0
+	depends on IMXRT_LPI2C
+
+config IMXRT_LPI2C_TIMEOMS
+	int "Timeout Milliseconds"
+	default 500
+	depends on IMXRT_LPI2C && !IMXRT_LPI2C_DYNTIMEO
+
+config IMXRT_LPI2C_TIMEOTICKS
+	int "Timeout for Done and Stop (ticks)"
+	default 500
+	depends on IMXRT_LPI2C && !IMXRT_LPI2C_DYNTIMEO
+
+endmenu # LPI2C Configuration
+
+menu "USDHC Configuration"
+	depends on IMXRT_USDHC
+
+config IMXRT_USDHC_DMA
+	bool "Support DMA data transfers"
+	default y
+	select SDIO_DMA
+	---help---
+		Support DMA data transfers.
+		Enable SD card DMA data transfers.  This is marginally optional.
+		For most usages, SD accesses will cause data overruns if used without
+		DMA.
+
+choice
+	prompt "Bus width for USDHC1"
+	default IMXRT_USDHC1_WIDTH_D1_ONLY
+	depends on IMXRT_USDHC1
+
+config IMXRT_USDHC1_WIDTH_D1_ONLY
+	bool "One bit"
+
+config IMXRT_USDHC1_WIDTH_D1_D4
+	bool "Four bit"
+endchoice
+
+config IMXRT_USDHC1_INVERT_CD
+	bool "Invert the USDHC1 CD"
+	default n
+	depends on IMXRT_USDHC1
+	---help---
+		If the board defines PIN_USDHC1_CD the CD_B input to the USDHC it is
+		assumed to be active low. Selecting IMXRT_USDHC1_INVERT_CD will make it
+		active high.
+
+		If the board defines PIN_USDHC1_CD_GPIO it is assumed to be active low.
+		Selecting IMXRT_USDHC1_INVERT_CD will make it active high.
+
+choice
+	depends on IMXRT_USDHC2
+	prompt "Bus width for USDHC2"
+	default IMXRT_USDHC2_WIDTH_D1_D4
+
+config IMXRT_USDHC2_WIDTH_D1_ONLY
+	bool "One bit"
+
+config IMXRT_USDHC2_WIDTH_D1_D4
+	bool "Four bit"
+
+config IMXRT_USDHC2_WIDTH_D1_D8
+	bool "Eight bit"
+endchoice
+
+config IMXRT_USDHC2_INVERT_CD
+	bool "Invert the USDHC2 CD"
+	default n
+	depends on IMXRT_USDHC2
+	---help---
+		If the board defines PIN_USDHC2_CD the CD_B input to the USDHC it is
+		assumed to be active low. Selecting IMXRT_USDHC_INVERT_CD will make it
+		active high.
+
+		If the board defines PIN_USDHC2_CD_GPIO it is assumed to be active low.
+		Selecting IMXRT_USDHC2_INVERT_CD will make it active high.
+
+endmenu # USDHC Configuration
+
+menu "eDMA Configuration"
+	depends on IMXRT_EDMA
+
+config IMXRT_EDMA_NTCD
+	int "Number of transfer descriptors"
+	default 0
+	---help---
+		Number of pre-allocated transfer descriptors.  Needed for scatter-
+		gather DMA.  Make to be set to zero to disable in-memory TCDs in
+		which case only the TCD channel registers will be used and scatter-
+		will not be supported.
+
+config IMXRT_EDMA_ELINK
+	bool "Channeling Linking"
+	default n
+	---help---
+		This option enables optional minor or major loop channel linking:
+
+		Minor loop channel linking:  As the channel completes the minor
+		loop, this flag enables linking to another channel. The link target
+		channel initiates a channel service request via an internal
+		mechanism that sets the TCDn_CSR[START] bit of the specified
+		channel.
+
+		If minor loop channel linking is disabled, this link mechanism is
+		suppressed in favor of the major loop channel linking.
+
+		Major loop channel linking:  As the channel completes the minor
+		loop, this option enables the linking to another channel. The link
+		target channel initiates a channel service request via an internal
+		mechanism that sets the TCDn_CSR[START] bit of the linked channel.
+
+config IMXRT_EDMA_ERCA
+	bool "Round Robin Channel Arbitration"
+	default n
+	---help---
+		Normally, a fixed priority arbitration is used for channel
+		selection.  If this option is selected, round robin arbitration is
+		used for channel selection.
+
+config IMXRT_EDMA_HOE
+	bool "Halt On Error"
+	default y
+	---help---
+		Any error causes the HALT bit to set. Subsequently, all service
+		requests are ignored until the HALT bit is cleared.
+
+config IMXRT_EDMA_CLM
+	bool "Continuous Link Mode"
+	default n
+	---help---
+		By default, A minor loop channel link made to itself goes through
+		channel arbitration before being activated again.  If this option is
+		selected, a minor loop channel link made to itself does not go
+		through channel arbitration before being activated again. Upon minor
+		loop completion, the channel activates again if that channel has a
+		minor loop channel link enabled and the link channel is itself. This
+		effectively applies the minor loop offsets and restarts the next
+		minor loop.
+
+config IMXRT_EDMA_EMLIM
+	bool "Minor Loop Mapping"
+	default n
+	---help---
+		Normally TCD word 2 is a 32-bit NBYTES field.  When this option is
+		enabled, TCD word 2 is redefined to include individual enable fields,
+		an offset field, and the NBYTES field.  The individual enable fields
+		allow the minor loop offset to be applied to the source address, the
+		destination address, or both. The NBYTES field is reduced when either
+		offset is enabled.
+
+config IMXRT_EDMA_EDBG
+	bool "Enable Debug"
+	default n
+	---help---
+		When in debug mode, the DMA stalls the start of a new channel. Executing
+		channels are allowed to complete. Channel execution resumes when the
+		system exits debug mode or the EDBG bit is cleared
+
+endmenu # eDMA Global Configuration
+
+if PM
+
+config IMXRT_PM_SERIAL_ACTIVITY
+	int "PM serial activity"
+	default 10
+	---help---
+		PM activity reported to power management logic on every serial
+		interrupt.
+
+endif
+
+menu "RTC Configuration"
+	depends on IMXRT_SNVS_HPRTC
+
+config IMXRT_RTC_MAGIC_REG
+	int "RTC SNVS GPR"
+	default 0
+	range  0 3
+	---help---
+		The BKP register used to store/check the Magic value to determine if
+		RTC is already setup
+
+config IMXRT_RTC_MAGIC
+	hex "RTC Magic 1"
+	default 0xfacefeed
+	---help---
+		Value used as Magic to determine if the RTC is already setup
+
+endmenu
+
+menu "LCD Configuration"
+	depends on IMXRT_LCD
+
+config IMXRT_LCD_VIDEO_PLL_FREQ
+	int "Video PLL Frequency"
+	default 92000000
+	range 41500000 1300000000
+	---help---
+		Frequency of Video PLL.
+
+config IMXRT_LCD_VRAMBASE
+	hex "Video RAM base address"
+	default 0x80000000
+	---help---
+		Base address of the video RAM frame buffer.
+		Default: SDRAM
+
+config IMXRT_LCD_REFRESH_FREQ
+	int "LCD refesh rate (Hz)"
+	default 60
+	---help---
+		LCD refesh rate (Hz)
+
+config IMXRT_LCD_BACKLIGHT
+	bool "Enable backlight"
+	default y
+	---help---
+		Enable backlight support.  If IMXRT_LCD_BACKLIGHT is selected, then
+		the board-specific logic must provide this IMXRT_backlight()
+		interface so that the LCD driver can turn the backlight on and off
+		as necessary.  You should select this option and implement
+		IMXRT_backlight() if your board provides GPIO control over the
+		backlight.  This interface provides only ON/OFF control of the
+		backlight.  If you want finer control over the backlight level (for
+		example, using PWM), then this interface would need to be extended.
+
+choice
+	prompt "Input Bits per pixel"
+	default IMXRT_LCD_INPUT_BPP16
+
+config IMXRT_LCD_INPUT_BPP8_LUT
+	bool "8 BPP Color Map"
+	select FB_CMAP
+
+config IMXRT_LCD_INPUT_BPP8
+	bool "8 BPP RGB_332"
+
+config IMXRT_LCD_INPUT_BPP15
+	bool "16 BPP RGB_555"
+
+config IMXRT_LCD_INPUT_BPP16
+	bool "16 BPP RGB_565"
+
+config IMXRT_LCD_INPUT_BPP24
+	bool "24 BPP RGB_888"
+
+config IMXRT_LCD_INPUT_BPP32
+	bool "32 BPP RGB_0888"
+
+endchoice
+
+config IMXRT_LCD_BGR
+	bool "Blue-Green-Red color order"
+	default n
+	---help---
+		This option selects BGR color order vs. default RGB
+
+choice
+	prompt "Output Bus width"
+	default IMXRT_LCD_OUTPUT_16
+
+config IMXRT_LCD_OUTPUT_8
+	bool "8 Bit LCD Bus"
+
+config IMXRT_LCD_OUTPUT_16
+	bool "16 Bit LCD Bus"
+
+config IMXRT_LCD_OUTPUT_18
+	bool "18 Bit LCD Bus"
+
+config IMXRT_LCD_OUTPUT_24
+	bool "24 Bit LCD Bus"
+
+endchoice
+
+config IMXRT_LCD_BACKCOLOR
+	hex "Initial background color"
+	default 0x0
+	---help---
+		Initial background color
+
+config IMXRT_LCD_HWIDTH
+	int "Display width (pixels)"
+	default 480
+	---help---
+		Horizontal width the display in pixels
+
+config IMXRT_LCD_HPULSE
+	int "Horizontal pulse"
+	default 41
+
+config IMXRT_LCD_HFRONTPORCH
+	int "Horizontal front porch"
+	default 4
+
+config IMXRT_LCD_HBACKPORCH
+	int "Horizontal back porch"
+	default 8
+
+config IMXRT_LCD_VHEIGHT
+	int "Display height (rows)"
+	default 272
+	---help---
+		Vertical height of the display in rows
+
+config IMXRT_LCD_VPULSE
+	int "Vertical pulse"
+	default 10
+
+config IMXRT_LCD_VFRONTPORCH
+	int "Vertical front porch"
+	default 4
+
+config IMXRT_LCD_VBACKPORCH
+	int "Vertical back porch"
+	default 2
+
+config IMXRT_VSYNC_ACTIVE_HIGH
+	bool "V-sync active high"
+	default n
+
+config IMXRT_HSYNC_ACTIVE_HIGH
+	bool "H-sync active high"
+	default n
+
+config IMXRT_DATAEN_ACTIVE_HIGH
+	bool "Data enable active high"
+	default y
+
+config IMXRT_DATA_RISING_EDGE
+	bool "Data clock rising edge"
+	default y
+
+endmenu # LCD Configuration
+
+if IMXRT_USBOTG && USBHOST
+
+menu "USB host controller driver (HCD) options"
+
+config IMXRT_EHCI_NQHS
+	int "Number of Queue Head (QH) structures"
+	default 4
+	---help---
+		Configurable number of Queue Head (QH) structures.  The default is
+		one per Root hub port plus one for EP0 (4).
+
+config IMXRT_EHCI_NQTDS
+	int "Number of Queue Element Transfer Descriptor (qTDs)"
+	default 6
+	---help---
+		Configurable number of Queue Element Transfer Descriptor (qTDs).
+		The default is one per root hub plus three from EP0 (6).
+
+config IMXRT_EHCI_BUFSIZE
+	int "Size of one request/descriptor buffer"
+	default 128
+	---help---
+		The size of one request/descriptor buffer in bytes.  The TD buffe
+		size must be an even number of 32-bit words and must be large enough
+		to hangle the largest transfer via a SETUP request.
+
+config IMXRT_EHCI_PREALLOCATE
+	bool "Preallocate descriptor pool"
+	default y
+	---help---
+		Select this option to pre-allocate EHCI queue and descriptor
+		structure pools in .bss.  Otherwise, these pools will be
+		dynamically allocated using kmm_memalign().
+
+endmenu # USB host controller driver (HCD) options
+endif # IMXRT_USBOTG && USBHOST
+
+if IMXRT_USBDEV
+
+menu "USB device controller driver (DCD) options"
+
+config IMXRT_USBDEV_NOVBUS
+    bool "No USB VBUS sensing"
+    default n
+
+config IMXRT_USBDEV_FRAME_INTERRUPT
+    bool "USB frame interrupt"
+    default n
+    ---help---
+        Handle USB Start-Of-Frame events.  Enable reading SOF from interrupt
+        handler vs. simply reading on demand. Probably a bad idea... Unless
+        there is some issue with sampling the SOF from hardware asynchronously.
+
+config IMXRT_USBDEV_REGDEBUG
+    bool "Register level debug"
+    depends on DEBUG_USB_INFO
+    default n
+    ---help---
+        Output detailed register-level USB device debug information.  Requires
+        also CONFIG_DEBUG_USB_INFO.
+
+endmenu # USB device controller driver (DCD) options
+endif # IMXRT_USBDEV
+
+endif # ARCH_CHIP_IMXRT
+

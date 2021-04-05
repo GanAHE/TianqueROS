@@ -1,0 +1,601 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if ARCH_CHIP_S32K1XX
+
+# Chip Selection
+
+choice
+	prompt "S32K1XX Chip Selection"
+	default ARCH_CHIP_S32K146
+
+config ARCH_CHIP_S32K116
+	bool "S32K116"
+	select ARCH_CHIP_S32K11X
+	---help---
+		Cortex-M0+, 128Kb FLASH, 17Kb RAM incl. 2Kb FlexRAM
+
+config ARCH_CHIP_S32K118
+	bool "S32K118"
+	select ARCH_CHIP_S32K11X
+	select S32K1XX_HAVE_LPSPI1
+	---help---
+		Cortex-M0+, 256Kb FLASH, 25Kb RAM incl. 2Kb FlexRAM
+
+config ARCH_CHIP_S32K142
+	bool "S32K142"
+	select ARCH_CHIP_S32K14X
+	select S32K1XX_HAVE_FLEXCAN1
+	---help---
+		Cortex-M4F, 256Kb FLASH, 32Kb RAM incl. 4Kb FlexRAM
+
+config ARCH_CHIP_S32K144
+	bool "S32K144"
+	select ARCH_CHIP_S32K14X
+	select S32K1XX_HAVE_LPSPI2
+	select S32K1XX_HAVE_FLEXCAN1
+	select S32K1XX_HAVE_FLEXCAN2
+	---help---
+		Cortex-M4F, 512Kb FLASH, 64Kb RAM incl. 4Kb FlexRAM
+
+config ARCH_CHIP_S32K146
+	bool "S32K146"
+	select ARCH_CHIP_S32K14X
+	select S32K1XX_HAVE_LPSPI2
+	select S32K1XX_HAVE_FLEXCAN1
+	select S32K1XX_HAVE_FLEXCAN2
+	---help---
+		Cortex-M4F, 1Mb FLASH, 128Kb RAM incl. 4Kb FlexRAM
+
+config ARCH_CHIP_S32K148
+	bool "S32K148"
+	select ARCH_CHIP_S32K14X
+	select S32K1XX_HAVE_ENET
+	select S32K1XX_HAVE_LPI2C1
+	select S32K1XX_HAVE_LPSPI2
+	select S32K1XX_HAVE_SAI
+	select S32K1XX_HAVE_FLEXCAN1
+	select S32K1XX_HAVE_FLEXCAN2
+	---help---
+		Cortex-M4F, 2Mb FLASH, 256Kb RAM incl. 4Kb FlexRAM
+
+endchoice # S32K1XX Chip Selection
+
+# Chip Family
+
+config ARCH_CHIP_S32K11X
+	bool
+	select ARCH_CORTEXM0
+	select S32K1XX_HAVE_FIRC_CMU
+
+config ARCH_CHIP_S32K14X
+	bool
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_FETCHADD
+	select S32K1XX_HAVE_EWM
+	select S32K1XX_HAVE_SPLL
+	select S32K1XX_HAVE_HSRUN
+	select S32K1XX_HAVE_LMEM
+	select S32K1XX_HAVE_LPSPI1
+
+# Chip Capabilities
+
+config S32K1XX_HAVE_ENET
+	bool
+	default n
+	select ARCH_HAVE_PHY
+	select ARCH_PHY_INTERRUPT
+	select ARCH_HAVE_NETDEV_STATISTICS
+
+config S32K1XX_HAVE_EWM
+	bool
+	default n
+
+config S32K1XX_HAVE_FIRC_CMU
+	bool
+	default n
+
+config S32K1XX_HAVE_HSRUN
+	bool
+	default n
+
+config S32K1XX_HAVE_LMEM
+	bool
+	default n
+
+config S32K1XX_HAVE_LPI2C1
+	bool
+	default n
+
+config S32K1XX_HAVE_LPSPI1
+	bool
+	default n
+
+config S32K1XX_HAVE_LPSPI2
+	bool
+	default n
+	
+config S32K1XX_HAVE_FLEXCAN1
+	bool
+	default n
+	
+config S32K1XX_HAVE_FLEXCAN2
+	bool
+	default n
+
+config S32K1XX_HAVE_QSPI
+	bool
+	default n
+
+config S32K1XX_HAVE_SAI
+	bool
+	default n
+
+config S32K1XX_HAVE_SPLL
+	bool
+	default n
+
+# Peripheral Group Selections
+
+config S32K1XX_LPUART
+	bool
+	default n
+
+config S32K1XX_LPI2C
+	bool
+	default n
+
+config S32K1XX_LPSPI
+	bool
+	default n
+
+config S32K1XX_FLEXCAN
+	bool
+	select NET_CAN_HAVE_CANFD
+	default n
+	
+# Peripheral Selection
+
+menu "S32K1XX Peripheral Selection"
+
+config S32K1XX_EDMA
+	bool "eDMA"
+	default n
+
+config S32K1XX_ENET
+	bool "Ethernet"
+	default n
+	depends on S32K1XX_HAVE_ENET
+
+config S32K1XX_FLEXCAN0
+	bool "FLEXCAN0"
+	select S32K1XX_FLEXCAN
+	select NET_CAN_HAVE_TX_DEADLINE
+	default n
+	
+config S32K1XX_FLEXCAN1
+	bool "FLEXCAN1"
+	select S32K1XX_FLEXCAN
+	select NET_CAN_HAVE_TX_DEADLINE
+	default n
+	depends on S32K1XX_HAVE_FLEXCAN1
+	
+config S32K1XX_FLEXCAN2
+	bool "FLEXCAN2"
+	select S32K1XX_FLEXCAN
+	select NET_CAN_HAVE_TX_DEADLINE
+	default n
+	depends on S32K1XX_HAVE_FLEXCAN2
+
+menuconfig S32K1XX_LPI2C0
+	bool "LPI2C0"
+	default n
+	select S32K1XX_LPI2C
+
+menuconfig S32K1XX_LPI2C1
+	bool "LPI2C1"
+	default n
+	select S32K1XX_LPI2C
+	depends on S32K1XX_HAVE_LPI2C1
+
+config S32K1XX_LPSPI0
+	bool "LPSPI0"
+	default n
+	select S32K1XX_LPSPI
+	select SPI
+
+config S32K1XX_LPSPI1
+	bool "LPSPI1"
+	default n
+	select S32K1XX_LPSPI
+	select SPI
+	depends on S32K1XX_HAVE_LPSPI1
+
+config S32K1XX_LPSPI2
+	bool "LPSPI2"
+	default n
+	select S32K1XX_LPSPI
+	select SPI
+	depends on S32K1XX_HAVE_LPSPI2
+
+config S32K1XX_LPUART0
+	bool "LPUART0"
+	default n
+	select S32K1XX_LPUART
+	select LPUART0_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+
+config S32K1XX_LPUART1
+	bool "LPUART1"
+	default n
+	select S32K1XX_LPUART
+	select LPUART1_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+
+config S32K1XX_LPUART2
+	bool "LPUART2"
+	default n
+	select S32K1XX_LPUART
+	select LPUART2_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+
+config S32K1XX_RTC
+	bool "RTC"
+	default n
+
+
+endmenu # S32K1XX Peripheral Selection
+
+config S32K1XX_WDT_DISABLE
+	bool "Disable watchdog on reset"
+	default y
+
+menu "S32K1xx GPIO Interrupt Configuration"
+
+config S32K1XX_GPIOIRQ
+	bool "GPIO pin interrupts"
+	---help---
+		Enable support for interrupting GPIO pins
+
+if S32K1XX_GPIOIRQ
+
+config S32K1XX_PORTAINTS
+	bool "GPIOA interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port A pins
+
+config S32K1XX_PORTBINTS
+	bool "GPIOB interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port B pins
+
+config S32K1XX_PORTCINTS
+	bool "GPIOC interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port C pins
+
+config S32K1XX_PORTDINTS
+	bool "GPIOD interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port D pins
+
+config S32K1XX_PORTEINTS
+	bool "GPIOE interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port E pins
+
+endif
+endmenu # S32K1xx GPIO Interrupt Configuration
+
+menu "S32K1xx FLASH Configuration"
+comment "CAREFUL: Bad selections may lock up your board"
+
+config S32K1XX_FLASHCFG_BACKDOOR1
+	hex "Backdoor comparison key 1"
+	default 0xffffffff
+	---help---
+		Refer to the S32K1xx reference manual for a description of the
+		backdoor key.  This option selects the first 32-bit word in
+		memory.
+
+config S32K1XX_FLASHCFG_BACKDOOR2
+	hex "Backdoor comparison key 2"
+	default 0xffffffff
+	---help---
+		Refer to the S32K1xx reference manual for a description of the
+		backdoor key.  This option selects the second 32-bit word in
+		memory
+
+config S32K1XX_FLASHCFG_FPROT
+	hex "Program flash protection bytes"
+	default 0xffffffff
+	---help---
+		Refer to the S32K1xx reference manual or to hardware/s32k1xx_flashcfg.h
+		for a description of the FPROT bitfields.
+
+config S32K1XX_FLASHCFG_FSEC
+	hex "Flash security byte"
+	default 0xfe
+	---help---
+		Refer to the S32K1xx reference manual or to hardware/s32k1xx_flashcfg.h
+		for a description of the FSEC bitfields.
+
+config S32K1XX_FLASHCFG_FOPT
+	hex "Flash nonvolatile option byte"
+	default 0x7f
+	---help---
+		Refer to the S32K1xx reference manual or to hardware/s32k1xx_flashcfg.h
+		for a description of the FOPT bitfields.
+
+config S32K1XX_FLASHCFG_FEPROT
+	hex "EEPROM protection byte"
+	default 0xff
+	---help---
+		Refer to the S32K1xx reference manual or to hardware/s32k1xx_flashcfg.h
+		for a description of the FEPROT bitfields.
+
+config S32K1XX_FLASHCFG_FDPROT
+	hex "Data flash protection byte"
+	default 0xff
+	---help---
+		Refer to the S32K1xx reference manual or to hardware/s32k1xx_flashcfg.h
+		for a description of the FDPROT bitfields.
+
+endmenu # S32K1xx FLASH Configuration
+
+menu "eDMA Configuration"
+	depends on S32K1XX_EDMA
+
+config S32K1XX_EDMA_NTCD
+	int "Number of transfer descriptors"
+	default 0
+	---help---
+		Number of pre-allocated transfer descriptors.  Needed for scatter-
+		gather DMA.  Make to be set to zero to disable in-memory TCDs in
+		which case only the TCD channel registers will be used and scatter-
+		will not be supported.
+
+config S32K1XX_EDMA_ELINK
+	bool "Channeling Linking"
+	default n
+	---help---
+		This option enables optional minor or major loop channel linking:
+
+		Minor loop channel linking:  As the channel completes the minor
+		loop, this flag enables linking to another channel. The link target
+		channel initiates a channel service request via an internal
+		mechanism that sets the TCDn_CSR[START] bit of the specified
+		channel.
+
+		If minor loop channel linking is disabled, this link mechanism is
+		suppressed in favor of the major loop channel linking.
+
+		Major loop channel linking:  As the channel completes the minor
+		loop, this option enables the linking to another channel. The link
+		target channel initiates a channel service request via an internal
+		mechanism that sets the TCDn_CSR[START] bit of the linked channel.
+
+config S32K1XX_EDMA_ERCA
+	bool "Round Robin Channel Arbitration"
+	default n
+	---help---
+		Normally, a fixed priority arbitration is used for channel
+		selection.  If this option is selected, round robin arbitration is
+		used for channel selection.
+
+config S32K1XX_EDMA_HOE
+	bool "Halt On Error"
+	default y
+	---help---
+		Any error causes the HALT bit to set. Subsequently, all service
+		requests are ignored until the HALT bit is cleared.
+
+config S32K1XX_EDMA_CLM
+	bool "Continuous Link Mode"
+	default n
+	---help---
+		By default, A minor loop channel link made to itself goes through
+		channel arbitration before being activated again.  If this option is
+		selected, a minor loop channel link made to itself does not go
+		through channel arbitration before being activated again. Upon minor
+		loop completion, the channel activates again if that channel has a
+		minor loop channel link enabled and the link channel is itself. This
+		effectively applies the minor loop offsets and restarts the next
+		minor loop.
+
+config S32K1XX_EDMA_EMLIM
+	bool "Minor Loop Mapping"
+	default n
+	---help---
+		Normally TCD word 2 is a 32-bit NBYTES field.  When this option is
+		enabled, TCD word 2 is redefined to include individual enable fields,
+		an offset field, and the NBYTES field.  The individual enable fields
+		allow the minor loop offset to be applied to the source address, the
+		destination address, or both. The NBYTES field is reduced when either
+		offset is enabled.
+
+config S32K1XX_EDMA_EDBG
+	bool "Enable Debug"
+	default n
+	---help---
+		When in debug mode, the DMA stalls the start of a new channel. Executing
+		channels are allowed to complete. Channel execution resumes when the
+		system exits debug mode or the EDBG bit is cleared
+
+endmenu # eDMA Global Configuration
+
+menu "LPI2C0 Configuration"
+	depends on S32K1XX_LPI2C0
+
+config LPI2C0_BUSYIDLE
+	int "Bus idle timeout period in clock cycles"
+	default 0
+
+config LPI2C0_FILTSCL
+	int "I2C master digital glitch filters for SCL input in clock cycles"
+	default 0
+
+config LPI2C0_FILTSDA
+	int "I2C master digital glitch filters for SDA input in clock cycles"
+	default 0
+
+endmenu # LPI2C0 Configuration
+
+menu "LPI2C1 Configuration"
+	depends on S32K1XX_LPI2C1
+
+config LPI2C1_BUSYIDLE
+	int "Bus idle timeout period in clock cycles"
+	default 0
+
+config LPI2C1_FILTSCL
+	int "I2C master digital glitch filters for SCL input in clock cycles"
+	default 0
+
+config LPI2C1_FILTSDA
+	int "I2C master digital glitch filters for SDA input in clock cycles"
+	default 0
+
+endmenu # LPI2C1 Configuration
+
+menu "Ethernet Configuration"
+	depends on S32K1XX_ENET
+
+config MXRT_ENET_NRXBUFFERS
+	int "Number Rx buffers"
+	default 6
+
+config S32K1XX_ENET_NTXBUFFERS
+	int "Number Tx buffers"
+	default 2
+
+config S32K1XX_ENET_ENHANCEDBD
+	bool # not optional
+	default n
+
+config S32K1XX_ENET_NETHIFS
+	int  # Not optional
+	default 1
+
+config S32K1XX_ENET_PHYINIT
+	bool "Board-specific PHY Initialization"
+	default n
+	---help---
+		Some boards require specialized initialization of the PHY before it
+		can be used.  This may include such things as configuring GPIOs,
+		resetting the PHY, etc.  If CONFIG_S32K1XX_ENET_PHYINIT is defined in
+		the configuration then the board specific logic must provide
+		imxrt_phy_boardinitialize();  The i.MXRT ENET driver will call this
+		function one time before it first uses the PHY.
+
+endmenu # S32K1XX_ENET
+
+menu "FLEXCAN0 Configuration"
+	depends on S32K1XX_FLEXCAN0
+
+config FLEXCAN0_BITRATE
+	int "CAN bitrate"
+	depends on !NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN0_SAMPLEP
+	int "CAN sample point"
+	depends on !NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN0_ARBI_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN0_ARBI_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN0_DATA_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 4000000
+	
+config FLEXCAN0_DATA_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 90
+	
+endmenu # S32K1XX_FLEXCAN0
+
+menu "FLEXCAN1 Configuration"
+	depends on S32K1XX_FLEXCAN1
+
+config FLEXCAN1_BITRATE
+	int "CAN bitrate"
+	depends on !NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN1_SAMPLEP
+	int "CAN sample point"
+	depends on !NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN1_ARBI_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN1_ARBI_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN1_DATA_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 4000000
+	
+config FLEXCAN1_DATA_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 90
+	
+endmenu # S32K1XX_FLEXCAN1
+
+menu "FLEXCAN2 Configuration"
+	depends on S32K1XX_FLEXCAN2
+
+config FLEXCAN2_BITRATE
+	int "CAN bitrate"
+	depends on !NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN2_SAMPLEP
+	int "CAN sample point"
+	depends on !NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN2_ARBI_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN2_ARBI_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN2_DATA_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 4000000
+	
+config FLEXCAN2_DATA_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 90
+	
+endmenu # S32K1XX_FLEXCAN0
+
+endif # ARCH_CHIP_S32K1XX

@@ -1,0 +1,1127 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+comment "LPC54xx Configuration Options"
+
+choice
+	prompt "LPC54XX Chip Selection"
+	default ARCH_CHIP_LPC54628
+	depends on ARCH_CHIP_LPC54XX
+
+config ARCH_CHIP_LPC54628
+	bool "LPC54628"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_HSUSB
+	select ARCH_LPC54_HAVE_ETHERNET
+	select ARCH_LPC54_HAVE_CAN20
+	select ARCH_LPC54_HAVE_CANFD
+	select ARCH_LPC54_HAVE_LCD
+	select ARCH_LPC54_HAVE_SHA
+
+config ARCH_CHIP_LPC54618
+	bool "LPC54618"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_HSUSB
+	select ARCH_LPC54_HAVE_ETHERNET
+	select ARCH_LPC54_HAVE_CAN20
+	select ARCH_LPC54_HAVE_CANFD
+	select ARCH_LPC54_HAVE_LCD
+
+config ARCH_CHIP_LPC54616
+	bool "LPC54616"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_HSUSB
+	select ARCH_LPC54_HAVE_ETHERNET
+	select ARCH_LPC54_HAVE_CAN20
+	select ARCH_LPC54_HAVE_CANFD
+
+config ARCH_CHIP_LPC54608
+	bool "LPC54608"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_ETHERNET
+	select ARCH_LPC54_HAVE_CAN20
+	select ARCH_LPC54_HAVE_LCD
+
+config ARCH_CHIP_LPC54607
+	bool "LPC54607"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_HSUSB
+	select ARCH_LPC54_HAVE_ETHERNET
+
+config ARCH_CHIP_LPC54606
+	bool "LPC54606"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_HSUSB
+	select ARCH_LPC54_HAVE_ETHERNET
+	select ARCH_LPC54_HAVE_CAN20
+
+config ARCH_CHIP_LPC54605
+	bool "LPC54605"
+	select ARCH_FAMILY_LPC546XX
+	select ARCH_LPC54_HAVE_FSUSB
+	select ARCH_LPC54_HAVE_HSUSB
+
+endchoice # LPC54XX Chip Selection
+
+# LPC54xx Families
+
+config ARCH_FAMILY_LPC546XX
+	bool
+	default n
+
+# Peripheral support
+
+config ARCH_LPC54_HAVE_FSUSB
+	bool
+	default n
+
+config ARCH_LPC54_HAVE_HSUSB
+	bool
+	default n
+
+config ARCH_LPC54_HAVE_ETHERNET
+	bool
+	default n
+
+config ARCH_LPC54_HAVE_CAN20
+	bool
+	default n
+
+config ARCH_LPC54_HAVE_CANFD
+	bool
+	default n
+
+config ARCH_LPC54_HAVE_LCD
+	bool
+	default n
+
+config ARCH_LPC54_HAVE_SHA
+	bool
+	default n
+
+# Peripheral Selection
+
+config LPC54_HAVE_I2C_MASTER
+	bool
+	default n
+
+config LPC54_HAVE_FLEXCOMM
+	bool
+	default n
+
+config LPC54_FLEXCOMM0
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM1
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM2
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM3
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM4
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM5
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM6
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM7
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM8
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_FLEXCOMM9
+	bool
+	default n
+	select LPC54_HAVE_FLEXCOMM
+
+config LPC54_HAVE_SPI_MASTER
+	bool
+	default n
+
+config LPC54_HAVE_USART
+	bool
+	default n
+
+menu "LPC54xx Peripheral Selection"
+
+config LPC54_DMA
+	bool "DMA"
+	default n
+	select ARCH_DMA
+	depends on EXPERIMENTAL
+
+menu "Flexcomm Peripherals"
+
+config LPC54_I2C0_MASTER
+	bool "I2C0 Master"
+	default n
+	select LPC54_FLEXCOMM0
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C1_MASTER
+	bool "I2C1 Master"
+	default n
+	select LPC54_FLEXCOMM1
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C2_MASTER
+	bool "I2C2 Master"
+	default n
+	select LPC54_FLEXCOMM2
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C3_MASTER
+	bool "I2C3 Master"
+	default n
+	select LPC54_FLEXCOMM3
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C4_MASTER
+	bool "I2C4 Master"
+	default n
+	select LPC54_FLEXCOMM4
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C5_MASTER
+	bool "I2C5 Master"
+	default n
+	select LPC54_FLEXCOMM5
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C6_MASTER
+	bool "I2C6 Master"
+	default n
+	select LPC54_FLEXCOMM6
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C7_MASTER
+	bool "I2C7 Master"
+	default n
+	select LPC54_FLEXCOMM7
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C8_MASTER
+	bool "I2C8 Master"
+	default n
+	select LPC54_FLEXCOMM8
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_I2C9_MASTER
+	bool "I2C9 Master"
+	default n
+	select LPC54_FLEXCOMM9
+	select LPC54_HAVE_I2C_MASTER
+
+config LPC54_SPI0_MASTER
+	bool "SPI0 Master"
+	default n
+	depends on !LPC54_I2C0_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM0
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI1_MASTER
+	bool "SPI1 Master"
+	default n
+	depends on !LPC54_I2C1_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM1
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI2_MASTER
+	bool "SPI2 Master"
+	default n
+	depends on !LPC54_I2C2_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM2
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI3_MASTER
+	bool "SPI3 Master"
+	default n
+	depends on !LPC54_I2C3_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM3
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI4_MASTER
+	bool "SPI4 Master"
+	default n
+	depends on !LPC54_I2C4_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM4
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI5_MASTER
+	bool "SPI5 Master"
+	default n
+	depends on !LPC54_I2C5_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM5
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI6_MASTER
+	bool "SPI6 Master"
+	default n
+	depends on !LPC54_I2C6_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM6
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI7_MASTER
+	bool "SPI7 Master"
+	default n
+	depends on !LPC54_I2C7_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM7
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI8_MASTER
+	bool "SPI8 Master"
+	default n
+	depends on !LPC54_I2C8_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM8
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI9_MASTER
+	bool "SPI9 Master"
+	default n
+	depends on !LPC54_I2C9_MASTER && EXPERIMENTAL
+	select LPC54_FLEXCOMM9
+	select LPC54_HAVE_SPI_MASTER
+
+config LPC54_USART0
+	bool "USART0"
+	default n
+	depends on !LPC54_I2C0_MASTER && !LPC54_SPI0_MASTER
+	select LPC54_FLEXCOMM0
+	select USART0_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART1
+	bool "USART1"
+	default n
+	depends on !LPC54_I2C1_MASTER && !LPC54_SPI1_MASTER
+	select LPC54_FLEXCOMM1
+	select USART1_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART2
+	bool "USART2"
+	default n
+	depends on !LPC54_I2C2_MASTER && !LPC54_SPI2_MASTER
+	select LPC54_FLEXCOMM2
+	select USART2_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART3
+	bool "USART3"
+	default n
+	depends on !LPC54_I2C3_MASTER && !LPC54_SPI3_MASTER
+	select LPC54_FLEXCOMM3
+	select USART3_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART4
+	bool "USART4"
+	default n
+	depends on !LPC54_I2C4_MASTER && !LPC54_SPI4_MASTER
+	select LPC54_FLEXCOMM4
+	select USART4_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART5
+	bool "USART5"
+	default n
+	depends on !LPC54_I2C5_MASTER && !LPC54_SPI5_MASTER
+	select LPC54_FLEXCOMM5
+	select USART5_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART6
+	bool "USART6"
+	default n
+	depends on !LPC54_I2C6_MASTER && !LPC54_SPI6_MASTER
+	select LPC54_FLEXCOMM6
+	select USART6_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART7
+	bool "USART7"
+	default n
+	depends on !LPC54_I2C7_MASTER && !LPC54_SPI7_MASTER
+	select LPC54_FLEXCOMM7
+	select USART7_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART8
+	bool "USART8"
+	default n
+	depends on !LPC54_I2C8_MASTER && !LPC54_SPI8_MASTER
+	select LPC54_FLEXCOMM8
+	select USART8_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+config LPC54_USART9
+	bool "USART9"
+	default n
+	depends on !LPC54_I2C9_MASTER && !LPC54_SPI9_MASTER
+	select LPC54_FLEXCOMM9
+	select USART9_SERIALDRIVER
+	select LPC54_HAVE_USART
+
+endmenu # Flexcomm Peripherals
+
+config LPC54_EMC
+	bool "External Memory Controller (EMC)"
+	default n
+
+config LPC54_OHCI
+	bool "USB0 OHCI"
+	select USBHOST
+	select USBHOST_HAVE_ASYNCH
+	default n
+
+config LPC54_ETHERNET
+	bool "Ethernet"
+	default n
+	select NETDEVICES
+	select ARCH_HAVE_PHY
+
+config LPC54_LCD
+	bool "LCD controller"
+	default n
+	depends on ARCH_LPC54_HAVE_LCD
+
+config LPC54_RNG
+	bool "Random Number Generator (RNG)"
+	default n
+	select ARCH_HAVE_RNG
+
+config LPC54_RTC
+	bool "Real Time Clock (RTC)"
+	default n
+	select RTC
+
+config LPC54_SDMMC
+	bool "SD/MMC"
+	default n
+	select ARCH_HAVE_SDIO
+	select SDIO_BLOCKSETUP
+	depends on EXPERIMENTAL
+
+config LPC54_WWDT
+	bool "Windowing Watchdog Timer (WWDT)"
+	default n
+	depends on EXPERIMENTAL
+
+endmenu # LPC54xx Peripheral Selection
+
+menu "GPIO Interrupt Configuration"
+
+config LPC54_GPIOIRQ
+	bool "Support GPIO Interrupts"
+	default n
+
+config LPC54_GPIOIRQ_GROUPS
+	bool "Support GPIO Interrupt groups"
+	default n
+	depends on LPC54_GPIOIRQ && EXPERIMENTAL
+
+endmenu # GPIO Interrupt Configuration
+
+menu "EMC Configuration"
+depends on LPC54_EMC
+
+config LPC54_EMC_STATIC
+	bool "EMC static memory support"
+	default n
+
+if LPC54_EMC_STATIC
+
+config LPC54_EMC_STATIC_CS0
+	bool "SRAM on CS0"
+	default n
+
+if LPC54_EMC_STATIC_CS0
+
+config LPC54_EMC_STATIC_CS0_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SRAM for other
+		usage.
+
+config LPC54_EMC_STATIC_CS0_SIZE
+	hex "SRAM size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SRAM form other purpose, or
+		it may be the full SRAM size to add the entire SRAM to the heap
+
+endif # LPC54_EMC_STATIC_CS0
+
+config LPC54_EMC_STATIC_CS1
+	bool "SRAM on CS1"
+	default n
+
+if LPC54_EMC_STATIC_CS1
+
+config LPC54_EMC_STATIC_CS1_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SRAM for other
+		usage.
+
+config LPC54_EMC_STATIC_CS1_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SRAM form other purpose, or
+		it may be the full SRAM size to add the entire SRAM to the heap
+
+endif # LPC54_EMC_STATIC_CS1
+
+config LPC54_EMC_STATIC_CS2
+	bool "SRAM on CS2"
+	default n
+
+if LPC54_EMC_STATIC_CS2
+
+config LPC54_EMC_STATIC_CS2_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SRAM for other
+		usage.
+
+config LPC54_EMC_STATIC_CS2_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SRAM form other purpose, or
+		it may be the full SRAM size to add the entire SRAM to the heap
+
+endif # LPC54_EMC_STATIC_CS2
+
+config LPC54_EMC_STATIC_CS3
+	bool "SRAM on CS3"
+	default n
+
+if LPC54_EMC_STATIC_CS3
+
+config LPC54_EMC_STATIC_CS3_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SRAM for other
+		usage.
+
+config LPC54_EMC_STATIC_CS3_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SRAM form other purpose, or
+		it may be the full SRAM size to add the entire SRAM to the heap
+
+endif # LPC54_EMC_STATIC_CS3
+endif # LPC54_EMC_STATIC
+
+config LPC54_EMC_DYNAMIC
+	bool "EMC dynamic memory support"
+	default y
+
+if LPC54_EMC_DYNAMIC
+
+config LPC54_EMC_DYNAMIC_CS0
+	bool "SDRAM on CS0"
+	default n
+
+if LPC54_EMC_DYNAMIC_CS0
+
+config LPC54_EMC_DYNAMIC_CS0_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SDRAM for other
+		usage.
+
+config LPC54_EMC_DYNAMIC_CS0_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SDRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SDRAM form other purpose, or
+		it may be the full SDRAM size to add the entire SDRAM to the heap
+
+endif # LPC54_EMC_DYNAMIC_CS0
+
+config LPC54_EMC_DYNAMIC_CS1
+	bool "SDRAM on CS1"
+	default n
+
+if LPC54_EMC_DYNAMIC_CS1
+
+config LPC54_EMC_DYNAMIC_CS1_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SDRAM for other
+		usage.
+
+config LPC54_EMC_DYNAMIC_CS1_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SDRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SDRAM form other purpose, or
+		it may be the full SDRAM size to add the entire SDRAM to the heap
+
+endif # LPC54_EMC_DYNAMIC_CS1
+
+config LPC54_EMC_DYNAMIC_CS2
+	bool "SDRAM on CS2"
+	default n
+
+if LPC54_EMC_DYNAMIC_CS2
+
+config LPC54_EMC_DYNAMIC_CS2_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SDRAM for other
+		usage.
+
+config LPC54_EMC_DYNAMIC_CS2_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SDRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SDRAM form other purpose, or
+		it may be the full SDRAM size to add the entire SDRAM to the heap
+
+endif # LPC54_EMC_DYNAMIC_CS2
+
+config LPC54_EMC_DYNAMIC_CS3
+	bool "SDRAM on CS3"
+	default n
+
+if LPC54_EMC_DYNAMIC_CS3
+
+config LPC54_EMC_DYNAMIC_CS3_OFFSET
+	hex "Heap offset"
+	default 0x0
+	---help---
+		May be used to reserve memory at the beginning of SDRAM for other
+		usage.
+
+config LPC54_EMC_DYNAMIC_CS3_SIZE
+	hex "Heap size"
+	default 0x0
+	---help---
+		Total amount of RAM (after the heap offset) that will be added to
+		the heap.  The may be zero, in which case none of the SDRAM will be
+		added to heap, it may be less than the size of heap if memory of
+		reserved at the beginning or end of the SDRAM form other purpose, or
+		it may be the full SDRAM size to add the entire SDRAM to the heap
+
+endif # LPC54_EMC_DYNAMIC_CS3
+endif # LPC54_EMC_DYNAMIC
+
+endmenu # EMC Configuration
+
+menu "SPI Master configuration"
+	depends on LPC54_HAVE_SPI_MASTER
+
+config LPC54_SPI_WIDEDATA
+	bool "Enable wide data"
+	default n
+	---help---
+		The LPC54xxx SPI supports data widths from 4 through 16 bits.  For
+		data from 4 through 8 bits; the receive and transmit data is
+		represented with a uint8_t type.  For the wider data, data is
+		represented with a uint16_t.  There is duplication of logic for this
+		different widths.   By default, SPI wide data is disabled since that
+		is the less frequently used data type and disabling wide data can
+		result in some size reduction.  Select this option if you need wide
+		SPI data.
+
+endmenu # SPI Master configuration
+
+menu "USB0 OHCI Options"
+	depends on LPC54_OHCI
+
+config LPC54_OHCI_NEDS
+	int "Number of Endpoint Descriptors"
+	default 2
+	---help---
+		Number of endpoint descriptors.  Default: 2
+
+config LPC54_OHCI_NTDS
+	int "Number of transfer descriptors"
+	default 3
+	---help---
+		Number of transfer descriptors. Default: 3
+
+config LPC54_OHCI_TDBUFFERS
+	int "Number of descriptor buffers"
+	default 2
+	---help---
+		Number of transfer descriptor buffers.  Default: 2
+
+config LPC54_OHCI_TDBUFSIZE
+	int "Descriptor buffer size"
+	default 128
+	---help---
+		Size of one transfer descriptor buffer.  Default 128
+
+config LPC54_OHCI_IOBUFSIZE
+	int "I/O buffer size"
+	default 512
+	---help---
+		Size of one end-user I/O buffer.
+
+config LPC54_OHCI_NIOBUFFERS
+	int "Number of I/O buffer"
+	default 8 if USBHOST_HUB
+	default 4 if !USBHOST_HUB
+	---help---
+		Size of one end-user I/O buffer.
+
+config LPC54_OHCI_NPREALLOC
+	int "Max concurrent transfers"
+	default 8 if USBHOST_HUB
+	default 4 if !USBHOST_HUB
+	---help---
+		This number represents a number of pre-allocated structures to support
+		concurrent data transfers.  This number limits that number of concurrent
+		asynchronous IN endpoint transfer that can be supported.
+
+config LPC54_OHCI_REGDEBUG
+	bool "Register level debug"
+	depends on DEBUG_USB_INFO
+	default n
+	---help---
+		Output detailed register-level USB host debug information.  Requires
+		also CONFIG_DEBUG_USB_INFO.
+
+endmenu
+
+menu "Ethernet configuration"
+	depends on LPC54_ETHERNET
+
+config LPC54_ETH_PHYADDR
+	int "PHY address"
+	default 1
+	---help---
+		The 5-bit address of the PHY on the board.  Default: 1
+
+config LPC54_ETH_MII
+	bool "Use MII interface"
+	default n
+	---help---
+		Support Ethernet MII interface.  Default:  Use RMII interface.
+
+config LPC54_ETH_MULTIQUEUE
+	bool "IEEE 802.1q VLAN AVBTP support"
+	default n
+	depends on EXPERIMENTAL
+	---help---
+		Enables software drivers for the special hardware support of
+		IEEE 802.1q VLAN Audio/Visual Bridge Types (AVBTP).  In this
+		configuration two queues are available:  One for normal traffic
+		and one dedicated to the AVBTP traffic.
+
+if LPC54_ETH_MULTIQUEUE
+
+config LPC54_ETH_BURSTLEN
+	int "DMA Tx burst length"
+	default 1
+	range 1 256
+	---help---
+		Transmit programmable burst length.  These bits indicate the maximum
+		number of beats to be transferred in one DMA data transfer. This is
+		the maximum value that is used in a single block read or write. The
+		DMA always attempts to burst as specified in PBL each time it starts
+		a burst transfer on the application bus. You can program PBL with
+		any of the following values: 1, 2, 4, 8, 16, 32, 64, 128, or 256.
+		Any other value results in undefined behavior.
+
+config LPC54_ETH_TXRR
+	bool "Tx round robin"
+	default y
+	---help---
+		Selects round-robin Tx scheduling.  The alternative is strict
+		priority scheduling.
+
+config LPC54_ETH_RXRR
+	bool "Rx round robin"
+	default y
+	---help---
+		Selects round-robin Rx scheduling.  The alternative is strict
+		priority scheduling.
+
+config LPC54_ETH_DYNAMICMAP
+	bool "Dynamic Rx queue mapping"
+	default n
+	---help---
+		If selected, the received frame in in Rx Qn, n=0..1, maps to the DMA
+		channel m, m=0..1 related with the same MAC.  Otherwise, static
+		mapping is used:  The received fame in Rx Qn, n=0..1 maps directly
+		to DMA channel n.
+
+config LPC54_ETH_RXQ0WEIGHT
+	int "Rx queue 0 weight"
+	default 0
+	range 0 7
+
+config LPC54_ETH_RXQ1WEIGHT
+	int "Rx queue 1 weight"
+	default 0
+	range 0 7
+
+config LPC54_ETH_TXQ0WEIGHT
+	int "Tx queue 0 weight"
+	default 0
+	range 0 2097151
+
+config LPC54_ETH_TXQ1WEIGHT
+	int "Tx queue 1 weight"
+	default 0
+	range 0 2097151
+
+endif # LPC54_ETH_MULTIQUEUE
+
+config LPC54_ETH_TX_STRFWD
+	bool "Tx store and forward"
+	default n
+	---help---
+		Transmission starts when a full packet resides in the MTL Tx Queue.
+		This disables the default Tx threshold controls.
+
+config LPC54_ETH_RX_STRFWD
+	bool "Rx store and forward"
+	default n
+	---help---
+		Read packets from the Rx Queue only after the complete packet has
+		been written to it. By default, the Rx Queue operates in the
+		threshold (cut-through) mode.
+
+config LPC54_ETH_RX_PROMISCUOUS
+	bool "Enable Rx promiscuous mode"
+	default n
+	---help---
+		If selected, the address filter module accepts all incoming frames
+		regardless of its destination or source address.
+
+config LPC54_ETH_RX_BROADCAST
+	bool "Enable Rx broadcast"
+	default y
+	---help---
+		If selected, all received frames with a broadcast destination
+		address are accepted.
+
+config LPC54_ETH_RX_ALLMULTICAST
+	bool "Accept all multicast packets"
+	default y if NET_BROADCAST
+	default n if !NET_BROADCAST
+	---help---
+		If selected, all received frames with a multicast destination
+		address (first bit in the destination address field is '1') are
+		accepted.
+
+		This feature will will be selected automatically if ICMPv6 or
+		IGMP are enabled.  Unlike other Ethernet hardware, the LPC54xx
+		does not seem to support explicit Multicast address filtering
+		as needed for ICMPv6 and for IGMP.  In these cases, I am simpl
+		accepting all multicast packets.
+
+config LPC54_ETH_FLOWCONTROL
+	bool "Enable flow control"
+	default n
+	---help---
+		Enable TX and RX flow control.
+
+config LPC54_ETH_TX_PAUSETIME
+	int "Tx pause time"
+	default 0
+	range 0 65535
+	depends on LPC54_ETH_FLOWCONTROL
+	---help---
+		Value to be used in the pause time field in the transmit control
+		frame.
+
+config LPC54_ETH_8023AS2K
+	bool "Enable 8023as support for 2K packets"
+	default n
+
+config LPC54_ETH_NRXDESC0
+	int "Number of Rx DMA descriptors (ch0)"
+	default 8
+	range 4 1024
+	---help---
+		The number of Rx DMA descriptors to configure for Rx Channel 0.  The
+		minimum is 4; the upper limit is 1024.
+
+		NOTE:  Each Rx descriptor will require a receive buffer at the size
+		of the configured MTU.
+
+config LPC54_ETH_NRXDESC1
+	int "Number of Rx DMA descriptors (ch1)"
+	default 8
+	range 4 1024
+	depends on LPC54_ETH_MULTIQUEUE
+	---help---
+		The number of Rx DMA descriptors to configure for Rx Channel 1.  The
+		minimum is 4; the upper limit is 1024.
+
+		NOTE:  Each Rx descriptor will require a receive buffer at the size
+		of the configured MTU.
+
+config LPC54_ETH_NTXDESC0
+	int "Number of Tx DMA descriptors (ch0)"
+	default 8
+	range 4 1024
+	---help---
+		The number of Tx DMA descriptors to configure for Rx Channel 0.  The
+		minimum is 4; the upper limit is 1024.
+
+		NOTE:  Each Rx descriptor will require a transmit buffer at the size
+		of the configured MTU.
+
+config LPC54_ETH_NTXDESC1
+	int "Number of Tx DMA descriptors (ch1)"
+	default 8
+	range 4 1024
+	depends on LPC54_ETH_MULTIQUEUE
+	---help---
+		The number of Tx DMA descriptors to configure for Rx Channel 1.  The
+		minimum is 4; the upper limit is 1024.
+
+		NOTE:  Each Rx descriptor will require a transmit buffer at the size
+		of the configured MTU.
+
+config LPC54_ETH_REGDEBUG
+		bool "Register level debug"
+		default n
+		depends on DEBUG_NET_INFO
+		---help---
+				Output detailed register-level Ethernet debug information.
+
+endmenu # Ethernet configuration
+
+menu "SD/MMC Configuration"
+	depends on LPC54_SDMMC
+
+config LPC54_SDMMC_PWRCTRL
+	bool "Power-enable pin"
+	default n
+	---help---
+		Select if the board supports a power-enable pin that must be selected
+		to provide power to the SD card.
+
+config LPC54_SDMMC_DMA
+	bool "Support DMA data transfers"
+	default y
+	select SDIO_DMA
+	---help---
+		Support DMA data transfers.
+
+config LPC54_SDMMC_REGDEBUG
+		bool "Register level debug"
+		default n
+		depends on DEBUG_MEMCARD_INFO
+		---help---
+				Output detailed register-level SD/MMC debug information.
+
+endmenu # SD/MMC Configuration
+
+menu "LCD Configuration"
+	depends on LPC54_LCD
+
+config LPC54_LCD_VRAMBASE
+	hex "Video RAM base address"
+	default 0xa0010000
+	---help---
+		Base address of the video RAM frame buffer.  The default is
+		(LPC54_EXTDRAM_CS0 + 0x00010000)
+
+config LPC54_LCD_USE_CLKIN
+	bool "Use optional input clock"
+	default n
+
+config LPC54_LCD_CLKIN_FREQUENCY
+	int "Input clock frequency"
+	default 0
+	depends on LPC54_LCD_USE_CLKIN
+
+config LPC54_LCD_REFRESH_FREQ
+	int "LCD refesh rate (Hz)"
+	default 50
+	---help---
+		LCD refesh rate (Hz)
+
+config LPC54_LCD_BACKLIGHT
+	bool "Enable backlight"
+	default y
+	---help---
+		Enable backlight support.  If LPC54_LCD_BACKLIGHT is selected, then
+		the board-specific logic must provide this lpc54_backlight()
+		interface so that the LCD driver can turn the backlight on and off
+		as necessary.  You should select this option and implement
+		lpc54_backlight() if your board provides GPIO control over the
+		backlight.  This interface provides only ON/OFF control of the
+		backlight.  If you want finer control over the backlight level (for
+		example, using PWM), then this interface would need to be extended.
+
+config LPC54_LCD_TFTPANEL
+	bool "TFT Panel"
+	default y
+	---help---
+		TFT Panel vs. STN display.  STN display panels require algorithmic
+		pixel pattern generation to provide pseudo gray scaling on
+		monochrome displays, or color creation on color displays.  TFT
+		display panels require the digital color value of each pixel to be
+		applied to the display data inputs.
+
+config LPC54_LCD_MONOCHROME
+	bool "Monochrome LCD"
+	default n
+	depends on !LPC54_LCD_TFTPANEL
+	---help---
+		STN LCD monochrome/color selection.  Selects monochrome LCD.  This
+		selection has no meaning for a TFT panel.
+
+choice
+	prompt "Bits per pixel"
+	default LPC54_LCD_BPP24 if LPC54_LCD_TFTPANEL
+	default LPC54_LCD_BPP16_565 if !LPC54_LCD_TFTPANEL
+
+config LPC54_LCD_BPP1
+	bool "1 BPP"
+	depends on LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP2
+	bool "2 BPP"
+	depends on LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP4
+	bool "4 BPP"
+	depends on LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP8
+	bool "8 BPP"
+	depends on LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP12_444
+	bool "12 bpp, 4:4:4 mode"
+	depends on !LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP16
+	bool "16 BPP"
+	depends on LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP16_565
+	bool "16 BPP, 5:6:5 mode"
+	depends on !LPC54_LCD_MONOCHROME
+
+config LPC54_LCD_BPP24
+	bool "24 BPP, 8:8:8 mode"
+	depends on LPC54_LCD_TFTPANEL
+
+endchoice
+
+config LPC54_LCD_BGR
+	bool "Blue-Green-Red color order"
+	default n
+	depends on !LPC54_LCD_MONOCHROME
+	---help---
+		This option selects BGR color order vs. default RGB
+
+config LPC54_LCD_BACKCOLOR
+	hex "Initial background color"
+	default 0x0
+	---help---
+		Initial background color
+
+config LPC54_LCD_HWIDTH
+	int "Display width (pixels)"
+	default 480
+	---help---
+		Horizontal width the display in pixels
+
+config LPC54_LCD_HPULSE
+	int "Horizontal pulse"
+	default 2
+
+config LPC54_LCD_HFRONTPORCH
+	int "Horizontal front porch"
+	default 5
+
+config LPC54_LCD_HBACKPORCH
+	int "Horizontal back porch"
+	default 40
+
+config LPC54_LCD_VHEIGHT
+	int "Display height (rows)"
+	default 272
+	---help---
+		Vertical height of the display in rows
+
+config LPC54_LCD_VPULSE
+	int "Vertical pulse"
+	default 2
+
+config LPC54_LCD_VFRONTPORCH
+	int "Vertical front porch"
+	default 8
+
+config LPC54_LCD_VBACKPORCH
+	int "Vertical back porch"
+	default 8
+
+endmenu # LCD Configuration

@@ -1,0 +1,385 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config ARCH_HAVE_NET
+	bool
+	default n
+
+config ARCH_HAVE_PHY
+	bool
+	default n
+
+config NET_WRITE_BUFFERS
+	bool
+	default n
+
+config NET_READAHEAD
+	bool
+	default n
+
+config NET_MCASTGROUP
+	bool
+	default n
+
+config NET
+	bool "Networking support"
+	default n
+	select ARCH_HAVE_NET
+	---help---
+		Enable or disable all network features
+
+if NET
+
+config NET_PROMISCUOUS
+	bool "Promiscuous mode"
+	default n
+	---help---
+		Force the Ethernet driver to operate in promiscuous mode (if supported
+		by the Ethernet driver).
+
+menu "Driver buffer configuration"
+
+config NET_ETH_PKTSIZE
+	int "Ethernet packet buffer size"
+	default 1294 if NET_IPv6
+	default 590 if !NET_IPv6
+	range 1294 1518 if NET_IPv6
+	range 590 1518 if !NET_IPv6
+	depends on NET_ETHERNET
+	---help---
+		Packet buffer size.  This size includes the TCP/UDP payload plus the
+		size of TCP/UDP header, the IP header, and the Ethernet header.
+		This value is related to the MTU (Maximum Transmission Unit), except
+		that it includes the size of the link layer header; the payload is
+		the MSS (Maximum Segment Size).
+
+		IPv4 hosts are required to be able to handle an MSS of at least
+		536 octets, resulting in a minimum buffer size of 536+20+20+14 =
+		590.
+
+		IPv6 hosts are required to be able to handle an MSS of 1220 octets,
+		resulting in a minimum buffer size of of 1220+20+40+14 = 1294
+
+		To get an MTU of 1500, for example, you would need packet buffer of
+		size 1514.
+
+config NET_SLIP_PKTSIZE
+	int "SLIP packet buffer size"
+	default 296
+	depends on NET_SLIP
+	range 296 1518
+	---help---
+		Provides the size of the SLIP packet buffers.  This size includes
+		the TCP/UDP payload plus the size of TCP/UDP header and the IP header.
+		This value is related to the MTU (Maximum Transmission Unit), except
+		that it includes the size of the link layer header; the payload is
+		the MSS (Maximum Segment Size).  SLIP has no link layer header so for
+		SLIP the MTU is the same as the PKTSIZE.
+
+		SLIP is required to support at least 256+20+20 = 296.  Values other than
+		296 are not recommended.
+
+		The Linux slip module hard-codes its MTU size to 296 (40 bytes for
+		the IP+TPC headers plus 256 bytes of data).  So you might as well
+		set CONFIG_NET_SLIP_PKTSIZE to 296 as well.
+
+		There may be an issue with this setting, however.  I see that Linux
+		uses a MTU of 296 and window of 256, but actually only sends 168
+		bytes of data: 40 + 128.  I believe that is to allow for the 2x
+		worst cast packet expansion.  Ideally we would like to advertise the
+		256 MSS, but restrict transfers to 128 bytes (possibly by modifying
+		the MSS value in the TCP connection structure).
+
+config NET_GUARDSIZE
+	int "Driver I/O guard size"
+	default 2
+	---help---
+		Network drivers often receive packets with garbage at the end and
+		are longer than the size of packet in the TCP header.  The following
+		"fudge" factor increases the size of the I/O buffering by a small
+		amount to allocate slightly oversize packets.  After receipt, the
+		packet size will be chopped down to the size indicated in the TCP
+		header.
+
+endmenu # Driver buffer configuration
+
+menu "Link layer support"
+
+config NET_ETHERNET
+	bool "Ethernet support"
+	default y
+	---help---
+		If NET_SLIP is not selected, then Ethernet will be used (there is
+		no need to define anything special in the configuration file to use
+		Ethernet -- it is the default).
+
+config NET_LOOPBACK
+	bool "Local loopback"
+	default n
+	---help---
+		Add support for the local network loopback device, lo.
+
+menuconfig NET_SLIP
+	bool "SLIP support"
+	default n
+	---help---
+		Enables building of the SLIP driver. SLIP requires
+		at least one IP protocol selected.
+
+		SLIP supports point-to-point IP communications over a serial port.
+		The default link layer for network layer is Ethernet. If NET_SLIP
+		is defined in the NuttX configuration file, then SLIP will be
+		supported.  The basic differences between the SLIP and Ethernet
+		configurations is that when SLIP is selected:
+
+			* The link level header (that comes before the IP header) is omitted.
+			* All MAC address processing is suppressed.
+			* ARP is disabled.
+
+		If NET_SLIP is not selected, then Ethernet will be used (there is
+		no need to define anything special in the configuration file to use
+		Ethernet -- it is the default).
+
+if NET_SLIP
+
+config SLIP_NINTERFACES
+	int "Number of SLIP interfaces"
+	default 1
+	---help---
+		Selects the number of physical SLIP
+		interfaces to support.
+		Default: 1
+
+config SLIP_STACKSIZE
+	int "SLIP stack size"
+	default 2048
+	---help---
+		Select the stack size of the SLIP RX and TX tasks.  Default: 2048
+
+config SLIP_DEFPRIO
+	int "SLIP priority"
+	default 128
+	---help---
+		The priority of the SLIP RX and TX tasks. Default: 128
+
+endif # NET_SLIP
+
+menuconfig NET_TUN
+	bool "TUN Virtual Network Device support"
+	default n
+	select ARCH_HAVE_NETDEV_STATISTICS
+
+if NET_TUN
+
+config TUN_NINTERFACES
+	int "Number of TUN interfaces"
+	default 1
+	range 1 8
+	---help---
+		Selects the number of TUN
+		interfaces to support.
+		Default: 1
+
+config NET_TUN_PKTSIZE
+	int "TUN packet buffer size"
+	default 296
+	range 296 1518
+	---help---
+		Provides the size of the TUN packet buffers.  This size includes
+		the TCP/UDP payload plus the size of TCP/UDP header and the IP header.
+		This value is related to the MTU (Maximum Transmission Unit), except
+		that it includes the size of the link layer header; the payload is
+		the MSS (Maximum Segment Size).  TUN has no link layer header so for
+		TUN the MTU is the same as the PKTSIZE.
+
+endif # NET_TUN
+
+config NET_USRSOCK
+	bool "User-space networking stack API"
+	default n
+	---help---
+		Enable or disable user-space networking stack support.
+
+		User-space networking stack API allows user-space daemon to
+		provide TCP/IP stack implementation for NuttX network.
+
+		Main use for this is to allow use and integration of
+		HW-provided TCP/IP stacks for NuttX.
+
+		For example, user-space daemon can translate /dev/usrsock API
+		requests to HW TCP/IP API requests while rest of the user-space
+		can access standard socket API, with socket descriptors that
+		can be used with NuttX system calls.
+
+config NETDEV_LATEINIT
+	bool "Late driver initialization"
+	default n
+	---help---
+		Normally, networking initialization occur in the later phase of the
+		boot process in the function up_initialize() when it calls the
+		driver initialization function, up_netinitialize().  This
+		initialization occurs after a sufficient about of the OS has been
+		initialized so that driver registration can be performed, but
+		before the completion of OS initialization and before the first
+		application is started.
+
+		In a few situations, however, you may want to suppress this early
+		network driver initialization.  As examples:
+
+			- If you are using SLIP or PPPD, then there will be no network
+			  driver to be initialized,
+			- Certain multi-network configurations where a simple call to
+			  up_netinitialize() may be insufficient, and
+			- Situations where there are other board-level hardware
+			  dependencies so that the hardware is not in an appropriate
+			  state for up_netinitialize() to be called.
+
+		Examples of this latter situation includes such things as network
+		drivers that required some setup via an I2C I/O expander, or network
+		drivers that depend on USB, SPI, I2C, PCI, serial, or other
+		interfaces that may not be ready when up_netiniailize() is normally
+		called.
+
+endmenu # Link layer support
+
+source "net/netdev/Kconfig"
+
+menu "Internet Protocol Selection"
+
+config NET_IPv4
+	bool "IPv4"
+	default y
+	---help---
+		Build in support for IPv4.
+
+config NET_IPv4_REASSEMBLY
+	bool "IPv4 reassembly"
+	default n
+	depends on NET_IPv4 && EXPERIMENTAL && NET_ETHERNET
+	---help---
+		Enable support for IP packet reassembly of fragmented IP packets.
+
+		This features requires an additional amount of RAM to hold a single
+		reassembly buffer.  The reassembly buffer is of the same size as the
+		MTU of the selected device.
+
+		REVISIT:  There are multiple issues with the current implementation:
+		1. IPv4 reassembly in its current form is untested (and, hence,
+		   depends on CONFIG_EXPERIMENTAL).
+		2. Currently this feature can only work with Ethernet due to internal
+		   definitions that depend on Ethernet configuration settings (and,
+		   hence, depends on CONFIG_NET_ETHERNET).
+		3. Since there is only a single reassembly buffer, IPv4 reassembly
+		   cannot be used in a context where multiple network devices may be
+		   concurrently re-assemblying packets.
+
+if NET_IPv4_REASSEMBLY
+
+config NET_IPv4_REASS_MAXAGE
+	int "IP fragment timeout"
+	default 200
+	---help---
+		The maximum time an IP fragment should wait in the reassembly buffer
+		before it is dropped.  Units are deci-seconds, the range of the timer
+		is 8-bits.  Default: 20 seconds.
+
+endif # NET_IPv4_REASSEMBLY
+
+config NET_IPv6
+	bool "IPv6"
+	default n
+	---help---
+		Build in support for IPv6.
+
+source "net/neighbor/Kconfig"
+
+menuconfig NET_6LOWPAN
+	bool "6LoWPAN support"
+	default n
+	select NETDEV_IOCTL
+	select NET_HAVE_STAR
+	depends on NET_IPv6
+	---help---
+		Enable support for Low power Wireless Personal Area Networking (6LoWPAN)
+		for IEEE 802.15.4 or other packet radios.
+
+source "net/sixlowpan/Kconfig"
+source "net/ipforward/Kconfig"
+
+endmenu # Internet Protocol Selection
+
+source "net/socket/Kconfig"
+source "net/inet/Kconfig"
+source "net/pkt/Kconfig"
+source "net/local/Kconfig"
+source "net/can/Kconfig"
+source "net/netlink/Kconfig"
+source "net/tcp/Kconfig"
+source "net/udp/Kconfig"
+source "net/bluetooth/Kconfig"
+source "net/ieee802154/Kconfig"
+source "net/icmp/Kconfig"
+source "net/icmpv6/Kconfig"
+source "net/mld/Kconfig"
+source "net/igmp/Kconfig"
+source "net/arp/Kconfig"
+source "net/loopback/Kconfig"
+source "net/procfs/Kconfig"
+source "net/usrsock/Kconfig"
+source "net/utils/Kconfig"
+
+config NET_STATISTICS
+	bool "Collect network statistics"
+	default n
+	---help---
+		Network layer statistics on or off
+
+config NET_HAVE_STAR
+	bool
+	default n
+	---help---
+		Automatically enabled if at least one selected L2 protocol supports
+		a STAR topology.  In order to support the star topology, the L2
+		protocol must support relaying all packets to a well-known hub node.
+
+menu "Network Topologies"
+
+config NET_STAR
+	bool "Enable star topology"
+	default n
+	depends on NET_HAVE_STAR && NET_IPv6
+	---help---
+		Enable support for a star network topology.
+
+		NOTE: Currently only supported by 6LoWPAN.
+		NOTE: L2 forwarding only supported for IPv6.
+
+choice
+	prompt "Node role"
+	depends on NET_STAR
+	default NET_STARPOINT
+	---help---
+		Specifies the role of this not in the star configuration.
+
+config NET_STARPOINT
+	bool "Point node in star"
+	---help---
+		The node is a "point" in the star configuration and must send all
+		packets to the star hub node.
+
+config NET_STARHUB
+	bool "Hub node of star"
+	select NET_IPFORWARD
+	---help---
+		This is the "hub" node in the star configurations.  It will receive
+		packets packets from all "point" nodes and perform L2 forwarding of
+		the packets that are not destined for this node.
+
+endchoice # Node role
+endmenu # Network Topologies
+
+source "net/route/Kconfig"
+
+endif # NET

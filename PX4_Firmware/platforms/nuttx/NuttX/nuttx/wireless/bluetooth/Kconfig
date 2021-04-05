@@ -1,0 +1,177 @@
+#############################################################################
+# wireless/bluetooth/Kconfig
+# Bluetooth LE stack configuration options
+#
+#   Copyright (C) 2018 Gregory Nutt. All rights reserved.
+#   Author: Gregory Nutt <gnutt@nuttx.org>
+#
+# Ported from the Intel/Zephyr arduino101_firmware_source-v1.tar package
+# where the code was released with a compatible 3-clause BSD license:
+#
+#   Copyright (c) 2016, Intel Corporation
+#   All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+#############################################################################
+
+menuconfig WIRELESS_BLUETOOTH
+	bool "Bluetooth LE support"
+	default n
+	select MM_IOB
+	select SCHED_HPWORK
+	select SCHED_LPWORK
+	---help---
+		This option enables Bluetooth Low Energy support.
+
+		NOTE: This selection is marked EXPERIMENTAL.  It is incomplete and,
+		hence, untested.  It still lacks any low-level Bluetooth drivers and
+		is missing the network interface driver.
+
+if WIRELESS_BLUETOOTH
+
+config BLUETOOTH_MAX_CONN
+	int "Maximum number of simultaneous connections"
+	default 1
+	range 1 16
+	---help---
+		Maximum number of simultaneous Bluetooth connections
+		supported. The minimum (and default) number is 1.
+
+config BLUETOOTH_MAX_PAIRED
+	int "Maximum number of paired devices"
+	default 1
+	range 1 32
+	---help---
+		Maximum number of paired Bluetooth devices. The minimum (and
+		default) number is 1.
+
+config BLUETOOTH_MAXSCANDATA
+	int "Max scan data size"
+	default 64
+	range 1 255
+	---help---
+		Scan results will be buffered in memory until the user requests the
+		scan results.  This parameter specifies the maximum size of the
+		advertiser data that accompanies the scan result.
+
+		This contributes to a static memory allocation that will be greater
+		than CONFIG_BLUETOOTH_MAXSCANDATA * CONFIG_BLUETOOTH_MAXSCANRESULT
+
+config BLUETOOTH_MAXSCANRESULT
+	int "Max scan results"
+	default 8
+	range 1 255
+	---help---
+		Scan results will be buffered in memory until the user requests the
+		scan results.  This parameter specifies the maximum number of
+		results that can be buffered before scan results are lost.
+
+		This contributes to a static memory allocation that will be greater
+		than CONFIG_BLUETOOTH_MAXSCANDATA * CONFIG_BLUETOOTH_MAXSCANRESULT
+
+config BLUETOOTH_MAXDISCOVER
+	int "Max GATT discovery results"
+	default 8
+	range 1 255
+	---help---
+		GATT discovery results will be buffered in memory until the user
+		requests the results.  This parameter specifies the maximum results
+		that can be buffered before discovery results are lost.
+
+config BLUETOOTH_BUFFER_PREALLOC
+	int "Number of pre-allocated buffer structures"
+	default 20
+	---help---
+		This specifies the total number of preallocated buffer structures.
+		This is for performance optimization.  If additional buffer structures
+		are needed, they will be allocated dynamically at some loss of
+		performance.
+
+config BLUETOOTH_BUFFER_IRQRESERVE
+	int "Reserved pre-allocated primitive structures"
+	default 0
+	---help---
+		If buffer structures can be allocated from interrupt handlers, then
+		this specifies the number of pre-allocated structures that are
+		reserved for for use only by interrupt handlers.  This may be set
+		zero to reserve no buffers for interrupt handlers. In that case,
+		the allocation will fail if tasking logic has allocated them all.
+
+		Interrupt logic will first attempt to allocate from the general,
+		pre-allocated buffer pool that will contain up to (size
+		CONFIG_BLUETOOTH_BUFFER_PREALLOC - BLUETOOTH_BUFFER_IRQRESERVE)
+		entries.  If that fails, then it will try to take a buffer from
+		the reserve (size CONFIG_BLUETOOTH_BUFFER_IRQRESERVE).
+
+		Non-interrupt logic will also first attempt to allocate from the
+		general, pre-allocated buffer pool.  If that fails, it will
+		dynamically allocate the buffer with an additional cost in
+		performance.
+
+		NOTE:  The Bluetooth stack never allocates buffers from the
+		interrupt level.  This setting only needs to be non-zero if your
+		low-level Bluetooth driver needs to do such allocations.
+
+menu "Kernel Thread Configuration"
+
+config BLUETOOTH_TXCMD_STACKSIZE
+	int "Tx command thread stack size"
+	default 1024
+
+config BLUETOOTH_TXCMD_PRIORITY
+	int "Tx command thread priority"
+	default 100
+	range 1 255
+
+config BLUETOOTH_TXCMD_NMSGS
+	int "Tx command thread mqueue size"
+	default 16
+
+config BLUETOOTH_TXCONN_STACKSIZE
+	int "Tx connection thread stack size"
+	default 1024
+
+config BLUETOOTH_TXCONN_PRIORITY
+	int "Tx connection thread priority"
+	default 100
+	range 1 255
+
+config BLUETOOTH_TXCONN_NMSGS
+	int "Tx connection thread mqueue size"
+	default 16
+
+endmenu # Kernel Thread Configuration
+
+config BLUETOOTH_SMP_SELFTEST
+	bool "Bluetooth SMP self tests executed on init"
+	default n
+	---help---
+		This option enables SMP self-tests executed on startup
+		to verify security and crypto functions.
+
+endif # WIRELESS_BLUETOOTH

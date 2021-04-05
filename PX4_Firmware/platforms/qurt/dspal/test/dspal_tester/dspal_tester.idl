@@ -1,0 +1,111 @@
+//============================================================================
+/// @file calculator.idl
+///
+                                                           //qidl copyright
+//% Copyright (c) 2015 James Wilson. All rights reserved.
+                                                           //qidl nested=false
+//%
+//% Redistribution and use in source and binary forms, with or without
+//% modification, are permitted provided that the following conditions
+//% are met:
+//%
+//% 1. Redistributions of source code must retain the above copyright
+//%    notice, this list of conditions and the following disclaimer.
+//% 2. Redistributions in binary form must reproduce the above copyright
+//%    notice, this list of conditions and the following disclaimer in
+//%    the documentation and/or other materials provided with the
+//%    distribution.
+//% 3. Neither the name DSPAL nor the names of its contributors may be
+//%    used to endorse or promote products derived from this software
+//%    without specific prior written permission.
+//%
+//% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+//% "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+//% LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+//% FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+//% COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+//% INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+//% BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+//% OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+//% AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+//% LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+//% ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//% POSSIBILITY OF SUCH DAMAGE.
+//============================================================================
+
+#include "AEEStdDef.idl"
+
+interface dspal_tester
+{
+   long test_dspal_get_version_info();
+   long test_clockid();
+   long test_sigevent();
+   long test_time();
+   long test_timer_realtime_sig_none();
+   long test_timer_monotonic_sig_none();
+   long test_timer_process_cputime_sig_none();
+   long test_timer_thread_cputime_sig_none();
+   long test_time_return_value();
+   long test_time_param();
+   long test_usleep();
+   long test_clock_getres();
+   long test_clock_gettime();
+   long test_clock_settime();
+   long test_one_shot_timer_cb();
+   long test_periodic_timer_cb();
+   long test_periodic_timer_signal_cb();
+   long test_periodic_timer_sigwait();
+
+   long test_pthread_attr_init();
+   long test_pthread_create();
+   long test_pthread_cancel();
+   long test_pthread_self();
+   long test_pthread_exit();
+   long test_pthread_kill();
+   long test_pthread_mutex_lock();
+   long test_pthread_mutex_lock_thread();
+   long test_pthread_stack();
+   long test_pthread_heap();
+   long test_pthread_cond_timedwait();
+
+   long test_semaphore_wait();
+
+   long test_posix_file_open_close();
+   long test_posix_file_read_write();
+   long test_posix_file_threading();
+   long test_posix_file_open_trunc();
+   long test_posix_file_open_append();
+   long test_posix_file_ioctl();
+   long test_posix_file_remove();
+   long test_posix_file_fsync();
+   long test_fopen_fclose();
+   long test_fwrite_fread();
+
+   long spi_test();
+
+   long serial_test();
+
+   long i2c_test();
+   
+   long pwm_test();
+
+   long test_farf_log_info();
+   long test_farf_log_err();
+   long test_farf_log_debug();
+
+   long test_gpio_open_close();
+   long test_gpio_ioctl_io();
+   long test_gpio_read_write();
+   long test_gpio_read_write_extern_loopback();
+   long test_gpio_int();
+
+   long test_cxx_heap();
+   long test_cxx_static();
+   long test_malloc();
+
+   long termios_test();
+
+   long test_rpcmem(inrout sequence<octet> data);
+   long test_hap_power(inrout sequence<octet> data);
+};
+

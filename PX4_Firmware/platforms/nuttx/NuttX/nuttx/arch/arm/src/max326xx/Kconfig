@@ -1,0 +1,447 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+comment "Maxim Integrate MAX326xx Configuration Options"
+
+# Chip Selection
+
+choice
+	prompt "MAX326xx Chip Selection"
+	default CONFIG_ARCH_CHIP_MAX32630
+	depends on ARCH_CHIP_MAX326XX
+
+config ARCH_CHIP_MAX32620
+	bool "MAX32620"
+	select ARCH_FAMILY_MAX32620
+	depends on EXPERIMENTAL  # Not fully implemented
+
+config ARCH_CHIP_MAX32621
+	bool "MAX32621"
+	select ARCH_FAMILY_MAX32620
+	depends on EXPERIMENTAL  # Not fully implemented
+
+config ARCH_CHIP_MAX32630
+	bool "MAX32630"
+	select ARCH_FAMILY_MAX32630
+	depends on EXPERIMENTAL  # Not fully implemented
+
+config ARCH_CHIP_MAX32632
+	bool "MAX32632"
+	select ARCH_FAMILY_MAX32630
+	depends on EXPERIMENTAL  # Not fully implemented
+
+config ARCH_CHIP_MAX32660
+	bool "MAX32660"
+	select ARCH_FAMILY_MAX32660
+
+endchoice # MAX326xx Chip Selection
+
+# Chip Families
+#
+# Chip Families are determined by sharing a common User Guide for the chip
+# specification:
+#
+# CONFIG_ARCH_FAMILY_MAX32620:  MAX32620 Rev C, User Guide, AN6242,
+#                               Rev 2, 2/17
+# CONFIG_ARCH_FAMILY_MAX32630:  MAX32630 Rev B, User Guide, AN6349,
+#                               Rev 0, 10/16
+# CONFIG_ARCH_FAMILY_MAX32660:  MAX32660 User Guide, AN6659, Rev0, 7/18
+
+config ARCH_FAMILY_MAX32620
+	bool
+	default n
+	select ARCH_CORTEXM4
+	select MAX326XX_HAVE_WWDOG
+	select MAX326XX_HAVE_LLWDOG
+	select MAX326XX_HAVE_WAKEUP
+	select MAX326XX_HAVE_CRC
+	select MAX326XX_HAVE_AES
+	select MAX326XX_HAVE_USB20
+	select MAX326XX_HAVE_TMR32_2
+	select MAX326XX_HAVE_TMR32_3
+	select MAX326XX_HAVE_TMR32_4
+	select MAX326XX_HAVE_TMR32_5
+	select MAX326XX_HAVE_PTENGINE
+	select MAX326XX_HAVE_SPIM2
+	select MAX326XX_HAVE_SPIS1
+	select MAX326XX_HAVE_SPIXIP
+	select MAX326XX_HAVE_I2SS
+	select MAX326XX_HAVE_I2CM2
+	select MAX326XX_HAVE_I2CS1
+	select MAX326XX_HAVE_UART2
+	select MAX326XX_HAVE_UART3
+	select MAX326XX_HAVE_1WIREM
+	select MAX326XX_HAVE_ADC10
+
+config ARCH_FAMILY_MAX32630
+	bool
+	default n
+	select ARCH_CORTEXM4
+	select MAX326XX_HAVE_WWDOG
+	select MAX326XX_HAVE_LLWDOG
+	select MAX326XX_HAVE_WAKEUP
+	select MAX326XX_HAVE_CRC
+	select MAX326XX_HAVE_AES
+	select MAX326XX_HAVE_USB20
+	select MAX326XX_HAVE_TMR32_2
+	select MAX326XX_HAVE_TMR32_3
+	select MAX326XX_HAVE_TMR32_4
+	select MAX326XX_HAVE_TMR32_5
+	select MAX326XX_HAVE_PTENGINE
+	select MAX326XX_HAVE_SPIM2
+	select MAX326XX_HAVE_SPIXIP
+	select MAX326XX_HAVE_I2CM2
+	select MAX326XX_HAVE_UART2
+	select MAX326XX_HAVE_UART3
+	select MAX326XX_HAVE_1WIREM
+	select MAX326XX_HAVE_ADC10
+
+config ARCH_FAMILY_MAX32660
+	bool
+	default n
+	select ARCH_CORTEXM4
+	select MAX326XX_HAVE_DMA
+	select MAX326XX_HAVE_I2CS1
+	select MAX326XX_HAVE_SPIS1
+	select MAX326XX_HAVE_WDOG
+	select MAX326XX_HAVE_TMR8
+
+# Chip-Specific Peripheral support
+
+config MAX326XX_HAVE_AES
+	bool
+	default n
+
+config MAX326XX_HAVE_WDOG
+	bool
+	default n
+
+config MAX326XX_HAVE_WWDOG
+	bool
+	default n
+
+config MAX326XX_HAVE_LLWDOG
+	bool
+	default n
+
+config MAX326XX_HAVE_WAKEUP
+	bool
+	default n
+
+config MAX326XX_HAVE_CRC
+	bool
+	default n
+
+config MAX326XX_HAVE_DMA
+	bool
+	default n
+
+config MAX326XX_HAVE_USB20
+	bool
+	default n
+
+config MAX326XX_HAVE_TMR32_2
+	bool
+	default n
+
+config MAX326XX_HAVE_TMR32_3
+	bool
+	default n
+
+config MAX326XX_HAVE_TMR32_4
+	bool
+	default n
+
+config MAX326XX_HAVE_TMR32_5
+	bool
+	default n
+
+config MAX326XX_HAVE_TMR8
+	bool
+	default n
+
+config MAX326XX_HAVE_SPIM2
+	bool
+	default n
+
+config MAX326XX_HAVE_SPIS1
+	bool
+	default n
+
+config MAX326XX_HAVE_SPIXIP
+	bool
+	default n
+
+config MAX326XX_HAVE_I2SS
+	bool
+	default n
+
+config MAX326XX_HAVE_I2CM2
+	bool
+	default n
+
+config MAX326XX_HAVE_I2CS1
+	bool
+	default n
+
+config MAX326XX_HAVE_UART2
+	bool
+	default n
+
+config MAX326XX_HAVE_UART3
+	bool
+	default n
+
+config MAX326XX_HAVE_1WIREM
+	bool
+	default n
+
+config MAX326XX_HAVE_ADC10
+	bool
+	default n
+
+# Driver support
+
+config MAX326XX_HAVE_I2CM
+	bool
+	default n
+
+config MAX326XX_HAVE_SPIM
+	bool
+	default n
+
+config MAX326XX_HAVE_UART
+	bool
+	default n
+
+# Peripheral Driver Selections
+
+menu "MAX32xx Peripheral Selection"
+
+config MAX326XX_WDOG
+	bool "Watchdog Timer"
+	default n
+	depends on MAX326XX_HAVE_WDOG
+
+config MAX326XX_WWDOG0
+	bool "Windowed Watchdog Timer (WDT0) "
+	default n
+	depends on MAX326XX_HAVE_WWDOG
+
+config MAX326XX_WWDOG1
+	bool "Low-Level Watchdog Timer (WDT1)"
+	default n
+	depends on MAX326XX_HAVE_WWDOG
+
+config MAX326XX_RWDOG
+	bool "Recovery Watchdog"
+	default n
+	depends on MAX326XX_HAVE_LLWDOG
+
+config MAX326XX_WAKEUP
+	bool "Wakeup Timer"
+	default n
+	depends on MAX326XX_HAVE_WAKEUP
+
+config MAX326XX_RTC
+	bool "RTC"
+	default n
+
+config MAX326XX_CRC
+	bool "CRC 16/32"
+	default n
+	depends on MAX326XX_HAVE_CRC
+
+config MAX326XX_AES
+	bool "AES 128, 192, 256"
+	default n
+	depends on MAX326XX_HAVE_AES
+
+config MAX326XX_USB20
+	bool "USB 2.0 Device"
+	default n
+	depends on MAX326XX_HAVE_USB20
+
+config MAX326XX_TMR32_0
+	bool "32-Bit Timer 0"
+	default n
+
+config MAX326XX_TMR32_1
+	bool "32-Bit Timer 1"
+	default n
+
+config MAX326XX_TMR32_2
+	bool "32-Bit Timer 2"
+	default n
+	depends on MAX326XX_HAVE_TMR32_2
+
+config MAX326XX_TMR32_3
+	bool "32-Bit Timer 3"
+	default n
+	depends on MAX326XX_HAVE_TMR32_3
+
+config MAX326XX_TMR32_4
+	bool "32-Bit Timer 4"
+	default n
+	depends on MAX326XX_HAVE_TMR32_4
+
+config MAX326XX_TMR32_5
+	bool "32-Bit Timer 5"
+	default n
+	depends on MAX326XX_HAVE_TMR32_5
+
+config MAX326XX_TMR8
+	bool "8-Bit Timer"
+	default n
+	depends on MAX326XX_HAVE_TMR8
+
+config MAX326XX_PTENGINE
+	bool "Pulse Train Engine"
+	default n
+	depends on MAX326XX_HAVE_PTENGINE
+
+config MAX326XX_SPIM0
+	bool "SPI Master 0"
+	default n
+	select MAX326XX_HAVE_SPIM
+
+config MAX326XX_SPIM1
+	bool "SPI Master 1"
+	default n
+	select MAX326XX_HAVE_SPIM
+
+config MAX326XX_SPIM2
+	bool "SPI Master 2"
+	default n
+	depends on MAX326XX_HAVE_SPIM2
+	select MAX326XX_HAVE_SPIM
+
+config MAX326XX_SPIS0
+	bool "SPI Slave 0"
+	default n
+	depends on !MAX326XX_SPIM0 || !ARCH_FAMILY_MAX32660
+
+config MAX326XX_SPIS1
+	bool "SPI Slave 1"
+	default n
+	depends on MAX326XX_HAVE_SPIS1
+	depends on !MAX326XX_SPIM1 || !ARCH_FAMILY_MAX32660
+
+config MAX326XX_SPIXIP
+	bool "SPI XIP"
+	default n
+	depends on MAX326XX_HAVE_SPIXIP
+
+config MAX326XX_I2SS
+	bool "I2S Slave"
+	default n
+	depends on MAX326XX_HAVE_I2SS
+
+config MAX326XX_I2CM0
+	bool "I2C Master 0"
+	default n
+	select MAX326XX_HAVE_I2CM
+
+config MAX326XX_I2CM1
+	bool "I2C Master 1"
+	default n
+	select MAX326XX_HAVE_I2CM
+
+config MAX326XX_I2CM2
+	bool "I2C Master 2"
+	default n
+	select MAX326XX_HAVE_I2CM
+	depends on MAX326XX_HAVE_I2CM2
+
+config MAX326XX_I2CS0
+	bool "I2C Slave 0"
+	default n
+	depends on !MAX326XX_I2CM0 || !ARCH_FAMILY_MAX32660
+
+config MAX326XX_I2CS1
+	bool "I2C Slave 1"
+	default n
+	depends on MAX326XX_HAVE_I2CS1
+	depends on !MAX326XX_I2CM1 || !ARCH_FAMILY_MAX32660
+
+config MAX326XX_UART0
+	bool "UART 0"
+	default n
+	select MAX326XX_HAVE_UART
+	select UART0_SERIALDRIVER
+
+config MAX326XX_UART1
+	bool "UART 1"
+	default n
+	select MAX326XX_HAVE_UART
+	select UART1_SERIALDRIVER
+
+config MAX326XX_UART2
+	bool "UART 2"
+	default n
+	select MAX326XX_HAVE_UART
+	select UART2_SERIALDRIVER
+	depends on MAX326XX_HAVE_UART2
+
+config MAX326XX_UART3
+	bool "UART 3"
+	default n
+	select UART3_SERIALDRIVER
+	depends on MAX326XX_HAVE_UART3
+
+config MAX326XX_1WIREM
+	bool "1-Wire Master"
+	default n
+	depends on MAX326XX_HAVE_1WIREM
+
+config MAX326XX_ADC10
+	bool "10-Bit ADC"
+	default n
+	depends on MAX326XX_HAVE_ADC10
+
+endmenu # MAX32xx Peripheral Selection
+
+config MAX326XX_ICC
+	bool "Instruction Cache Controller (ICC)"
+	default y
+	select ARMV7M_HAVE_ICACHE
+
+config MAX326XX_DMA
+	bool "Standard DMA"
+	default n
+	depends on MAX326XX_HAVE_DMA
+
+config MAX326XX_GPIOIRQ
+	bool "GPIO Interrupt Support"
+	default n
+
+menu "SPI Master Configuration"
+	depends on MAX326XX_HAVE_SPIM
+
+if MAX326XX_SPIM0
+
+config MAX326XX_3WIRE
+	bool "SP0 3-pin mode"
+	default n
+	---help---
+		By default, 4-pin mode is supported(MISO, MOSI, SCK, SS).  Selecting
+		this option enables 3-pin mode (SOSI, SCK, SS).  The SISO pin is bi-
+		directional, half duplex in the 3-pin mode.
+
+		REVISIT:  Perhaps this should be an on-the-fly configuration as an
+		SPI "Hardware Feature" so that we can support 3-wire and 4-wire
+		devices on the same SPI bus?
+
+endif # MAX326XX_SPIM0
+
+config MAX326_SPI_REGDEBUG
+	bool "SPI Register level debug"
+	depends on DEBUG_MEMCARD_INFO
+	default n
+	---help---
+		Output detailed register-level SPI device debug information.
+		Very invasive! Requires also DEBUG_MEMCARD_INFO.
+
+endmenu # SPI Master Configuration

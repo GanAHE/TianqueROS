@@ -1,0 +1,141 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menu "Routing Table Configuration"
+
+config NET_ROUTE
+	bool "Routing table support"
+	default n
+	depends on NET_IPv4 || NET_IPv6
+	---help---
+		Build in support for a routing table.  See include/net/route.h
+
+if NET_ROUTE
+
+choice
+	prompt "IPv4 routing table"
+	default ROUTE_IPv4_RAMROUTE
+	depends on NET_IPv4
+
+config ROUTE_IPv4_RAMROUTE
+	bool "In-memory"
+	---help---
+		Select to used a IPv4 routing table RAM.
+
+config ROUTE_IPv4_ROMROUTE
+	bool "Read-only"
+	---help---
+		Select to used a fixed read-only IPv4 routing table in FLASH or ROM.
+		In this case, the board-specific logic must provide a routing table
+		of the form of a simple array:
+
+			FAR const struct net_route_ipv4_s g_ipv4_routes[];
+			const unsigned int g_ipv4_nroutes;
+
+		NOTE:  The read-only variable g_ipv4_nroutes must be set to the
+		actual number of valid entries in the array.
+
+config ROUTE_IPv4_FILEROUTE
+	bool "File"
+	---help---
+		Select to used a IPv4 routing table in a file in a mounted file system.
+
+endchoice # IPv4 routing table
+
+config ROUTE_MAX_IPv4_RAMROUTES
+	int "Preallocated IPv4 routing table entries"
+	default 4
+	depends on ROUTE_IPv4_RAMROUTE
+	---help---
+		The number of preallocated of the IPv4 routing table entries.  This
+		eliminates dynamica memory allocations, but limits the maximum size
+		of the in-memory routing table to this number.
+
+config ROUTE_IPv4_CACHEROUTE
+	bool "In-memory IPv4 cache"
+	default n
+	depends on ROUTE_IPv4_FILEROUTE
+	---help---
+		Accessing a routing table on a file system before each packet is sent
+		can harm performance.  This option will cache a few of the most
+		frequently used routing table entries in memory to reduce performance
+		issues.
+
+config ROUTE_MAX_IPv4_CACHEROUTES
+	int "IPv4 cache size"
+	default 4
+	depends on ROUTE_IPv4_CACHEROUTE
+	---help---
+		This determines the maxium number of routes that can be cached in
+		memory.
+
+choice
+	prompt "IPv6 routing table"
+	default ROUTE_IPv6_RAMROUTE
+	depends on NET_IPv6
+
+config ROUTE_IPv6_RAMROUTE
+	bool "In-memory"
+	---help---
+		Select to use a IPv6 routing table RAM.
+
+config ROUTE_IPv6_ROMROUTE
+	bool "Read-only"
+	---help---
+		Select to use a fixed read-only IPv6 routing table in FLASH or ROM.
+		In this case, the board-specific logic must provide a routing table
+		of the form of simply array:
+
+			FAR const struct net_route_ipv6_s g_ipv6_routes[];
+			const unsigned int g_ipv6_nroutes;
+
+		NOTE:  The read-only variable g_ipv6_nroutes must be set to the
+		actual number of valid entries in the array.
+
+config ROUTE_IPv6_FILEROUTE
+	bool "File"
+	---help---
+		Select to use a IPv6 routing table in a file in a mounted file system.
+
+endchoice # IPv6 routing table
+
+config ROUTE_MAX_IPv6_RAMROUTES
+	int "Preallocated IPv6 routing table entries"
+	default 4
+	depends on ROUTE_IPv6_RAMROUTE
+	---help---
+		The number of preallocated of the IPv6 routing table entries.  This
+		eliminates dynamica memory allocations, but limits the maximum size
+		of the in-memory routing table to this number.
+
+config ROUTE_FILEDIR
+	string "Routing table directory"
+	default /tmp
+	depends on ROUTE_IPv4_FILEROUTE || ROUTE_IPv6_FILEROUTE
+	---help---
+		Provides the full path to location in the file system where routing
+		table will be accessed.  This is a string and should not include
+		any traling '/'.
+
+config ROUTE_IPv6_CACHEROUTE
+	bool "In-memory IPv6 cache"
+	default n
+	depends on ROUTE_IPv6_FILEROUTE
+	---help---
+		Accessing a routing table on a file system before each packet is sent
+		can harm performance.  This option will cache a few of the most
+		frequently used routing table entries in memory to reduce performance
+		issues.
+
+config ROUTE_MAX_IPv6_CACHEROUTES
+	int "IPv6 cache size"
+	default 4
+	depends on ROUTE_IPv6_CACHEROUTE
+	---help---
+		This determines the maxium number of routes that can be cached in
+		memory.
+
+endif # NET_ROUTE
+endmenu # ARP Configuration

@@ -1,0 +1,17 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menu "pthread support"
+	depends on !DISABLE_PTHREAD
+
+config PTHREAD_SPINLOCKS
+	bool "pthread spinlock support"
+	default n
+	depends on SPINLOCK && LIB_BOARDCTL
+	select BOARDCTL_TESTSET
+	---help---
+		Enable support for pthread spinlocks.
+
+endmenu # pthread support

@@ -1,0 +1,17 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if NXWIDGETS
+
+config NXGLYPHS_LARGE_ICONS
+	bool
+	default n
+
+config NXGLYPHS_BACKGROUNDCOLOR
+	hex "Background Color"
+	---help---
+		Normal background color.  Default: RGB(148,189,215)
+
+endif # NXWIDGETS

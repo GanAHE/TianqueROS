@@ -1,0 +1,113 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if ARCH_BOARD_STM32F103_MINIMUM
+
+choice
+	prompt "Board type"
+	default STM32F103MINIMUM_BLUEPILL
+
+config STM32F103MINIMUM_BLUEPILL
+	bool "Blue Pill/Red Pill/RoboDyn Black Pill"
+
+config STM32F103MINIMUM_BLACKPILL
+	bool "Black Pill"
+
+endchoice
+
+config STM32F103MINIMUM_AT24_BLOCKMOUNT
+	bool "AT24 Serial EEPROM auto-mount"
+	default n
+	depends on NSH_ARCHINIT && STM32_I2C1 && MTD_AT24XX
+	---help---
+		Automatically initialize the AT24 I2C EEPROM driver when NSH starts.
+
+choice
+	prompt "AT24 serial EPPROM configuration"
+	default STM32F103MINIMUM_AT24_FTL
+	depends on STM32F103MINIMUM_AT24_BLOCKMOUNT
+
+config STM32F103MINIMUM_AT24_FTL
+	bool "Create AT24 block driver"
+	---help---
+		Create the MTD driver for the AT24 and "wrap" the AT24 as a standard
+		block driver that could then, for example, be mounted using FAT or
+		any other file system.  Any file system may be used, but there will
+		be no wear-leveling.
+
+config STM32F103MINIMUM_AT24_NXFFS
+	bool "Create AT24 NXFFS file system"
+	depends on FS_NXFFS
+	---help---
+		Create the MTD driver for the AT24 and mount the AT24 device as
+		a wear-leveling, NuttX FLASH file system (NXFFS).  The downside of
+		NXFFS is that it can be very slow.
+
+endchoice # AT24 serial EPPROM configuration
+
+config STM32F103MINIMUM_FLASH
+	bool "MTD driver for external 4Mbyte W25Q32FV FLASH on SPI1"
+	default n
+	select MTD
+	select MTD_W25
+	select MTD_SMART
+	select FS_SMARTFS
+	select STM32_SPI1
+	select MTD_BYTE_WRITE
+	---help---
+		Configures an MTD device for use with the onboard flash
+
+config STM32F103MINIMUM_FLASH_MINOR
+	int "Minor number for the FLASH /dev/smart entry"
+	default 0
+	depends on STM32F103MINIMUM_FLASH
+	---help---
+		Sets the minor number for the FLASH MTD /dev entry
+
+config STM32F103MINIMUM_FLASH_PART
+	bool "Enable partition support on FLASH"
+	default y
+	depends on STM32F103MINIMUM_FLASH
+	select MTD_PARTITION
+	---help---
+		Enables creation of partitions on the FLASH
+
+config STM32F103MINIMUM_FLASH_CONFIG_PART
+	bool "Create application config data partition on FLASH"
+	default n
+	depends on STM32F103MINIMUM_FLASH_PART
+	depends on PLATFORM_CONFIGDATA
+	---help---
+		Enables creation of a /dev/config partition on the FLASH
+
+config STM32F103MINIMUM_FLASH_CONFIG_PART_NUMBER
+	int "Index number of config partition (in list below)"
+	default 0
+	depends on STM32F103MINIMUM_FLASH_CONFIG_PART
+	---help---
+		Specifies the index number of the config data partition
+		from the partition list.
+
+config STM32F103MINIMUM_FLASH_PART_LIST
+	string "Flash partition size list"
+	default "1024,1024,1024,1024"
+	depends on STM32F103MINIMUM_FLASH_PART
+	---help---
+		Comma separated list of partition sizes in KB.
+
+config STM32F103MINIMUM_FLASH_PART_NAMES
+	string "Flash partition name list"
+	default "first,second,third,forth"
+	depends on STM32F103MINIMUM_FLASH_PART
+	depends on MTD_PARTITION_NAMES
+	---help---
+		Comma separated list of partition names.
+
+config STM32F103MINIMUM_QETIMER
+	int "Timer to use with QE encoder"
+	default 4
+	depends on SENSORS_QENCODER
+
+endif

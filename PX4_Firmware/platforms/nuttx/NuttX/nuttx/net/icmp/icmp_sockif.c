@@ -1,0 +1,555 @@
+/****************************************************************************
+ * net/socket/icmp_sockif.c
+ *
+ *   Copyright (C) 2017 Gregory Nutt. All rights reserved.
+ *   Author: Gregory Nutt <gnutt@nuttx.org>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name NuttX nor the names of its contributors may be
+ *    used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+
+/****************************************************************************
+ * Included Files
+ ****************************************************************************/
+
+#include <nuttx/config.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
+#include <errno.h>
+#include <debug.h>
+
+#include <nuttx/mm/iob.h>
+#include <nuttx/net/net.h>
+#include <socket/socket.h>
+
+#include "icmp/icmp.h"
+
+#ifdef CONFIG_NET_ICMP_SOCKET
+
+/****************************************************************************
+ * Private Function Prototypes
+ ****************************************************************************/
+
+static int        icmp_setup(FAR struct socket *psock, int protocol);
+static sockcaps_t icmp_sockcaps(FAR struct socket *psock);
+static void       icmp_addref(FAR struct socket *psock);
+static int        icmp_bind(FAR struct socket *psock,
+                    FAR const struct sockaddr *addr, socklen_t addrlen);
+static int        icmp_getsockname(FAR struct socket *psock,
+                    FAR struct sockaddr *addr, FAR socklen_t *addrlen);
+static int        icmp_getpeername(FAR struct socket *psock,
+                    FAR struct sockaddr *addr, FAR socklen_t *addrlen);
+static int        icmp_listen(FAR struct socket *psock, int backlog);
+static int        icmp_connect(FAR struct socket *psock,
+                    FAR const struct sockaddr *addr, socklen_t addrlen);
+static int        icmp_accept(FAR struct socket *psock,
+                    FAR struct sockaddr *addr, FAR socklen_t *addrlen,
+                    FAR struct socket *newsock);
+static int        icmp_netpoll(FAR struct socket *psock,
+                    FAR struct pollfd *fds, bool setup);
+static ssize_t    icmp_send(FAR struct socket *psock, FAR const void *buf,
+                    size_t len, int flags);
+static int        icmp_close(FAR struct socket *psock);
+
+/****************************************************************************
+ * Public Data
+ ****************************************************************************/
+
+const struct sock_intf_s g_icmp_sockif =
+{
+  icmp_setup,       /* si_setup */
+  icmp_sockcaps,    /* si_sockcaps */
+  icmp_addref,      /* si_addref */
+  icmp_bind,        /* si_bind */
+  icmp_getsockname, /* si_getsockname */
+  icmp_getpeername, /* si_getpeername */
+  icmp_listen,      /* si_listen */
+  icmp_connect,     /* si_connect */
+  icmp_accept,      /* si_accept */
+  icmp_netpoll,     /* si_poll */
+  icmp_send,        /* si_send */
+  icmp_sendto,      /* si_sendto */
+#ifdef CONFIG_NET_SENDFILE
+  NULL,             /* si_sendfile */
+#endif
+  icmp_recvfrom,    /* si_recvfrom */
+#ifdef CONFIG_NET_CMSG
+  NULL,             /* si_recvmsg */
+  NULL,             /* si_sendmsg */
+#endif
+  icmp_close        /* si_close */
+};
+
+/****************************************************************************
+ * Private Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Name: icmp_setup
+ *
+ * Description:
+ *   Called for socket() to verify that the provided socket type and
+ *   protocol are usable by this address family.  Perform any family-
+ *   specific socket fields.
+ *
+ * Input Parameters:
+ *   psock    A pointer to a user allocated socket structure to be
+ *            initialized.
+ *   protocol (see sys/socket.h)
+ *
+ * Returned Value:
+ *   Zero (OK) is returned on success.  Otherwise, a negated errno value is
+ *   returned.
+ *
+ ****************************************************************************/
+
+static int icmp_setup(FAR struct socket *psock, int protocol)
+{
+  /* Only SOCK_DGRAM and IPPROTO_ICMP are supported */
+
+  if (psock->s_type == SOCK_DGRAM && protocol == IPPROTO_ICMP)
+    {
+      /* Allocate the IPPROTO_ICMP socket connection structure and save in
+       * the new socket instance.
+       */
+
+      FAR struct icmp_conn_s *conn = icmp_alloc();
+      if (conn == NULL)
+        {
+          /* Failed to reserve a connection structure */
+
+          return -ENOMEM;
+        }
+
+      /* Set the reference count on the connection structure.
+       * This reference count will be incremented only if the socket is
+       * dup'ed
+       */
+
+      DEBUGASSERT(conn->crefs == 0);
+      conn->crefs = 1;
+
+      /* Save the pre-allocated connection in the socket structure */
+
+      psock->s_conn = conn;
+      return OK;
+    }
+  else
+    {
+      return -EPROTONOSUPPORT;
+    }
+}
+
+/****************************************************************************
+ * Name: icmp_sockcaps
+ *
+ * Description:
+ *   Return the bit encoded capabilities of this socket.
+ *
+ * Input Parameters:
+ *   psock - Socket structure of the socket whose capabilities are being
+ *           queried.
+ *
+ * Returned Value:
+ *   The set of socket cababilities is returned.
+ *
+ ****************************************************************************/
+
+static sockcaps_t icmp_sockcaps(FAR struct socket *psock)
+{
+  return 0;
+}
+
+/****************************************************************************
+ * Name: icmp_addref
+ *
+ * Description:
+ *   Increment the refernce count on the underlying connection structure.
+ *
+ * Input Parameters:
+ *   psock - Socket structure of the socket whose reference count will be
+ *           incremented.
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+static void icmp_addref(FAR struct socket *psock)
+{
+  FAR struct icmp_conn_s *conn;
+
+  DEBUGASSERT(psock != NULL && psock->s_conn != NULL);
+
+  conn = psock->s_conn;
+  DEBUGASSERT(conn->crefs > 0 && conn->crefs < 255);
+  conn->crefs++;
+}
+
+/****************************************************************************
+ * Name: icmp_connect
+ *
+ * Description:
+ *   icmp_connect() connects the local socket referred to by the structure
+ *   'psock' to the address specified by 'addr'. The addrlen argument
+ *   specifies the size of 'addr'.  The format of the address in 'addr' is
+ *   determined by the address space of the socket 'psock'.
+ *
+ *   If the socket 'psock' is of type SOCK_DGRAM then 'addr' is the address
+ *   to which datagrams are sent by default, and the only address from which
+ *   datagrams are received. If the socket is of type SOCK_STREAM or
+ *   SOCK_SEQPACKET, this call attempts to make a connection to the socket
+ *   that is bound to the address specified by 'addr'.
+ *
+ *   Generally, connection-based protocol sockets may successfully
+ *   icmp_connect() only once; connectionless protocol sockets may use
+ *   icmp_connect() multiple times to change their association.
+ *   Connectionless sockets may dissolve the association by connecting to
+ *   an address with the sa_family member of sockaddr set to AF_UNSPEC.
+ *
+ * Input Parameters:
+ *   psock     Pointer to a socket structure initialized by psock_socket()
+ *   addr      Server address (form depends on type of socket)
+ *   addrlen   Length of actual 'addr'
+ *
+ * Returned Value:
+ *   0 on success; a negated errno value on failue.  See connect() for the
+ *   list of appropriate errno values to be returned.
+ *
+ ****************************************************************************/
+
+static int icmp_connect(FAR struct socket *psock,
+                       FAR const struct sockaddr *addr, socklen_t addrlen)
+{
+  return -EAFNOSUPPORT;
+}
+
+/****************************************************************************
+ * Name: icmp_accept
+ *
+ * Description:
+ *   The icmp_accept function is used with connection-based socket types
+ *   (SOCK_STREAM, SOCK_SEQPACKET and SOCK_RDM). It extracts the first
+ *   connection request on the queue of pending connections, creates a new
+ *   connected socket with mostly the same properties as 'sockfd', and
+ *   allocates a new socket descriptor for the socket, which is returned. The
+ *   newly created socket is no longer in the listening state. The original
+ *   socket 'sockfd' is unaffected by this call.  Per file descriptor flags
+ *   are not inherited across an icmp_accept.
+ *
+ *   The 'sockfd' argument is a socket descriptor that has been created with
+ *   socket(), bound to a local address with bind(), and is listening for
+ *   connections after a call to listen().
+ *
+ *   On return, the 'addr' structure is filled in with the address of the
+ *   connecting entity. The 'addrlen' argument initially contains the size
+ *   of the structure pointed to by 'addr'; on return it will contain the
+ *   actual length of the address returned.
+ *
+ *   If no pending connections are present on the queue, and the socket is
+ *   not marked as non-blocking, icmp_accept blocks the caller until a
+ *   connection is present. If the socket is marked non-blocking and no
+ *   pending connections are present on the queue, icmp_accept returns
+ *   EAGAIN.
+ *
+ * Input Parameters:
+ *   psock    Reference to the listening socket structure
+ *   addr     Receives the address of the connecting client
+ *   addrlen  Input: allocated size of 'addr', Return: returned size of 'addr'
+ *   newsock  Location to return the accepted socket information.
+ *
+ * Returned Value:
+ *   Returns 0 (OK) on success.  On failure, it returns a negated errno
+ *   value.  See accept() for a desrciption of the approriate error value.
+ *
+ * Assumptions:
+ *   The network is locked.
+ *
+ ****************************************************************************/
+
+static int icmp_accept(FAR struct socket *psock, FAR struct sockaddr *addr,
+                      FAR socklen_t *addrlen, FAR struct socket *newsock)
+{
+  return -EAFNOSUPPORT;
+}
+
+/****************************************************************************
+ * Name: icmp_bind
+ *
+ * Description:
+ *   icmp_bind() gives the socket 'psock' the local address 'addr'.  'addr'
+ *   is 'addrlen' bytes long.  Traditionally, this is called "assigning a
+ *   name to a socket."  When a socket is created with socket(), it exists
+ *   in a name space (address family) but has no name assigned.
+ *
+ * Input Parameters:
+ *   psock    Socket structure of the socket to bind
+ *   addr     Socket local address
+ *   addrlen  Length of 'addr'
+ *
+ * Returned Value:
+ *   0 on success;  A negated errno value is returned on failure.  See
+ *   bind() for a list a appropriate error values.
+ *
+ ****************************************************************************/
+
+static int icmp_bind(FAR struct socket *psock, FAR const struct sockaddr *addr,
+                     socklen_t addrlen)
+{
+  /* An ICMP socket cannot be bound to a local address */
+
+  return -EBADF;
+}
+
+/****************************************************************************
+ * Name: icmp_getsockname
+ *
+ * Description:
+ *   The icmp_getsockname() function retrieves the locally-bound name of the
+ *   specified packet socket, stores this address in the sockaddr structure
+ *   pointed to by the 'addr' argument, and stores the length of this
+ *   address in the object pointed to by the 'addrlen' argument.
+ *
+ *   If the actual length of the address is greater than the length of the
+ *   supplied sockaddr structure, the stored address will be truncated.
+ *
+ *   If the socket has not been bound to a local name, the value stored in
+ *   the object pointed to by address is unspecified.
+ *
+ * Input Parameters:
+ *   psock    Socket structure of the socket to be queried
+ *   addr     sockaddr structure to receive data [out]
+ *   addrlen  Length of sockaddr structure [in/out]
+ *
+ * Returned Value:
+ *   On success, 0 is returned, the 'addr' argument points to the address
+ *   of the socket, and the 'addrlen' argument points to the length of the
+ *   address.  Otherwise, a negated errno value is returned.  See
+ *   getsockname() for the list of appropriate error numbers.
+ *
+ ****************************************************************************/
+
+static int icmp_getsockname(FAR struct socket *psock,
+                           FAR struct sockaddr *addr, FAR socklen_t *addrlen)
+{
+  return -EAFNOSUPPORT;
+}
+
+/****************************************************************************
+ * Name: icmp_getpeername
+ *
+ * Description:
+ *   The icmp_getpeername() function retrieves the remote-connected name of the
+ *   specified packet socket, stores this address in the sockaddr structure
+ *   pointed to by the 'addr' argument, and stores the length of this
+ *   address in the object pointed to by the 'addrlen' argument.
+ *
+ *   If the actual length of the address is greater than the length of the
+ *   supplied sockaddr structure, the stored address will be truncated.
+ *
+ *   If the socket has not been bound to a local name, the value stored in
+ *   the object pointed to by address is unspecified.
+ *
+ * Parameters:
+ *   psock    Socket structure of the socket to be queried
+ *   addr     sockaddr structure to receive data [out]
+ *   addrlen  Length of sockaddr structure [in/out]
+ *
+ * Returned Value:
+ *   On success, 0 is returned, the 'addr' argument points to the address
+ *   of the socket, and the 'addrlen' argument points to the length of the
+ *   address.  Otherwise, a negated errno value is returned.  See
+ *   getpeername() for the list of appropriate error numbers.
+ *
+ ****************************************************************************/
+
+static int icmp_getpeername(FAR struct socket *psock,
+                           FAR struct sockaddr *addr, FAR socklen_t *addrlen)
+{
+  return -EAFNOSUPPORT;
+}
+
+/****************************************************************************
+ * Name: icmp_listen
+ *
+ * Description:
+ *   To accept connections, a socket is first created with psock_socket(), a
+ *   willingness to accept incoming connections and a queue limit for
+ *   incoming connections are specified with psock_listen(), and then the
+ *   connections are accepted with psock_accept().  For the case of raw
+ *   packet sockets, psock_listen() calls this function.  The psock_listen()
+ *   call applies only to sockets of type SOCK_STREAM or SOCK_SEQPACKET.
+ *
+ * Input Parameters:
+ *   psock    Reference to an internal, boound socket structure.
+ *   backlog  The maximum length the queue of pending connections may grow.
+ *            If a connection request arrives with the queue full, the client
+ *            may receive an error with an indication of ECONNREFUSED or,
+ *            if the underlying protocol supports retransmission, the request
+ *            may be ignored so that retries succeed.
+ *
+ * Returned Value:
+ *   On success, zero is returned. On error, a negated errno value is
+ *   returned.  See list() for the set of appropriate error values.
+ *
+ ****************************************************************************/
+
+int icmp_listen(FAR struct socket *psock, int backlog)
+{
+  return -EOPNOTSUPP;
+}
+
+/****************************************************************************
+ * Name: icmp_netpoll
+ *
+ * Description:
+ *   The standard poll() operation redirects operations on socket descriptors
+ *   to net_poll which, indiectly, calls to function.
+ *
+ * Input Parameters:
+ *   psock - An instance of the internal socket structure.
+ *   fds   - The structure describing the events to be monitored, OR NULL if
+ *           this is a request to stop monitoring events.
+ *   setup - true: Setup up the poll; false: Teardown the poll
+ *
+ * Returned Value:
+ *  0: Success; Negated errno on failure
+ *
+ ****************************************************************************/
+
+static int icmp_netpoll(FAR struct socket *psock, FAR struct pollfd *fds,
+                        bool setup)
+{
+#ifdef CONFIG_MM_IOB
+  /* Check if we are setting up or tearing down the poll */
+
+  if (setup)
+    {
+      /* Perform the ICMP poll() setup */
+
+      return icmp_pollsetup(psock, fds);
+    }
+  else
+    {
+      /* Perform the ICMP poll() teardown */
+
+      return icmp_pollteardown(psock, fds);
+    }
+#else
+  return -ENOSYS;
+#endif /* CONFIG_MM_IOB */
+}
+
+/****************************************************************************
+ * Name: icmp_send
+ *
+ * Description:
+ *   Socket send() method for the raw packet socket.
+ *
+ * Input Parameters:
+ *   psock    An instance of the internal socket structure.
+ *   buf      Data to send
+ *   len      Length of data to send
+ *   flags    Send flags
+ *
+ * Returned Value:
+ *   On success, returns the number of characters sent.  On  error, a negated
+ *   errno value is returned (see send() for the list of appropriate error
+ *   values.
+ *
+ ****************************************************************************/
+
+static ssize_t icmp_send(FAR struct socket *psock, FAR const void *buf,
+                        size_t len, int flags)
+{
+  /* ICMP sockets cannot be bound and, hence, cannot support any connection-
+   * oriented data transfer.
+   */
+
+  return -EDESTADDRREQ;
+}
+
+/****************************************************************************
+ * Name: icmp_close
+ *
+ * Description:
+ *   Performs the close operation on a raw packet socket instance
+ *
+ * Input Parameters:
+ *   psock   Socket instance
+ *
+ * Returned Value:
+ *   0 on success; a negated errno value is returned on any failure.
+ *
+ * Assumptions:
+ *
+ ****************************************************************************/
+
+static int icmp_close(FAR struct socket *psock)
+{
+  FAR struct icmp_conn_s *conn;
+
+  DEBUGASSERT(psock != NULL && psock->s_conn != NULL);
+  conn = psock->s_conn;
+
+  /* Is this the last reference to the connection structure (there could be\
+   * more if the socket was dup'ed).
+   */
+
+  DEBUGASSERT(conn->crefs > 0);
+
+  if (conn->crefs <= 1)
+    {
+      /* Yes... free any read-ahead data */
+
+      iob_free_queue(&conn->readahead, IOBUSER_NET_SOCK_ICMP);
+
+      /* Then free the connection structure */
+
+      conn->crefs = 0;           /* No more references on the connection */
+      icmp_free(psock->s_conn);  /* Free network resources */
+    }
+  else
+    {
+      /* No.. Just decrement the reference count */
+
+      conn->crefs--;
+    }
+
+  return OK;
+}
+
+/****************************************************************************
+ * Public Functions
+ ****************************************************************************/
+
+#endif /* CONFIG_NET_ICMP_SOCKET */

@@ -1,0 +1,8 @@
+sensor_msgs/Image left_image
+sensor_msgs/Image right_image
+int32[] update_vect
+int32 stereo
+---
+int32[] update_vect
+float64[] features_l
+float64[] features_r

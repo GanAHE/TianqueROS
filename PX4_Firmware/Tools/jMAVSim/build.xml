@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jMAVSim" default="all">
+
+    <property name="build.dir" value="out/production" />
+    <property name="classes.dir" value="${build.dir}/jMAVSim"/>
+    <property name="resource_list" value="environment/**/*,mavlink/**/*,models/**/*" />
+
+    <path id="libsclasspath">
+        <fileset dir="lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="all" description="Compile all sources and create JAR (not including dependencies)." depends="jmavsim"/>
+
+    <target name="make_dirs" description="Make dirs">
+        <mkdir dir="${classes.dir}"/>
+    </target>
+
+    <path id="javac.class.path">
+        <pathelement location="lib/annotations.jar"/>
+    </path>
+
+    <path id="javac2.class.path">
+        <pathelement location="lib/annotations.jar"/>
+        <pathelement location="lib/javac2.jar"/>
+        <pathelement location="lib/asm4-all.jar"/>
+        <pathelement location="lib/jdom.jar"/>
+        <pathelement location="lib/vecmath.jar"/>
+    </path>
+
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.class.path"/>
+
+    <target name="compile" description="Compile java sources" depends="make_dirs">
+        <javac destdir="${classes.dir}" includeantruntime="false" debug="true">
+            <classpath refid="libsclasspath"/>
+            <src path="src"/>
+            <src path="jMAVlib/src"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-Xlint:unchecked"/>
+        </javac>
+    </target>
+
+    <target name="jmavsim" description="Link classes and JARs for jMAVSim" depends="compile">
+        <jar id="jmavsim" jarfile="${build.dir}/jmavsim.jar">
+            <fileset dir="${classes.dir}">
+                <include name="**/*.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="create_run_jar" depends="compile" description="Creates standalone runnable JAR file including dependencies.">
+        <jar destfile="${build.dir}/jmavsim_run.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="me.drton.jmavsim.Simulator"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ annotations.jar gluegen-rt-natives-linux-amd64.jar gluegen-rt-natives-linux-i586.jar gluegen-rt-natives-macosx-universal.jar gluegen-rt-natives-windows-amd64.jar gluegen-rt-natives-windows-i586.jar gluegen-rt.jar j3dcore.jar j3dutils.jar joal-natives-linux-amd64.jar joal-natives-linux-i586.jar joal-natives-macosx-universal.jar joal-natives-windows-amd64.jar joal-natives-windows-i586.jar joal.jar jogl-all-natives-linux-amd64.jar jogl-all-natives-linux-i586.jar jogl-all-natives-macosx-universal.jar jogl-all-natives-windows-amd64.jar jogl-all-natives-windows-i586.jar jogl-all.jar jssc.jar vecmath.jar"/>
+            </manifest>
+            <fileset dir="${classes.dir}"/>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <zipfileset dir="lib" includes="annotations.jar"/>
+            <zipfileset dir="lib" includes="gluegen-rt.jar"/>
+            <zipfileset dir="lib" includes="j3dcore.jar"/>
+            <zipfileset dir="lib" includes="j3dutils.jar"/>
+            <zipfileset dir="lib" includes="joal.jar"/>
+            <zipfileset dir="lib" includes="jogl-all.jar"/>
+            <zipfileset dir="lib" includes="jssc.jar"/>
+            <zipfileset dir="lib" includes="vecmath.jar"/>
+            <zipgroupfileset dir="lib" includes="forms_rt.jar"/>
+
+            <!-- OS-specific jars (can exclude any you don't need) -->
+
+            <zipfileset dir="lib" includes="gluegen-rt-natives-linux-amd64.jar"/>
+            <zipfileset dir="lib" includes="joal-natives-linux-amd64.jar"/>
+            <zipfileset dir="lib" includes="jogl-all-natives-linux-amd64.jar"/>
+            <!--
+            <zipfileset dir="lib" includes="gluegen-rt-natives-linux-i586.jar"/>
+            <zipfileset dir="lib" includes="joal-natives-linux-i586.jar"/>
+            <zipfileset dir="lib" includes="jogl-all-natives-linux-i586.jar"/>
+            -->
+            <zipfileset dir="lib" includes="gluegen-rt-natives-macosx-universal.jar"/>
+            <zipfileset dir="lib" includes="joal-natives-macosx-universal.jar"/>
+            <zipfileset dir="lib" includes="jogl-all-natives-macosx-universal.jar"/>
+
+            <zipfileset dir="lib" includes="gluegen-rt-natives-windows-amd64.jar"/>
+            <zipfileset dir="lib" includes="joal-natives-windows-amd64.jar"/>
+            <zipfileset dir="lib" includes="jogl-all-natives-windows-amd64.jar"/>
+            <!--
+            <zipfileset dir="lib" includes="gluegen-rt-natives-windows-i586.jar"/>
+            <zipfileset dir="lib" includes="joal-natives-windows-i586.jar"/>
+            <zipfileset dir="lib" includes="jogl-all-natives-windows-i586.jar"/>
+            -->
+        </jar>
+    </target>
+
+    <target name="copy_res"
+            description="Copies all supporting resource files into build folder, eg. to use jmavsim_run.jar or prepare for distro.">
+        <copy todir="${build.dir}/" preservelastmodified="true" overwrite="false">
+            <zipfileset dir="./" includes="${resource_list}" />
+        </copy>
+    </target>
+
+    <target name="distro" depends="create_run_jar"
+            description="Creates complete distributable package.">
+        <zip destfile="${build.dir}/jMAVSim-distrib.zip" >
+            <zipfileset file="${build.dir}/jmavsim_run.jar" prefix="" />
+            <zipfileset dir="./" includes="${resource_list}" />
+        </zip>
+    </target>
+
+    <target name="clean" description="Delete build artifacts.">
+        <delete dir="${classes.dir}"/>
+        <delete file="${build.dir}/jmavsim.jar"/>
+        <delete file="${build.dir}/jmavsim_run.jar"/>
+    </target>
+
+    <target name="clean-all" description="Delete entire build folder, including any distro files, copied resources, etc.">
+        <delete dir="${build.dir}" />
+    </target>
+</project>

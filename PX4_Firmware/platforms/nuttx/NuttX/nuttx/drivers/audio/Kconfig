@@ -1,0 +1,247 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config AUDIO_TONE
+	bool "Audio Tone Generator using PWM"
+	default n
+	depends on PWM && DRIVERS_AUDIO
+	---help---
+		This driver enables the Audio Tone Generator for NuttX.
+
+if AUDIO_TONE
+
+endif # AUDIO_TONE
+
+config AUDIO_VS1053
+	bool "VS1053 codec chip"
+	default n
+	depends on AUDIO
+	---help---
+		Select to enable support for the VS1053 Audio codec by VLSI Solutions.
+		This chip provides encoding and decoding of MP3, WMA, AAC and Ogg
+		Vorbis format audio.  It also has a general DSP which is user
+		programmable to perform special audio (or any DSP) functions.
+
+if AUDIO_VS1053
+
+config VS1053_DEVICE_COUNT
+	int "Number of VS1053 devices attached"
+	default 1
+	---help---
+		Sets the number of VS1053 type devices available to the system.
+		This is required to reserve global, static lower-half driver
+		context pointers for the DREQ ISR to use for lookup when it needs
+		to signal that additional data is being requested.
+
+config VS1053_WORKER_STACKSIZE
+	int "VS1053 worker thread stack size"
+	default 768
+	---help---
+		Stack size to use with the VS1053 worker thread.
+
+if AUDIO_DRIVER_SPECIFIC_BUFFERS
+
+config VS1053_NUM_BUFFERS
+	int "Number of Audio Pipeline Buffers to use"
+	default 2
+	---help---
+		Sets the number of the Audio Pipeline Buffers used to deliver audio
+		data to the VS1053 driver.  The minimum you should set this is
+		2 buffers, which should be adequate for most media types.
+
+config VS1053_BUFFER_SIZE
+	int "Size of Audio Pipeline Buffers to use"
+	default 8192
+	---help---
+		Sets the size of the Audio Pipeline Buffers used to deliver audio
+		data to the VS1053 driver.  The minimum you should set this is
+		2048 bytes.  The larger the buffer, the better CPU performance.
+
+endif # AUDIO_DRIVER_SPECIFIC_BUFFERS
+endif # AUDIO_VS1053
+
+config AUDIO_CS43L22
+	bool "CS43L22 audio chip"
+	default n
+	depends on AUDIO
+	---help---
+		Select to enable support for the CS43L22 Audio codec by Cirrus Logic.
+		This chip is a lower level audio chip.. basically
+		an exotic D-to-A.  It includes no built-in support for audio CODECS
+		The CS43L22 provides:
+
+			- Low power consumption
+			- High SNR
+			- Stereo digital microphone input
+			- Digital Dynamic Range Controller (compressor / limiter)
+			- Digital sidetone mixing
+			- Ground-referenced headphone driver
+			- Ground-referenced line outputs
+
+		NOTE: This driver also depends on both I2C and I2S support although
+		that dependency is not explicit here.
+
+if AUDIO_CS43L22
+
+config CS43L22_INITVOLUME
+	int "CS43L22 initial volume setting"
+	default 250
+
+config CS43L22_INFLIGHT
+	int "CS43L22 maximum in-flight audio buffers"
+	default 2
+
+config CS43L22_MSG_PRIO
+	int "CS43L22 message priority"
+	default 1
+
+config CS43L22_BUFFER_SIZE
+	int "CS43L22 preferred buffer size"
+	default 8192
+
+config CS43L22_NUM_BUFFERS
+	int "CS43L22 preferred number of buffers"
+	default 4
+
+config CS43L22_WORKER_STACKSIZE
+	int "CS43L22 worker thread stack size"
+	default 768
+
+config CS43L22_REGDUMP
+	bool "CS43L22 register dump"
+	default n
+	---help---
+		Enable logic to dump the contents of all CS43L22 registers.
+
+config CS43L22_CLKDEBUG
+	bool "CS43L22 clock analysis"
+	default n
+	---help---
+		Enable logic to analyze CS43L22 clock configuation.
+
+endif # AUDIO_CS43L22
+
+config AUDIO_WM8776
+	bool "WM8776 audio chip"
+	default n
+	depends on AUDIO
+	---help---
+		Select to enable support for the WM8776 Audio codec by Wolfson
+		Microelectonics.
+
+if AUDIO_WM8776
+
+config WM8776_INFLIGHT
+	int "WM8776 maximum in-flight audio buffers"
+	default 2
+
+config WM8776_MSG_PRIO
+	int "WM8776 message priority"
+	default 1
+
+config WM8776_WORKER_STACKSIZE
+	int "WM8776 worker thread stack size"
+	default 768
+
+config WM8776_SWAP_HPOUT
+	bool "Swap WM8776 HP out signals"
+	default n
+
+endif # AUDIO_WM8776
+
+config AUDIO_WM8904
+	bool "WM8904 audio chip"
+	default n
+	depends on AUDIO
+	---help---
+		Select to enable support for the WM8904 Audio codec by Wolfson
+		Microelectonics.  This chip is a lower level audio chip.. basically
+		an exotic D-to-A.  It includes no built-in support for audio CODECS
+		The WM8904 provides:
+
+			- Low power consumption
+			- High SNR
+			- Stereo digital microphone input
+			- Digital Dynamic Range Controller (compressor / limiter)
+			- Digital sidetone mixing
+			- Ground-referenced headphone driver
+			- Ground-referenced line outputs
+
+		NOTE: This driver also depends on both I2C and I2S support although
+		that dependency is not explicit here.
+
+if AUDIO_WM8904
+
+config WM8904_INITVOLUME
+	int "WM8904 initial volume setting"
+	default 250
+
+config WM8904_INFLIGHT
+	int "WM8904 maximum in-flight audio buffers"
+	default 2
+
+config WM8904_MSG_PRIO
+	int "WM8904 message priority"
+	default 1
+
+config WM8904_BUFFER_SIZE
+	int "WM8904 preferred buffer size"
+	default 8192
+
+config WM8904_NUM_BUFFERS
+	int "WM8904 preferred number of buffers"
+	default 4
+
+config WM8904_WORKER_STACKSIZE
+	int "WM8904 worker thread stack size"
+	default 768
+
+config WM8904_REGDUMP
+	bool "WM8904 register dump"
+	default n
+	---help---
+		Enable logic to dump the contents of all WM8904 registers.
+
+config WM8904_CLKDEBUG
+	bool "WM8904 clock analysis"
+	default n
+	---help---
+		Enable logic to analyze WM8904 clock configuation.
+
+endif # AUDIO_WM8904
+
+config AUDIO_NULL
+	bool "NULL audio device"
+	default n
+	depends on AUDIO
+	---help---
+		A do-nothing audio device driver to simplify testing of audio
+		decoders.
+
+if AUDIO_NULL
+
+config AUDIO_NULL_MSG_PRIO
+	int "Null audio device message priority"
+	default 1
+
+config AUDIO_NULL_BUFFER_SIZE
+	int "Null audio device preferred buffer size"
+	default 8192
+
+config AUDIO_NULL_NUM_BUFFERS
+	int "Null audio device preferred number of buffers"
+	default 4
+
+config AUDIO_NULL_WORKER_STACKSIZE
+	int "Null audio device worker thread stack size"
+	default 768
+
+endif # AUDIO_NULL
+
+config AUDIO_I2S
+	bool "Audio I2S"
+	depends on AUDIO
+	depends on I2S
+

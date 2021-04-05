@@ -1,0 +1,187 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config ADC
+	bool "Analog-to-Digital Conversion"
+	default n
+	---help---
+		Select to enable support for analog input device support.  This includes
+		not only Analog-to-Digital Converters (ADC) but also amplifiers and
+		analog multiplexers.
+
+		This selection enables:
+
+			- The upper half, device-independent ADC character driver, and
+			- Selection of common lower half ADC drivers.
+
+		MCU-specific, lower half drivers may be selected independently of
+		CONFIG_ADC.  However, if CONFIG_ADC is selected, then it is assume
+		that lower half ADC drivers will be used only with the common ADC
+		upper half driver.
+
+if ADC
+
+config ADC_FIFOSIZE
+	int "ADC buffer size"
+	default 8
+	---help---
+		This variable defines the size of the ADC ring buffer that is used
+		to queue received ADC data until they can be retrieved by the
+		application by reading from the ADC character device.  NOTE:  Since
+		this is a ring buffer, the actual number of bytes that can be
+		retained in buffer is (ADC_FIFOSIZE - 1).
+
+config ADC_NPOLLWAITERS
+	int "Number of poll waiters"
+	default 2
+	---help---
+		Maximum number of threads that can be waiting on poll.
+
+config ADC_ADS1242
+	bool "TI ADS1242 support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the ADS1242 24-Bit SPI powered ADC.
+
+		This driver supports reading the ADC conversion result as well as
+		configuring the ADC, setting the input channel, etc. is implemented
+		via ioctl calls. However, it does not yet implement the standard ADC
+		interface.
+
+config ADC_ADS125X
+	bool "TI ADS1255/ADS1256 support"
+	default n
+	select SPI
+	select SCHED_HPWORK
+
+if ADC_ADS125X
+
+config ADS1255_FREQUENCY
+	int "ADS1255/ADS1256 SPI frequency"
+	default 1000000
+
+endif # ADC_ADS125X
+
+config ADC_LTC1867L
+	bool "LTC 1863L/1867L support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the LTC 1863L (12 bit) and LTC 1867L (16 bit) SPI powered ADC.
+
+		Note that the ADC conversion is started via the ANIOC_TRIGGER iotcl.
+
+if ADC_LTC1867L
+
+config LTC1867L_FREQUENCY
+	int "LTC 1863L/1867L SPI frequency"
+	default 1000000
+	---help---
+		LTC 1863L/1867L SPI frequency. Maximum is 20 MHz.
+
+endif # ADC_LTC1867L
+
+config ADC_PGA11X
+	bool "TI PGA112/3/6/7 support"
+	default n
+	select SPI
+	---help---
+		Enables support for the  PGA112, PGA113, PGA116, PGA117 Zero-Drift
+		PROGRAMMABLE GAIN AMPLIFIER with MUX
+
+if ADC_PGA11X
+
+config PGA11X_SPIFREQUENCY
+	int "TI PGA112/3/6/7 SPI frequency"
+	default 1000000
+	---help---
+		PGA11x SPI frequency.
+
+config PGA11X_SPIMODE
+	int "TI PGA112/3/6/7 SPI mode"
+	default 0
+	---help---
+		PGA11x SPI mode.  The specification says that the device operates in Mode 0 or
+		Mode 3.  But sometimes you need to tinker with this to get things to work
+		correctly. Default:  Mode 0
+
+config PGA11X_DAISYCHAIN
+	bool "TI PGA112/3/6/7 daisy chain mode"
+	default n
+	---help---
+		Enable support to use two PGA116/7's in Daisy Chain configuration.
+
+config PGA11X_MULTIPLE
+	bool "Multiple TI PGA112/3/6/7 support"
+	default n
+	depends on !PGA11X_DAISYCHAIN
+	---help---
+		Can be defined to support multiple PGA11X devices on board with separate
+		chip selects (not daisy chained).  Each device will require a customized
+		SPI interface to distinguish them when SPI_SELECT is called with
+		devid=SPIDEV_MUX(n).
+
+endif # if ADC_PGA11X
+
+endif # ADC
+
+config COMP
+	bool "Analog Comparator"
+	default n
+	---help---
+		Select to enable support for Analog Comparators (COMPs).
+
+config DAC
+	bool "Digital-to-Analog Conversion"
+	default n
+	---help---
+		Select to enable support for Digital-to-Analog Converters (DACs).
+
+if DAC
+
+config DAC_AD5410
+	bool "AD5410 support"
+	default n
+	select SPI
+
+config DAC7571
+	bool "DAC7571 support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Texas Instruments DAC7571 dac.
+
+config DAC7571_I2C_FREQUENCY
+	int "DAC7571 I2C frequency"
+	default 400000
+	depends on DAC7571
+
+config DAC7554
+	bool "DAC7554 support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the Texas Instruments DAC7554 dac.
+
+endif # DAC
+
+config OPAMP
+	bool "Operational Amplifier"
+	default n
+	---help---
+		Select to enable support for Operational Amplifiers (OPAMPs).
+
+config LMP92001
+	bool "LMP92001 support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Texas Instruments LMP92001.
+
+config LMP92001_I2C_FREQUENCY
+	int "LMP92001 I2C frequency"
+	default 400000
+	depends on LMP92001

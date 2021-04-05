@@ -1,0 +1,107 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config SPIRIT_NETDEV
+	bool "STMicro Spirit1-based Network Driver"
+	default n
+	select WL_SPIRIT
+	select ARCH_HAVE_NETDEV_STATISTICS
+	---help---
+		This selection enables support for the TMicro Spirit1-based device.
+		This configuration generates an IEEE802.15.4 work-alike radio device that
+		works with the 6LoWPAN stack.
+
+if SPIRIT_NETDEV
+
+config SPIRIT_PKTLEN
+	int "Fixed packet length"
+	default 96
+	range 1 96 if !SPIRIT_FIFOS
+	range 1 65535 if SPIRIT_FIFOS
+	---help---
+		Fixed pkt sizes are used.  This setting describes that fixed packet
+		size.
+
+		This comment exists in the STMicro Spirit driver.  I have not
+		experienced this myself, but this is something you should be aware
+		of:  "Sometimes Spirit1 seems to NOT deliver (correctly) the
+		'IRQ_RX_DATA_READY' event for packets which have a length which is
+		close to a multiple of RX FIFO size. Furthermore, in these cases
+		also the content delivery seems to be compromised as well as the
+		generation of RX/TX FIFO errors. This can be avoided by reducing
+		the maximum packet length to a value which is lower than the RX FIFO
+		size."
+
+config SPIRIT_FIFOS
+	bool "FIFO Watermarks"
+	default n
+	depends on EXPERIMENTAL
+	---help---
+		The Spirit hardware can provided interrupts when indicate when the
+		RX or TX FIFOs are almost full or empty.  This is useful for
+		supporting very large packets, larger than the FIFO size.  The RX/TX
+		FIFO size is 96 bytes.  If the packet size is significantly less than
+		96 bytes, this feature is not needed.  It is required for packet sizes
+		greater than 96 bytes and if it is not selected, there may be
+		occurrences of RX FIFO errors if the packet size is less than but close
+		to 96.
+
+		This comment exists in the STMicro Spirit driver.  I have not
+		experienced this myself, but this is something you should be aware
+		of:  "Sometimes Spirit1 seems to NOT deliver (correctly) the
+		'IRQ_RX_DATA_READY' event for packets which have a length which is
+		close to a multiple of RX FIFO size. Furthermore, in these cases
+		also the content delivery seems to be compromised as well as the
+		generation of RX/TX FIFO errors. This can be avoided by reducing
+		the maximum packet length to a value which is lower than the RX FIFO
+		size."
+
+		From my reading, the only known work-around is to reduce the maximum
+		packet size so that it is smaller than 96.  Hence, this option is
+		conditioned on EXPERMENTAL.
+
+config SPIRIT_PROMISICUOUS
+	bool "Promiscuous mode"
+	default n
+	---help---
+		Disables all address filtering.  Otherwise, filtering the node
+		address will be supported.
+
+config SPIRIT_MULTICAST
+	bool "Multicast address filter"
+	default n
+	depends on !SPIRIT_PROMISICUOUS
+	---help---
+		Enables address filtering for the multicast addess 0xee.
+
+config SPIRIT_BROADCAST
+	bool "Broadcast address filter"
+	default n
+	depends on !SPIRIT_PROMISICUOUS
+	---help---
+		Enables address filtering for the broadcast addess 0xff.
+
+config SPIRIT_CRCDISABLE
+	bool "Disable CRC"
+	default n
+	---help---
+		Disables CRC calculation and filtering.  Default is enabled.
+
+		Errata:  "Using the STack packet format and no CRC field, the
+		reading from RX FIFO to the last received byte, is not possible. ..."
+		Workaround: "By configuring the packet handler with at least one byte
+		of CRC, the problem is solved. If the CRC is not required in the
+		application, configure one byte of CRC in the receiver only, to read
+		the payload correctly from RX FIFO."
+
+config SPIRIT_HUBNODE
+	hex "Address of hub node"
+	default 0x34
+	depends on NET_STAR
+	---help---
+		Provides the "well known" address of the hub node in the
+		star configuration.
+
+endif # SPIRIT_NETDEV

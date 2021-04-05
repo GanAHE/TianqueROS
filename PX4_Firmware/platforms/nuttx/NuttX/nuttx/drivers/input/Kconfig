@@ -1,0 +1,512 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config MOUSE
+	bool "Enable mouse support"
+	default n
+	---help---
+		Enable support for mouse devices.
+
+if MOUSE
+
+config MOUSE_WHEEL
+	bool "Enable mouse wheel support"
+	default n
+	---help---
+		Enable support for a 4-button mouse report that includes a while
+		position.
+
+endif # MOUSE
+
+config INPUT_MAX11802
+	bool "MAX11802 touchscreen controller"
+	default n
+	select SPI
+	---help---
+		Enable support for the MAX11802 touchscreen controller
+
+config INPUT_TSC2007
+	bool "TI TSC2007 touchscreen controller"
+	default n
+	select I2C
+	---help---
+		Enable support for the TI TSC2007 touchscreen controller
+
+if INPUT_TSC2007
+
+config TSC2007_8BIT
+	bool "TSC2007 8-bit Conversions"
+	default n
+	---help---
+		Use faster, but less accurate, 8-bit conversions.  Default: 12-bit conversions.
+
+config TSC2007_MULTIPLE
+	bool "Multiple TSC2007 Devices"
+	default n
+	---help---
+		Can be defined to support multiple TSC2007 devices on board.
+
+config TSC2007_NPOLLWAITERS
+	int "Number TSC2007 poll waiters"
+	default 4
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+endif # INPUT_TSC2007
+
+config INPUT_FT5X06
+	bool "FocalTech FT5x06 multi-touch, capacitive touch panel controller"
+	default n
+	select I2C
+	---help---
+		Enable support for the FocalTech FT5x06 multi-touch, capacitive
+		touch panel controller
+
+config INPUT_FT5336
+	bool "FocalTech FT5336 multi-touch, capacitive touch panel controller"
+	default n
+	select I2C
+	select INPUT_FT5X06
+	depends on EXPERIMENTAL
+	---help---
+		Enable support for the FocalTech FT5x06 multi-touch, capacitive
+		touch panel controller
+
+if INPUT_FT5X06
+
+config FT5X06_POLLMODE
+	bool "Polled mode"
+	default n
+	---help---
+		Run the FT5x06 in a non-interrupt driven polled mode.  Events will
+		not be driven by interrupts but rather based on a timed poll.
+
+		This is a non-optimal design both because (1) it will lead to delays
+		in detecting touch related events and (2) it will consume a
+		significant amount of CPU time to perform the polling.
+
+config FT5X06_SWAPXY
+	bool "Swap X/Y"
+	default n
+	---help---
+		Reverse the meaning of X and Y to handle different LCD orientations.
+
+config FT5X06_SINGLEPOINT
+	bool "Single point"
+	default n
+	---help---
+		Do no report multi-touch events
+
+if FT5X06_SINGLEPOINT
+
+config FT5X06_THRESHX
+	int "X threshold"
+	default 12
+	---help---
+		New touch positions will only be reported when the X or Y data changes by these
+		thresholds. This trades reduced data rates for some loss in dragging accuracy.  For
+		12-bit values the raw ranges are 0-4095. So for example, if your display is
+		320x240, then THRESHX=13 and THRESHY=17 would correspond to one pixel.  Default: 12
+
+config FT5X06_THRESHY
+	int "Y threshold"
+	default 12
+	---help---
+		New touch positions will only be reported when the X or Y data changes by these
+		thresholds. This trades reduced data rates for some loss in dragging accuracy.  For
+		12-bit values the raw ranges are 0-4095. So for example, if your display is
+		320x240, then THRESHX=13 and THRESHY=17 would correspond to one pixel.  Default: 12
+
+endif # FT5X06_SINGLEPOINT
+
+config FT5X06_NPOLLWAITERS
+	int "Number FT5336/FT5x06 poll waiters"
+	default 4
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+endif # INPUT_FT5X06
+
+config INPUT_ADS7843E
+	bool "TI ADS7843/TSC2046 touchscreen controller"
+	default n
+	select SPI
+	---help---
+		Enable support for the TI/Burr-Brown ADS7842 touchscreen controller.  I believe
+		that driver should be compatibile with the TI/Burr-Brown TSC2046 and XPT2046
+		touchscreen controllers as well.
+
+if INPUT_ADS7843E
+
+config ADS7843E_MULTIPLE
+	bool "Multiple ADS7843E Devices"
+	default n
+	---help---
+		Can be defined to support multiple ADS7843E devices on board.
+
+config ADS7843E_NPOLLWAITERS
+	int "Number poll waiters"
+	default 4
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+config ADS7843E_SPIDEV
+	int "SPI bus number"
+	default 0
+	---help---
+		Selects the SPI bus number identifying that SPI interface that
+		connects the ADS843E to the MCU.
+
+config ADS7843E_DEVMINOR
+	int "Input device minor number"
+	default 0
+	---help---
+		The ADS7843E device will be registered as /dev/inputN where N is the
+		value provided by this setting.
+
+config ADS7843E_SPIMODE
+	int "SPI mode"
+	default 0
+	range 0 3
+	---help---
+		Controls the SPI mode.  The device should work in mode 0, but
+		sometimes you need to experiment.
+
+config ADS7843E_FREQUENCY
+	int "SPI frequency"
+	default 100000
+	---help---
+		Define to use a different SPI bus frequency.
+
+config ADS7843E_SWAPXY
+	bool "Swap X/Y"
+	default n
+	---help---
+		Reverse the meaning of X and Y to handle different LCD orientations.
+
+config ADS7843E_THRESHX
+	int "X threshold"
+	default 12
+	---help---
+		New touch positions will only be reported when the X or Y data changes by these
+		thresholds. This trades reduced data rates for some loss in dragging accuracy.  For
+		12-bit values the raw ranges are 0-4095. So for example, if your display is
+		320x240, then THRESHX=13 and THRESHY=17 would correspond to one pixel.  Default: 12
+
+config ADS7843E_THRESHY
+	int "Y threshold"
+	default 12
+	---help---
+		New touch positions will only be reported when the X or Y data changes by these
+		thresholds. This trades reduced data rates for some loss in dragging accuracy.  For
+		12-bit values the raw ranges are 0-4095. So for example, if your display is
+		320x240, then THRESHX=13 and THRESHY=17 would correspond to one pixel.  Default: 12
+
+endif
+
+config INPUT_MXT
+	bool "Atmel maXTouch Driver"
+	default n
+	---help---
+		Enables support for the Atmel maXTouch driver
+
+if INPUT_MXT
+
+config MXT_THRESHX
+	int "X threshold"
+	default 5
+	---help---
+		New touch positions will only be reported when the X or Y data
+		changes by these thresholds. This trades reduced data rates for some
+		loss in dragging accuracy.  For 12-bit values the raw ranges are
+		0-4095. So for example, if your display is 800x480, then THRESHX=5
+		and THRESHY=8 would correspond to a one pixel change. Default: 5
+
+		NOTE: This does nothing to reduce the interrupt rate.  It only
+		reduces the rate at which touch events are reports.
+
+config MXT_THRESHY
+	int "Y threshold"
+	default 8
+	---help---
+		New touch positions will only be reported when the X or Y data
+		changes by these thresholds. This trades reduced data rates for some
+		loss in dragging accuracy.  For 12-bit values the raw ranges are
+		0-4095. So for example, if your display is 800x480, then THRESHX=5
+		and THRESHY=8 would correspond to a one pixel change. Default: 8
+
+		NOTE: This does nothing to reduce the interrupt rate.  It only
+		reduces the rate at which touch events are reports.
+
+config MXT_NPOLLWAITERS
+	int "Number poll waiters"
+	default 4
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+config MXT_DISABLE_CONFIG_DEBUG_INFO
+	bool "Disable verbose debug output"
+	default y
+	depends on DEBUG_INPUT_INFO
+	---help---
+		The maXTouch tends to generate interrupts at a high rate during the
+		contact.  If verbose debug is enabled in this driver, you may not
+		be able to get anything done because of the high debug output rate.
+
+		This setting will allow you to keep verbose touchscreen debug output
+		in other modules, but to specifically suppress the debug out from
+		the MXT driver.  Debug (non-verbose) errors will still be generated,
+		but the chit-chat level will be eliminated.
+
+endif # INPUT_MXT
+
+config INPUT_STMPE811
+	bool "STMicro STMPE811 Driver"
+	default n
+	---help---
+		Enables support for the STMPE811 driver
+
+if INPUT_STMPE811
+
+choice
+	prompt "STMPE Interface"
+	default STMPE811_I2C
+
+config STMPE811_SPI
+	bool "SPI Interface"
+	select SPI
+	---help---
+		Enables support for the SPI interface (not currently supported)
+
+config STMPE811_I2C
+	bool "STMPE811 I2C Interface"
+	select I2C
+	---help---
+		Enables support for the I2C interface
+
+endchoice
+
+config STMPE811_ACTIVELOW
+	bool "Active Low Interrupt"
+	default n
+	---help---
+		The STMPE811 interrupt is provided by a discrete input (usually a
+		GPIO interrupt on most MCU architectures).  This setting determines
+		whether the interrupt is active high (or rising edge triggered) or
+		active low (or falling edge triggered).  Default:  Active
+		high/rising edge.
+
+config STMPE811_EDGE
+	bool "Edge triggered Interrupt"
+	default n
+	---help---
+		The STMPE811 interrupt is provided by a discrete input (usually a
+		GPIO interrupt on most MCU architectures).  This setting determines
+		whether the interrupt is edge or level triggered.  Default: Level
+		triggered.
+
+config STMPE811_MULTIPLE
+	bool "Multiple STMPE811 Devices"
+	default n
+	---help---
+		Can be defined to support multiple STMPE811 devices on board.
+
+config STMPE811_NPOLLWAITERS
+	int "Number poll waiters"
+	default 4
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+config STMPE811_TSC_DISABLE
+	bool "Disable STMPE811 Touchscreen Support"
+	default n
+	---help---
+		Disable driver touchscreen functionality.
+
+config STMPE811_SWAPXY
+	bool "Swap X/Y"
+	default n
+	depends on !STMPE811_TSC_DISABLE
+	---help---
+		Reverse the meaning of X and Y to handle different LCD orientations.
+
+config STMPE811_THRESHX
+	int "X threshold"
+	default 12
+	depends on !STMPE811_TSC_DISABLE
+	---help---
+		STMPE811 touchscreen data comes in a a very high rate.  New touch positions
+		will only be reported when the X or Y data changes by these thresholds.
+		This trades reduced data rates for some loss in dragging accuracy.  The
+		STMPE811 is configure for 12-bit values the raw ranges are 0-4095. So
+		for example, if your display is 320x240, then THRESHX=13 and THRESHY=17
+		would correspond to one pixel.  Default: 12
+
+config STMPE811_THRESHY
+	int "Y threshold"
+	default 12
+	depends on !STMPE811_TSC_DISABLE
+	---help---
+		STMPE811 touchscreen data comes in a a very high rate.  New touch positions
+		will only be reported when the X or Y data changes by these thresholds.
+		This trades reduced data rates for some loss in dragging accuracy.  The
+		STMPE811 is configure for 12-bit values the raw ranges are 0-4095. So
+		for example, if your display is 320x240, then THRESHX=13 and THRESHY=17
+		would correspond to one pixel.  Default: 12
+
+config STMPE811_ADC_DISABLE
+	bool "Disable STMPE811 ADC Support"
+	default y
+	---help---
+		Disable driver ADC functionality.
+
+config STMPE811_GPIO_DISABLE
+	bool "Disable STMPE811 GPIO Support"
+	default y
+	---help---
+		Disable driver GPIO functionality.
+
+config STMPE811_GPIOINT_DISABLE
+	bool "Disable STMPE811 GPIO Interrupt Support"
+	default y
+	depends on !STMPE811_GPIO_DISABLE
+	---help---
+		Disable driver GPIO interrupt functionality (ignored if GPIO functionality is
+		disabled).
+
+config STMPE811_TEMP_DISABLE
+	bool "Disable STMPE811 Temperature Sensor Support"
+	default y
+	---help---
+		Disable driver temperature sensor functionality.
+
+config STMPE811_REGDEBUG
+	bool "Enable Register-Level STMPE811 Debug"
+	default n
+	depends on DEBUG_FEATURES
+	---help---
+		Enable very low register-level debug output.
+
+endif # INPUT_STMPE811
+
+config INPUT_CYPRESS_MBR3108
+	bool "Enable Cypress MBR3108 CapSense driver"
+	default n
+	---help---
+		Enable support for Cypress MBR3108 CapSense touch button & proximity
+		input sensor.
+
+if INPUT_CYPRESS_MBR3108
+
+config INPUT_CYPRESS_MBR3108_DEBUG
+	bool "Enable debug support for Cypress sensor"
+	default n
+	depends on DEBUG_FEATURES
+	---help---
+		Enable debugging traces for MBR3108 driver
+
+config INPUT_CYPRESS_MBR3108_NPOLLWAITERS
+	int "Number of waiters to poll"
+	default 1
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+endif # INPUT_CYPRESS_MBR3108
+
+config BUTTONS
+	bool "Button Inputs"
+	default n
+	---help---
+		Enable standard button upper half driver.
+
+if BUTTONS
+
+config BUTTONS_LOWER
+	bool "Generic Lower Half Button Driver"
+	default n
+	depends on ARCH_BUTTONS && ARCH_IRQBUTTONS
+	---help---
+		If the board supports the standard button interfaces as
+		defined in include/nuttx/board.h header file, then this
+		standard button lower half driver might be usable.
+
+		In order for this generic driver to be usable:
+
+		1. The board implementation must provide the button
+		   interfaces as defined in include/nuttx/board.h
+		2. The board implementation must support interrupts for each
+		  button.
+		3. The board.h header file must provide the definition
+		   NUM_BUTTONS, and
+		4. The board.h header file must not include any other
+		   header files that are not accessible in this context
+		   (such as those in arch/<arch>/src/<chip>) UNLESS those
+		   inclusions are conditioned on __KERNEL__.  button_lower.c
+		   will undefine __KERNEL__ before included board.h.
+
+		If your board does not meet these requirements, then the
+		button_lower.c file can still be copied to your your
+		board src/ directory and modified for your specific board
+		requirements.
+
+config BUTTONS_NPOLLWAITERS
+	int "Max Number of Poll Waiters"
+	default 2
+
+endif # BUTTONS
+
+config DJOYSTICK
+	bool "Discrete Joystick"
+	default n
+	---help---
+		Enable standard discrete joystick upper half driver.  A discrete
+		joystick refers to a joystick that could be implemented entirely
+		with GPIO input pins.  So up, down, left, and right are all discrete
+		values like buttons (as opposed to integer values like you might
+		obtain from an analog joystick).
+
+if DJOYSTICK
+
+config DJOYSTICK_NPOLLWAITERS
+	int "Max Number of Poll Waiters"
+	default 2
+
+endif # DJOYSTICK
+
+config AJOYSTICK
+	bool "Analog Joystick"
+	default n
+	---help---
+		Enable standard analog joystick upper half driver.  An analog
+		joystick refers to a joystick that provides position data as an
+		integer value that might have been obtained through Analog-
+		to-Digital Conversion (ADC).  The analog positional data may also
+		be accompanied by discrete button data.
+
+if AJOYSTICK
+
+config AJOYSTICK_NPOLLWAITERS
+	int "Max Number of Poll Waiters"
+	default 2
+
+endif # AJOYSTICK
+
+config INPUT_NUNCHUCK
+	bool "Nintendo Wii Nunchuck Joystick (White Model)"
+	default n
+	select I2C
+	---help---
+		Enable a Nintendo Wii Nunchuck joystick upper half driver. The
+		nunchuck joystick provides position data as an integer value.The
+		analog positional data may also	be accompanied by discrete
+		button data.
+
+if INPUT_NUNCHUCK
+
+config NUNCHUCK_NPOLLWAITERS
+	int "Max Number of Poll Waiters"
+	default 2
+
+endif # INPUT_NUNCHUCK

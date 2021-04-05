@@ -1,0 +1,530 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config NX
+	bool "NX Graphics"
+	default n
+	select NXGLIB
+	select NXFONTS
+	---help---
+		Enables overall support for graphics library and NX
+
+if NX
+
+config NX_LCDDRIVER
+	bool "LCD driver"
+	default y
+	depends on LCD
+	---help---
+		By default, the NX graphics system uses the frame buffer driver interface
+		defined in include/nuttx/video/fb.h.  However, if LCD is support is enabled,
+		this this option is provide to select, instead, the LCD driver interface
+		defined in include/nuttx/lcd/lcd.h.
+
+config NX_NDISPLAYS
+	int "Maximum number of displays supported"
+	default 1
+	range 1 9
+	---help---
+		The maximum number of displays that can be supported by the NX server.
+		Normally this takes the value one but may be increased to support systems
+		with multiple displays.
+
+config NX_NPLANES
+	int "Number of Color Planes"
+	default 1
+	range 1 8
+	---help---
+		Some YUV color formats requires support for multiple planes, one for
+		each color component.  Unless you have such special hardware (and
+		are willing to debug a lot of untested logic), this value should be
+		set to 1.
+
+config NX_RAMBACKED
+	bool "RAM backed windows"
+	default n
+	---help---
+		If this option is selected, then windows may be optionally created
+		with a RAM frambuffer backing up the window content.  Rending into
+		the window will result in rending into the backup framebuffer, then
+		updating the physical display from the framebuffer.
+
+		The advantage of this option is that the application that manages
+		window will no longer receive redraw() callbacks.  Those calls
+		normally occur when a window "above" moves exposing a portion of the
+		window below.  If this option is selected, then the system will
+		redraw the exposed portion of the window from the backup framebuffer
+		without intervention of the window applications.  This greatly
+		reduces the complexity of the application and performance of the
+		window at the expense of increased memory usage.
+
+		Redraw requests in other cases are also suppressed:  Changes to window
+		position, size, etc.  As a consequence, some manual updates will be
+		required when certain events occur (like removing a toolbar from a
+		window).
+
+		An exception is the case when the window is resized to a wider and/or
+		taller size.  In that case, the redraw callback will till occur.
+		It is necessary in that case to provide new graphic content for the
+		extended window area.
+
+		Redraw requests in other cases are also suppressed:  Changes to window
+		position, size, etc.  As a consequence, some manual updates will be
+		required when certain events occur (like removing a toolbar from a
+		window).
+
+		NOTE:  A significant amount of RAM, usually external SDRAM, may be
+		required to use per-window framebuffers.
+
+choice
+	prompt "Cursor support"
+	default NX_NOCURSOR
+
+config NX_NOCURSOR
+	bool "No cursor support"
+
+config NX_SWCURSOR
+	bool "Software cursor support"
+	depends on !NX_LCDDRIVER && NX_DISABLE_1BPP && NX_DISABLE_2BPP && NX_DISABLE_4BPP && !BUILD_KERNEL
+	---help---
+		Software cursor support has several dependencies are due to un-
+		implemented cursor capabilities.  This assumes the following:
+
+		  1. You are using a framebuffer hardware interface.  This is
+		     because the logic to implement this feature on top of the LCD
+		     interface has not been implemented.
+		  2. The pixel depth is greater then or equal to 8-bits (8-bpp,
+		     16-bpp, 24/32/-bpp).  This is because the logic to handle
+		     pixels smaller than 1-byte has not been implemented,
+		  3. For FLAT and PROTECTED builds only.  In those builds, the
+		     cursor image resides in the common application space and is
+		     assumed to pesist as long as needed.  But with the KERNEL
+		     build, the image will lie in a process space and will not be
+		     generally available.  In that case, we could keep the image in
+		     a shared memory region or perhaps copy the image into a kernel
+		     internal buffer.  Neither of  those are implemented.
+
+config NX_HWCURSOR
+	bool "Software cursor support"
+	depends on (FB_HWCURSOR || LCD_HWCURSOR) && EXPERIMENTAL
+	---help---
+		Hardware cursor support has not been implemented, hence the
+		EXPERIMENTAL dependency.
+
+endchoice # Cursor support
+
+config NX_HWCURSORIMAGE
+	bool "Support cursor images"
+	default n
+	depends on NX_HWCURSOR
+
+config NX_BGCOLOR
+	hex "Initial background color"
+	default 0x0
+	---help---
+		NX will clear the background plane initially.  This is the default
+		color that will be used when the background is cleared.  Note: This
+		logic would have to be extended if you want to support multiple
+		color planes.
+
+config NX_ANTIALIASING
+	bool "Anti-aliasing support"
+	default n
+	depends on (!NX_DISABLE_16BPP || !NX_DISABLE_24BPP || !NX_DISABLE_32BPP) && !NX_LCDDRIVER
+	---help---
+		Enable support for anti-aliasing when rendering lines as various
+		orientations.
+
+config NX_WRITEONLY
+	bool "Write-only Graphics Device"
+	default y if NX_LCDDRIVER && LCD_NOGETRUN
+	default n if !NX_LCDDRIVER || !LCD_NOGETRUN
+	---help---
+		Define if the underlying graphics device does not support read operations.
+		Automatically defined if NX_LCDDRIVER and LCD_NOGETRUN are
+		defined.
+
+config NX_UPDATE
+	bool "Display update hooks"
+	default n
+	---help---
+		Enable a callout to inform some external module that the display has
+		been updated.  This would be useful in a couple for cases.
+
+		- When a serial LCD is used, but a framebuffer is used to access the
+		  LCD.  In this case, the update callout can be used to refresh the
+		  affected region of the display.
+
+		- When VNC is enabled.  This is case, this callout is necessary to
+		  update the remote frame buffer to match the local framebuffer.
+
+		When this feature is enabled, some external logic must provide this
+		interface:
+
+		  void nx_notify_rectangle(FAR NX_PLANEINFOTYPE *pinfo,
+		                           FAR const struct nxgl_rect_s *rect);
+
+		That is the function that will handle the notification.  It
+		receives the rectangular region that was updated in the provided
+		plane.
+
+menu "Supported Pixel Depths"
+
+config NX_DISABLE_1BPP
+	bool "Disable 1 BPP"
+	default y
+	select NXFONTS_DISABLE_1BPP if NXFONTS
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 1BPP
+		pixel depth.
+
+config NX_DISABLE_2BPP
+	bool "Disable 2 BPP"
+	default y
+	select NXFONTS_DISABLE_2BPP
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 2BPP
+		pixel depth.
+
+config NX_DISABLE_4BPP
+	bool "Disable 4 BPP"
+	select NXFONTS_DISABLE_4BPP if NXFONTS
+	default y
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 4BPP
+		pixel depth.
+
+config NX_DISABLE_8BPP
+	bool "Disable 8 BPP"
+	default y
+	select NXFONTS_DISABLE_8BPP if NXFONTS
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 8BPP
+		pixel depth.
+
+config NX_DISABLE_16BPP
+	bool "Disable 16 BPP"
+	default y
+	select NXFONTS_DISABLE_16BPP if NXFONTS
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 16BPP
+		pixel depth.
+
+config NX_DISABLE_24BPP
+	bool "Disable 24 BPP"
+	default y
+	select NXFONTS_DISABLE_24BPP if NXFONTS
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 24BPP
+		pixel depth.
+
+config NX_DISABLE_32BPP
+	bool "Disable 32 BPP"
+	default y
+	select NXFONTS_DISABLE_32BPP if NXFONTS
+	---help---
+		NX supports a variety of pixel depths.  You can save some memory by disabling
+		support for unused color depths.  The selection disables support for 32BPP
+		pixel depth.
+
+endmenu
+
+config NX_PACKEDMSFIRST
+	bool "Packed MS First"
+	default y
+	select NXFONTS_PACKEDMSFIRST if NXFONTS
+	select LCD_PACKEDMSFIRST if LCD
+	---help---
+		If a pixel depth of less than 8-bits is used, then NX needs to know if the
+		pixels pack from the MS to LS or from LS to MS
+
+menu "Input Devices"
+
+config NX_XYINPUT
+	bool
+	default n
+
+choice
+	prompt "Mouse/Touchscreen Support"
+	default NX_XYINPUT_NONE
+
+config NX_XYINPUT_NONE
+	bool "No X/Y input device"
+	---help---
+		There is no X/Y positional input device connected
+
+config NX_XYINPUT_MOUSE
+	bool "Mouse device support"
+	select NX_XYINPUT
+	---help---
+		X/Y positional input is provided by a mouse.  The only difference
+		between the mouse and touchscreen selection is in the presence or
+		absence of the mouse buttons.  This difference is not used within
+		NuttX itself, however, graphics applications may need this
+		information, for example, to handle the different ways that graphic
+		elements are selected and dragged.
+
+config NX_XYINPUT_TOUCHSCREEN
+	bool "Touchscreen device support"
+	select NX_XYINPUT
+	---help---
+		X/Y positional input is provided by a touchscreen.  The only difference
+		between the mouse and touchscreen selection is in the presence or
+		absence of the mouse buttons.  This difference is not used within
+		NuttX itself, however, graphics applications may need this
+		information, for example, to handle the different ways that graphic
+		elements are selected and dragged.
+
+endchoice # Mouse/Touchscreen Support
+
+config NX_KBD
+	bool "Keyboard Support"
+	default n
+	---help---
+		Build in support of keypad/keyboard input.
+
+endmenu
+
+menu "Framed Window Borders"
+
+config NXTK_BORDERWIDTH
+	int "Border Width"
+	default 4
+	---help---
+		Specifies with with of the border (in pixels) used with framed windows.
+		The default is 4.
+
+config NXTK_DEFAULT_BORDERCOLORS
+	bool "Use Default Border Colors"
+	default y
+	---help---
+		If this option is defined, the default system border colors will be
+		used on framed windows.  Otherwise, additional options will be
+		present so that you can define custom board colors.
+
+if !NXTK_DEFAULT_BORDERCOLORS
+
+config NXTK_BORDERCOLOR1
+	hex "Border Color"
+	default 0x0
+	---help---
+		Specify the colors of the border used with framed windows.
+		NXTL_BORDERCOLOR1 is the "normal" color of the border.
+		NXTK_BORDERCOLOR2 is the shadow side color and so is normally darker.
+		NXTK_BORDERCOLOR3 is the shiny side color and so is normally brighter.
+
+config NXTK_BORDERCOLOR2
+	hex "Darker Border Color"
+	default 0x0
+	---help---
+		Specify the colors of the border used with framed windows.
+		NXTL_BORDERCOLOR1 is the "normal" color of the border.
+		NXTK_BORDERCOLOR2 is the shadow side color and so is normally darker.
+		NXTK_BORDERCOLOR3 is the shiny side color and so is normally brighter.
+
+config NXTK_BORDERCOLOR3
+	hex "Brighter Border Color"
+	default 0x0
+	---help---
+		Specify the colors of the border used with framed windows.
+		NXTL_BORDERCOLOR1 is the "normal" color of the border.
+		NXTK_BORDERCOLOR2 is the shadow side color and so is normally darker.
+		NXTK_BORDERCOLOR3 is the shiny side color and so is normally brighter.
+
+endif # !NXTK_DEFAULT_BORDERCOLORS
+endmenu
+
+config NXTK_AUTORAISE
+	bool "Autoraise"
+	default n
+	---help---
+		If set, a window will be raised to the top if the mouse position is over a
+		visible portion of the window.  Default: A mouse button must be clicked over
+		a visible portion of the window.
+
+menuconfig NXTERM
+	bool "NxTerm"
+	default n
+	---help---
+		Enables building of the NxTerm driver.
+
+if NXTERM
+
+comment "NxTerm Output Text/Graphics Options"
+
+config NXTERM_BPP
+	int "NxTerm BPP"
+	default 1 if !NX_DISABLE_1BPP
+	default 2 if !NX_DISABLE_2BPP
+	default 4 if !NX_DISABLE_4BPP
+	default 8 if !NX_DISABLE_8BPP
+	default 16 if !NX_DISABLE_16BPP
+	default 24 if !NX_DISABLE_24BPP
+	default 32 if !NX_DISABLE_32BPP
+	---help---
+		Currently, NxTerm supports only a single pixel depth. This
+		configuration setting must be provided to support that single pixel depth.
+		Default: The smallest enabled pixel depth. (see NX_DISABLE_*BPP)
+
+config NXTERM_CURSORCHAR
+	int "Character code to use as the cursor"
+	default 137
+	---help---
+		The bitmap code to use as the cursor.  Default '_' (137)
+
+config NXTERM_MXCHARS
+	int "Max Characters on Display"
+	default 128
+	---help---
+		NxTerm needs to remember every character written to the console so
+		that it can redraw the window. This setting determines the size of some
+		internal memory allocations used to hold the character data. Default: 128.
+
+config NXTERM_CACHESIZE
+	int "Font Cache Size"
+	default 16
+	---help---
+		NxTerm supports caching of rendered fonts. This font caching is required
+		for two reasons: (1) First, it improves text performance, but more
+		importantly (2) it preserves the font memory. Since the NX server runs on
+		a separate server thread, it requires that the rendered font memory persist
+		until the server has a chance to render the font. Unfortunately, the font
+		cache would be quite large if all fonts were saved. The NXTERM_CACHESIZE
+		setting will control the size of the font cache (in number of glyphs). Only that
+		number of the most recently used glyphs will be retained. Default: 16.
+		NOTE: There can still be a race condition between the NxTerm driver and the
+		NX task.  If you every see character corruption (especially when printing
+		a lot of data or scrolling), then increasing the value of NXTERM_CACHESIZE
+		is something that you should try.  Alternatively, you can reduce the size of
+		MQ_MAXMSGSIZE which will force NxTerm task to pace the server task.
+		NXTERM_CACHESIZE should be larger than MQ_MAXMSGSIZE in any event.
+
+config NXTERM_LINESEPARATION
+	int "Line Separation"
+	default 0
+	---help---
+		This the space (in rows) between each row of test.  Default: 0
+
+config NXTERM_NOWRAP
+	bool "No wrap"
+	default n
+	---help---
+		By default, lines will wrap when the test reaches the right hand side
+		of the window. This setting can be defining to change this behavior so
+		that the text is simply truncated until a new line is  encountered.
+
+comment "NxTerm Input options"
+
+config NXTERM_NXKBDIN
+	bool "NX KBD input"
+	default n
+	---help---
+		Take input from the NX keyboard input callback.  By default, keyboard
+		input is taken from stdin (/dev/console).  If this option is set, then
+		the interface nxterm_kdbin() is enabled.  That interface may be driven
+		by window callback functions so that keyboard input *only* goes to the
+		top window.
+
+		NOTE: nxterm_kdbin() is an internal OS API.  It can be accessed by
+		applications via the boardctl(BOARDIOC_NXTERM) interface.
+
+		The logic path is complex in this case:  (1) The keyboard input is
+		received by an application listener thread and injected into NX via
+		nx_kbdin().  NX sends (2) the keyboard input to single the NX window
+		that has focus.  That window then (3) gives the keyboard input to the
+		single NxTerm associated with the window via boardctl(BOARDIOC_NXTERM).
+
+		NOTE:  If CONFIG_NXTERM_NXKBDIN not defined, then NxTerm input coming
+		directly from /dev/console.  That works well if there is only a single
+		NxTerm window.  But if there are multiple NxTerm windows, then it is
+		anyone's guess which will receive the keyboard input.  That does not
+		work well in such cases.
+
+config NXTERM_KBDBUFSIZE
+	int "Keyboard Input Buffer Size"
+	default 16
+	---help---
+		If NXTERM_NXKBDIN is enabled, then this value may be used to
+		define the size of the per-window keyboard input buffer.  Default: 16
+
+config NXTERM_NPOLLWAITERS
+	int "Number of Poll Waiters"
+	default 4
+	---help---
+		The number of threads that can be waiting for read data available.
+		Default: 4
+
+endif # NXTERM
+
+comment "NX server options"
+
+config NX_BLOCKING
+	bool "Blocking"
+	default n
+	---help---
+		Open the client message queues in blocking mode.  In this case,
+		nx_eventhandler() will not return until a message is received and processed.
+
+config NX_MXSERVERMSGS
+	int "Max Server Messages"
+	default 32
+	---help---
+		Specifies the maximum number of messages that can fit in the message queues.
+		No additional resources are allocated, but this can be set to prevent
+		flooding of the client or server with too many messages (PREALLOC_MQ_MSGS
+		controls how many messages are pre-allocated).
+
+config NX_MXCLIENTMSGS
+	int "Max Client Messages"
+	default 16
+	---help---
+		Specifies the maximum number of messages that can fit in the message queues.
+		No additional resources are allocated, but this can be set to prevent
+		flooding of the client or server with too many messages (PREALLOC_MQ_MSGS
+		controls how many messages are pre-allocated).
+
+config NXSTART_EXTERNINIT
+	bool "External Display Initialization"
+	default n
+	select LCD_EXTERNINIT if LCD && LCD_FRAMEBUFFER && NX_LCDDRIVER
+	---help---
+		Define to support external display initialization by platform-
+		specific code.  This this option is defined, then nxmu_start()
+		will call board_graphics_setup(CONFIG_NXSTART_DEVNO) to initialize
+		the graphics device.  This option is necessary if display is used
+		that cannot be initialized using the standard LCD or framebuffer
+		interfaces.
+
+config NXSTART_SERVERPRIO
+	int "NX Server priority"
+	default 110
+	---help---
+		Priority of the NX server.  Default: 110.
+
+		NOTE:  NXSTART_SERVERPRIO should have a relatively high priority to
+		avoid data overrun race conditions.
+
+config NXSTART_SERVERSTACK
+	int "NX Server Stack Size"
+	default 2048
+	---help---
+		NX server thread stack size (in multi-user mode).  Default 2048
+
+config NXSTART_DEVNO
+	int "LCD Device Number"
+	default 0
+	depends on NX_LCDDRIVER || NXSTART_EXTERNINIT
+	---help---
+		LCD device number (in case there are more than one LCDs connected).
+		Default: 0
+source "graphics/vnc/Kconfig"
+
+endif # NX

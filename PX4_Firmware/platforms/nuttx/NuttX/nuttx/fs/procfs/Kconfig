@@ -1,0 +1,130 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config FS_PROCFS
+	bool "PROCFS File System"
+	default n
+	select FS_READABLE
+	---help---
+		The PROCFS file system provides access to task status and other driver
+		status through the NuttX file system.  The PROCFS may, for example, be
+		mount at /proc.  Then information about all of the currently active
+		tasks and threads will be available in /proc.
+
+if FS_PROCFS
+
+config FS_PROCFS_REGISTER
+	bool "Run-time registration"
+	default n
+	---help---
+		Support run-time registration of the new entries in the procfs file
+		system.
+
+menu "Exclude individual procfs entries"
+
+config FS_PROCFS_EXCLUDE_PROCESS
+	bool "Exclude process information"
+	default n
+	---help---
+		Causes the process information to be excluded from the procfs system.
+		This will reduce code space, but then giving access to process info
+		was kinda the whole point of procfs, but hey, whatever.
+
+config FS_PROCFS_EXCLUDE_ENVIRON
+	bool "Exclude environment information"
+	default y
+	depends on !FS_PROCFS_EXCLUDE_PROCESS
+	---help---
+		Causes the environment variable information to be excluded from the
+		procfs system.  This will reduce code space slightly.
+
+config FS_PROCFS_EXCLUDE_MODULE
+	bool "Exclude module information"
+	depends on MODULE
+	default n
+	---help---
+		Causes the module information to be excluded from the procfs system.
+
+config FS_PROCFS_EXCLUDE_BLOCKS
+	bool "Exclude fs/blocks information"
+	depends on !DISABLE_MOUNTPOINT
+	default n
+	---help---
+		Causes the fs block usage information to be excluded from the procfs
+		system.  This procfs file provides the text output for the NSH 'df'
+		command.
+
+config FS_PROCFS_EXCLUDE_MOUNT
+	bool "Exclude fs/mount information"
+	depends on !DISABLE_MOUNTPOINT
+	default n
+	---help---
+		Causes the mount point information to be excluded from the procfs
+		system.  This procfs file provides the text output for the NSH 'mount'
+		command.
+
+config FS_PROCFS_EXCLUDE_USAGE
+	bool "Exclude fs/usage information"
+	depends on !DISABLE_MOUNTPOINT
+	default n
+	---help---
+		Causes the fs usage information to be excluded from the procfs
+		system.  This procfs file provides the text output for the NSH 'df -h'
+		command.
+
+config FS_PROCFS_EXCLUDE_UPTIME
+	bool "Exclude uptime"
+	default n
+
+config FS_PROCFS_EXCLUDE_VERSION
+	bool "Exclude version"
+	default y
+
+config FS_PROCFS_EXCLUDE_CPULOAD
+	bool "Exclude CPU load"
+	default n
+	depends on SCHED_CPULOAD
+
+config FS_PROCFS_EXCLUDE_MEMINFO
+	bool "Exclude meminfo"
+	default n
+
+config FS_PROCFS_INCLUDE_PROGMEM
+	bool "Include prog mem"
+	default n
+	depends on ARCH_HAVE_PROGMEM && !FS_PROCFS_EXCLUDE_MEMINFO
+
+config FS_PROCFS_EXCLUDE_IOBINFO
+	bool "Exclude iobinfo"
+	depends on MM_IOB
+	default n
+
+config FS_PROCFS_EXCLUDE_MOUNTS
+	bool "Exclude mounts"
+	default n
+	depends on !DISABLE_MOUNTPOINT
+
+config FS_PROCFS_EXCLUDE_NET
+	bool "Exclude network"
+	depends on NET
+	default n
+
+config FS_PROCFS_EXCLUDE_PARTITIONS
+	bool "Exclude partitions"
+	depends on MTD_PARTITION
+	default n
+
+config FS_PROCFS_EXCLUDE_ROUTE
+	bool "Exclude routing table"
+	depends on !FS_PROCFS_EXCLUDE_NET && NET_ROUTE
+	default n
+
+config FS_PROCFS_EXCLUDE_SMARTFS
+	bool "Exclude fs/smartfs"
+	depends on FS_SMARTFS
+	default n
+
+endmenu # Exclude individual procfs entries
+endif # FS_PROCFS

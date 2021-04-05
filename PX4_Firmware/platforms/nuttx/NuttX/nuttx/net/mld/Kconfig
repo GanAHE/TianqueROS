@@ -1,0 +1,44 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if NET_ICMPv6
+
+menuconfig NET_MLD
+	bool "Multicast Listener Discovery (MLD)"
+	default n
+	select NET_MCASTGROUP
+	select NETDEV_IFINDEX
+	---help---
+		Enable Multicast Listener Discovery (MLD) support.
+
+if NET_MLD
+
+config NET_MLD_ROUTER
+	bool # "MLD Router support"
+	default n
+	depends on EXPERIMENTAL
+	---help---
+		Enables a few hooks that will be needed for router support in the
+		future.  Not yet ready for prime time.
+
+config NET_MLD_DEBUG
+	bool "Force MLD debug"
+	default n
+	depends on DEBUG_ERROR
+	---help---
+		Normally, MLD debug output is controlled by CONFIG_DEBUG_NET_*.
+		This option will force debug output from MLD files even if network
+		debug is not enabled.  This feature does still depend on global
+		debug output CONFIG_DEBUG_INFO, CONFIG_DEBUG_WARN, and
+		CONFIG_DEBUG_ERROR.
+
+config NET_MLD_TXDUMP
+	bool "Enable TX Packet Dump"
+	default n
+	---help---
+		Dump the content of all outgoing packets.
+
+endif # NET_MLD
+endif # NET_ICMPv6

@@ -1,0 +1,41 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config WL_SPIRIT
+	bool "STMicro Spirit Radio Library"
+	default n
+	select SPI
+	---help---
+		Enable support for the STMicro Spirit Radio Library
+
+if WL_SPIRIT
+
+config WL_SPIRIT_SPIFREQUENCY
+	int "Spirit SPI frequency"
+	default 10000000
+	---help---
+		Frequency at which to operate the SPI interface to the Spirit part.
+		The default is the absolution maximum and you may likely have to
+		reduce this for your board.
+
+config WL_SPIRIT_REGDEBUG
+	bool "Enable register level debug"
+	default n
+	depends on DEBUG_WIRELESS_INFO
+	---help---
+		Enable logic to dump each value read from and written to the Spirit
+		registers.
+
+config WL_SPIRIT_FIFODUMP
+	bool "Enable debug FIFO dump"
+	default n
+	depends on DEBUG_WIRELESS_INFO
+	---help---
+		Enable logic to dump data written to and read from the linear FIFO.
+
+endif
+
+source drivers/wireless/spirit/drivers/Kconfig
+

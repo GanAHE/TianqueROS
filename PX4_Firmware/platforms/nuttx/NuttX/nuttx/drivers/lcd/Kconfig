@@ -1,0 +1,1367 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menu "LCD Driver Support"
+
+menuconfig LCD
+	bool "Graphic LCD Driver Support"
+	default n
+	select NX_LCDDRIVER if NX
+	---help---
+		Drivers for parallel and serial LCD and OLED type devices.  These
+		drivers support interfaces as defined in include/nuttx/lcd/lcd.h
+
+		This selection is necessary to enable support for LCD drivers in
+		drivers/lcd as well as for board-specific LCD drivers in the boards/
+		subdirectories.
+
+if LCD
+
+config LCD_HWCURSOR
+	bool
+	default n
+
+config LCD_PACKEDMSFIRST
+	bool
+	default n
+
+config LCD_UPDATE
+	bool
+	default n
+	select NX_UPDATE if NX
+
+comment "Common Graphic LCD Settings"
+
+config LCD_FRAMEBUFFER
+	bool "LCD framebuffer front end"
+	default n
+	select LCD_UPDATE
+	---help---
+		Enable a "front end" that converts an sequential LCD driver into a
+		standard, NuttX frame buffer driver.
+
+		NOTE: Some LCD drivers implement an internal framebuffer for
+		effeciency reasons but do not export a framebuffer interface.  So
+		those LCD cannot be used as framebuffer drivers.  If the option is
+		available, then such internal framebuffer support should be
+		disabled because this external common framebuffer interface will
+		provide the necessary buffering.
+
+config LCD_EXTERNINIT
+	bool "External LCD Initialization"
+	default n
+	depends on LCD_FRAMEBUFFER
+	---help---
+		Define to support external LCD initialization by platform-specific
+		code.  This this option is defined, then the LCD framebuffer
+		emulation will call board_graphics_setup() to initialize the
+		graphics device.  This option is necessary if display is used that
+		cannot be initialized using the standard LCD interfaces.
+
+menu "LCD driver selection"
+
+config LCD_NOGETRUN
+	bool "Write-only LCD"
+	default n
+	---help---
+		Many LCD hardware interfaces provide only minimal graphics capability.  In
+		particulary, many simple LCD interfaces are write only.  That is we, can
+		write graphics data to the LCD device memory, but we cannot read it back.
+		If the LCD hardware does not support reading the graphics memory, then
+		this option should be defined so that the NX layer can taking alternative
+		measures when the LCD is not readable.  For example, if the LCD is not
+		readable, then NX will not attempt to support transparency.
+
+		See also NX_WRITEONLY in the graphics support menu.
+
+config LCD_MAXCONTRAST
+	int "LCD maximum contrast"
+	default 31 if AQM_1248A
+	default 63 if LCD_SHARP_MEMLCD
+	default 255 if LCD_P14201 || LCD_LCD1602
+	default 63
+	range 1 255
+	---help---
+		must be 63 with the Epson controller and 127 with
+		the Phillips controller.
+
+config LCD_MAXPOWER
+	int "LCD maximum power"
+	default 255 if LCD_LCD1602
+	default 1
+	range 1 255
+	---help---
+		Maximum value of LCD power setting.  This normally equates to brightness:
+		The brighter the screen, the hight the power usage.
+
+		On LCDs that have a backlight, this value corresponds directly to that
+		backlight setting.  Board-specific logic may place restrictions on this
+		value.
+
+comment "Graphic LCD Devices"
+
+config LCD_P14201
+	bool "Rit P1402 series display"
+	default n
+	---help---
+		p14201.c.  Driver for RiT P14201 series display with SD1329 IC
+		controller.  This OLED is used with older versions of the
+		TI/Luminary LM3S8962 Evaluation Kit.
+
+if LCD_P14201
+config P14201_NINTERFACES
+	int "Number of physical P14201 devices"
+	default 1
+	range 1 1
+	---help---
+		Specifies the number of physical P14201
+		devices that will be supported.
+
+config P14201_SPIMODE
+	int "SPI mode"
+	default 2
+	range 0 3
+	---help---
+		Controls the SPI mode
+
+config P14201_FREQUENCY
+	int "SPI frequency"
+	default 1000000
+	---help---
+		Define to use a different bus frequency,FIXME DEFAULT VALUE OK?
+
+config P14201_FRAMEBUFFER
+	bool "Enable P14201 GDDRAM cache"
+	default y
+	---help---
+		If defined, accesses will be performed
+		using an in-memory copy of the OLEDs GDDRAM.  This cost of this
+		buffer is 128 * 96 / 2 = 6Kb.  If this is defined, then the driver
+		will be fully functional. If not, then it will have the following
+		limitations:
+
+		Reading graphics memory cannot be supported, and
+
+		All pixel writes must be aligned to byte boundaries.
+		The latter limitation effectively reduces the 128x96 disply to 64x96.
+
+		NOTE: This option should not be used if CONFIG_LCD_FRAMBEBUFFER is
+		enabled.  That options provides for a more generalized, external
+		LCD framebuffer.  This internal framebuffer support should not be
+		enabled with CONFIG_LCD_FRAMBEBUFFER because this external common
+		framebuffer interface will provide the necessary buffering.
+endif
+
+config LCD_MAX7219
+	bool "Matrix of 8x8 LEDs controlled by MAX7219"
+	default n
+	---help---
+		Matrix of LEDs (8x8) controlled by MAX7219.
+		You can use cluster of 8x8 chained together.
+
+if LCD_MAX7219
+
+config MAX7219_NHORIZONTALBLKS
+	int "Number of 8x8 LEDs matrices in the horizontal (width)!"
+	default 1
+	---help---
+		Specifies the number of physical 8x8 LED matrices that are
+		connected together in the horizontal. In fact we have only
+		a single strip, but it can be arranged in blocks creating
+		physically horizontal/vertical columns/rows.
+
+config MAX7219_NVERTICALBLKS
+	int "Number of 8x8 LEDs matrices in the vertical (height)!"
+	default 1
+	---help---
+		Specifies the number of physical 8x8 LED matrices that are
+		connected together in the vertical. In fact we have only
+		a single strip, but it can be arranged in blocks creating
+		physically horizontal/vertical columns/rows.
+
+config MAX7219_INTENSITY
+	int "Default LED Matrix bright intensity"
+	default 10
+	range 0 15
+	---help---
+		Specifies the default LEDs bright intensity to use.
+
+endif # LCD_MAX7219
+
+config LCD_MIO283QT2
+	bool "MIO283QT-2 TFT LCD Display Module"
+	default n
+	---help---
+		OLED Display Module, MIO283QT-2, Multi-Inno Technology, Co.
+		based on the Himax HX8347-D LCD controller.
+
+config LCD_MIO283QT9A
+	bool "MIO283QT-9A TFT LCD Display Module"
+	default n
+	---help---
+		Selects the driver for the MI0283QT-9A LCD from Multi-Inno
+		Technology Co., Ltd.  This LCD is based on the Ilitek ILI9341
+		LCD controller.
+
+config LCD_UG9664HSWAG01
+	bool "UG-9664HSWAG01 OLED Display Module"
+	default n
+	depends on SPI
+	---help---
+		OLED Display Module, UG-9664HSWAG01, Univision Technology Inc.  Used
+		with the LPCXpresso and Embedded Artists base board.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+		Required SPI driver settings:
+		SPI_CMDDATA - Include support for cmd/data selection.
+
+if LCD_UG9664HSWAG01
+
+config UG9664HSWAG01_SPIMODE
+	int "UG-9664HSWAG01 SPI Mode"
+	default 0
+	range 0 3
+	---help---
+		Controls the SPI mode
+
+config UG9664HSWAG01_FREQUENCY
+	int "UG-9664HSWAG01 SPI Frequency"
+	default 3500000
+	---help---
+		Define to use a different bus frequency
+
+config UG9664HSWAG01_NINTERFACES
+	int "Number of UG-9664HSWAG01 Devices"
+	default 1
+	---help---
+		Specifies the number of physical UG-9664HSWAG01 devices that will be
+		supported.  NOTE:  At present, this must be undefined or defined to be 1.
+
+config UG9664HSWAG01_POWER
+	bool "Power control"
+	default n
+	---help---
+		If the hardware supports a controllable OLED a power supply, this
+		configuration should be defined.  In this case the system must
+		provide an interface ug_power().
+
+endif
+
+config LCD_SH1106_OLED_132
+	bool "Generic 0.96'' OLED Display Module (SH1106/SSD1306)"
+	default n
+	select LCD_SSD1306
+	---help---
+		0.96'' OLED Display Module, featuring an SH1106, typically advertised as
+		SSD1306. Mostly similar to "UG2864HSWEG01" although it uses the full
+		132x28 pixels.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+config LCD_UG2864HSWEG01
+	bool "UG-2864HSWEG01 OLED Display Module (SSD1306)"
+	default n
+	select LCD_SSD1306
+	---help---
+		OLED Display Module, UG-2864HSWEG01, Univision Technology Inc based
+		on the Solomon Tech SSD1306 LCD controller.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+		Required SPI driver settings:
+		SPI_CMDDATA - Include support for cmd/data selection.
+
+config LCD_UG2832HSWEG04
+	bool "UG-2832HSWEG04 OLED Display Module (SSD1306)"
+	default n
+	select LCD_SSD1306
+	---help---
+		OLED Display Module, UG-UG2832HSWEG04, Univision Technology Inc
+		based on the Solomon Tech SSD1306 LCD controller.  Used with the
+		Atmel SAM4L Xplained Pro board on the OLED1 module.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+		Required SPI driver settings:
+		SPI_CMDDATA - Include support for cmd/data selection.
+
+config LCD_DD12864WO4A
+	bool "DD-12864WO-4A OLED Display Module"
+	default n
+	select LCD_SSD1306
+	select SPI_CMDDATA
+	---help---
+		OLED Display Module, DD-12864WO-4A, Densitron Technologies
+		based on the Solomon Tech SSD1309 LCD controller.  Used with the
+		ThingseeOne board.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+		Required SPI driver settings:
+		SPI_CMDDATA - Include support for cmd/data selection.
+
+config LCD_HILETGO
+	bool "HiletGO 128x64 OLED"
+	default n
+	select LCD_SSD1306
+	select SPI_CMDDATA
+	---help---
+		HiletGo 129x64 OLED Display Module, featuring an SSD1306.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+config LCD_SSD1306
+	bool
+
+if LCD_SSD1306
+
+choice
+	prompt "SSD1306 Interface"
+	default LCD_SSD1306_SPI
+
+config LCD_SSD1306_SPI
+	bool "SSD1306 on SPI Interface"
+	select SPI
+	---help---
+		Enables support for the SPI interface.
+
+config LCD_SSD1306_I2C
+	bool "SSD1306 on I2C Interface"
+	select I2C
+	---help---
+		Enables support for the I2C interface
+
+endchoice # SSD1306 Interface
+endif # LCD_SSD1306
+
+if LCD_SSD1306_SPI
+
+config SSD1306_SPIMODE
+	int "SSD1306 SPI Mode"
+	default 0 if !LCD_DD12864WO4A
+	default 3 if LCD_DD12864WO4A
+	range 0 3
+	---help---
+		Selects the SPI mode used with the SSD1306 device
+
+config SSD1306_FREQUENCY
+	int "SSD1306 SPI Frequency"
+	default 3500000 if !LCD_DD12864WO4A
+	default 10000000 if LCD_DD12864WO4A
+	---help---
+		Selects the SPI bus frequency used with the SSD1306 device
+
+#config SSD1306_NINTERFACES
+#	int "Number of SSD1306 Devices"
+#	default 1
+#	---help---
+#		Specifies the number of physical SSD1306 devices that will be
+#		supported.  NOTE:  At present, this must be undefined or defined to
+#		be 1.
+
+endif # LCD_SSD1306_SPI
+
+if LCD_SSD1306_I2C
+
+config SSD1306_I2CADDR
+	int "SSD1306 I2C Address"
+	default 60
+	---help---
+		7-bit I2C Address of SSD1306.  Typical addresses are 0x3c (60) or
+		0x3d (61).  NOTE that these correspond to the 8-bit addresses
+		0x78 or 0x7a that you may see in documentation.
+
+config SSD1306_I2CFREQ
+	int "SSD1306 I2C Frequency"
+	default 400000
+	---help---
+		I2C Frequency to communicate with SSD1306
+
+endif # LCD_SSD1306_I2C
+
+config LCD_SSD1351
+	bool "SSD1351 OLED Display Module"
+	default n
+	---help---
+		OLED Display Module, SSD1351, Solomon Systech.
+
+if LCD_SSD1351
+
+choice
+	prompt "Interface"
+	default SSD1351_SPI4WIRE
+
+config SSD1351_PARALLEL8BIT
+	bool "8-bit Parallel Interface"
+	---help---
+		Enables support for the 8-bit parallel interface.
+
+config SSD1351_SPI3WIRE
+	bool "3-wire SPI Interface"
+	select SPI
+	---help---
+		Enables support for the 3-wire SPI interface.
+
+config SSD1351_SPI4WIRE
+	bool "4-wire SPI Interface"
+	select SPI
+	select SPI_CMDDATA
+	---help---
+		Enables support for the 4-wire SPI interface.
+
+endchoice
+
+if SSD1351_SPI3WIRE || SSD1351_SPI4WIRE
+
+config SSD1351_SPIMODE
+	int "SPI Mode"
+	default 0
+	range 0 3
+	---help---
+		Specifies the SPI mode.
+
+config SSD1351_SPIFREQ
+	int "SPI Frequency"
+	default 1000000
+	---help---
+		Specifies the SPI frequency.
+
+endif
+
+config SSD1351_NINTERFACES
+	int "Number of SSD1351 Devices"
+	default 1
+	range 1 1
+	---help---
+		Specifies the number of physical SSD1351 devices that will
+		be supported.
+
+config SSD1351_XRES
+	int "X Resolution"
+	default 128
+	range 1 128
+	---help---
+		Specifies the X resolution of the display.
+
+config SSD1351_YRES
+	int "Y Resolution"
+	default 128
+	range 1 128
+	---help---
+		Specifies the Y resolution of the display.
+
+config SSD1351_MIRRORX
+	bool "Mirror X"
+	default n
+	---help---
+		Mirrors the display along the X axis.
+
+config SSD1351_MIRRORY
+	bool "Mirror Y"
+	default n
+	---help---
+		Mirrors the display along the Y axis.
+
+config SSD1351_INVERT
+	bool "Invert Display"
+	default n
+	---help---
+		Inverts the display.
+
+config SSD1351_VDDEXT
+	bool "External VDD"
+	default n
+	---help---
+		Specifies that VDD is external.
+
+config SSD1351_TRST
+	int "Reset Period"
+	default 5
+	range 5 31
+	---help---
+		Specifies the reset period in DCLKs.
+
+config SSD1351_TPRECHG1
+	int "First Pre-charge Period"
+	default 8
+	range 3 15
+	---help---
+		Specifies the first pre-charge period in DCLKs.
+
+config SSD1351_PERFENHANCE
+	bool "Enhance Display Performance"
+	default n
+	---help---
+		Enhances the display performance.
+
+config SSD1351_CLKDIV
+	int "Clock Divider"
+	default 0
+	range 0 10
+	---help---
+		Specifies the clock divider.
+
+config SSD1351_OSCFREQ
+	int "Oscillator Frequency"
+	default 15
+	range 0 15
+	---help---
+		Specifies the oscillator frequency.
+
+config SSD1351_TPRECHG2
+	int "Second Pre-charge Period"
+	default 8
+	range 1 15
+	---help---
+		Specifies the second pre-charge period in DCLKs.
+
+config SSD1351_VPRECHG
+	int "Voltage Pre-charge Level"
+	default 50
+	range 20 60
+	---help---
+		Specifies the pre-charge voltage level as a percentage of VCC.
+
+config SSD1351_VCOMH
+	int "COM Deselect Voltage Level"
+	default 82
+	range 72 86
+	---help---
+		Specifies the COM deselect voltage level as a percentage of VCC.
+
+config SSD1351_CONTRASTA
+	int "Color A Contrast"
+	default 138
+	range 0 255
+	---help---
+		Specifies the contrast of color A.
+
+config SSD1351_CONTRASTB
+	int "Color B Contrast"
+	default 81
+	range 0 255
+	---help---
+		Specifies the contrast of color B.
+
+config SSD1351_CONTRASTC
+	int "Color C Contrast"
+	default 138
+	range 0 255
+	---help---
+		Specifies the contrast of color C.
+
+config SSD1351_MSTRCONTRAST
+	int "Master Contrast Ratio"
+	default 16
+	range 1 16
+	---help---
+		Specifies the master contrast ratio in sixteenths.
+
+endif
+
+config LCD_PCD8544
+	bool "Nokia 5110 LCD Display (Philips PCD8544)"
+	default n
+	---help---
+		LCD Display Module, PCD8544, Philips
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+
+if LCD_PCD8544
+
+config PCD8544_NINTERFACES
+	int "Number of PCD8544 Devices"
+	default 1
+	---help---
+		Specifies the number of physical PCD8544 devices that will be
+		supported.  NOTE:  At present, this must be undefined or defined to be 1.
+
+config PCD8544_XRES
+	int "PCD8544 X Resolution"
+	default 84
+	---help---
+		Specifies the X resolution of the LCD.
+
+config PCD8544_YRES
+	int "PCD8544 Y Resolution"
+	default 48
+	---help---
+		Specifies the Y resolution of the LCD.
+
+config PCD8544_INVERSE_VIDEO
+	bool "PCD8544 Inverse video"
+	default n
+	---help---
+		Inverse video on LCD.
+
+endif # LCD_PCD8544
+
+config LCD_ST7565
+	bool "ST7565 LCD Display Module"
+	default n
+	---help---
+		LCD Display Module, ST7565, Univision Technology Inc.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+
+if LCD_ST7565
+
+choice
+	prompt "LCD Display Module initialization sequence"
+	default NHD_C12864KGZ
+
+config NHD_C12864KGZ
+	bool "like NHD C12864KGZ"
+
+config ERC_12864_3
+	bool "like ERC12864-3"
+
+config AQM_1248A
+	bool "like AQM1248A"
+
+endchoice
+
+config ST7565_NINTERFACES
+	int "Number of ST7565 Devices"
+	default 1
+	---help---
+		Specifies the number of physical ST7565 devices that will be
+		supported.  NOTE:  At present, this must be undefined or defined to be 1.
+
+config ST7565_XRES
+	int "ST7565 X Resolution"
+	default 128
+	---help---
+		Specifies the X resolution of the LCD.
+
+config ST7565_YRES
+	int "ST7565 Y Resolution"
+	default 48 if AQM_1248A
+	default 64
+	---help---
+		Specifies the Y resolution of the LCD.
+
+config ST7565_MIRROR_X
+	bool "ST7565 apply mirror on X"
+	default n
+	---help---
+		Mirror X on LCD.
+
+config ST7565_MIRROR_Y
+	bool "ST7565 apply mirror on Y"
+	default y if AQM_1248A
+	default n
+	---help---
+		Mirror Y on LCD.
+
+config ST7565_INVERSE_VIDEO
+	bool "ST7565 Inverse video"
+	default n
+	---help---
+		Inverse video on LCD.
+
+endif # LCD_ST7565
+
+config LCD_ST7567
+	bool "ST7567 LCD Display Module"
+	default n
+	---help---
+		LCD Display Module, ST7567, Univision Technology Inc.  Used
+		with the LPCXpresso and Embedded Artists base board.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+		Required SPI driver settings:
+		SPI_CMDDATA - Include support for cmd/data selection.
+
+if LCD_ST7567
+
+config ST7567_SPIMODE
+	int "ST7567 SPI Mode"
+	default 0
+	range 0 3
+	---help---
+		Controls the SPI mode
+
+config ST7567_FREQUENCY
+	int "ST7567 SPI Frequency"
+	default 3500000
+	---help---
+		Define to use a different bus frequency
+
+config ST7567_NINTERFACES
+	int "Number of ST7567 Devices"
+	default 1
+	---help---
+		Specifies the number of physical ST7567 devices that will be
+		supported.  NOTE:  At present, this must be undefined or defined to be 1.
+
+config ST7567_POWER
+	bool "Power control"
+	default n
+	---help---
+		If the hardware supports a controllable LCD a power supply, this
+		configuration should be defined.  In this case the system must
+		provide an interface ug_power().
+
+config ST7567_XRES
+	int "ST7567 X Resolution"
+	default 128
+	---help---
+		Specifies the X resolution of the LCD.
+
+config ST7567_YRES
+	int "ST7567 Y Resolution"
+	default 64
+	---help---
+		Specifies the Y resolution of the LCD.
+
+endif # LCD_ST7567
+
+config LCD_UG2864AMBAG01
+	bool "UG-2864AMBAG01 OLED Display Module"
+	default n
+	---help---
+		OLED Display Module, UG-2864AMBAG01, Univision Technology Inc.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+		Required SPI driver settings:
+		SPI_CMDDATA - Include support for cmd/data selection.
+
+if LCD_UG2864AMBAG01
+
+config UG2864AMBAG01_SPIMODE
+	int "UG-2864AMBAG01 SPI Mode"
+	default 3
+	range 0 3
+	---help---
+		Controls the SPI mode
+
+config UG2864AMBAG01_FREQUENCY
+	int "UG-2864AMBAG01 SPI Frequency"
+	default 3500000
+	---help---
+		Define to use a different bus frequency
+
+config UG2864AMBAG01_NINTERFACES
+	int "Number of UG-2864AMBAG01 Devices"
+	default 1
+	---help---
+		Specifies the number of physical UG-9664HSWAG01 devices that will be
+		supported.  NOTE:  At present, this must be undefined or defined to be 1.
+
+endif
+
+config LCD_SSD1289
+	bool "LCD Based on SSD1289 Controller"
+	default n
+	---help---
+		Enables generic support for any LCD based on the Solomon Systech,
+		Ltd, SSD1289 Controller.  Use of this driver will usually require so
+		detailed customization of the LCD initialization code as necessary
+		for the specific LCD driven by the SSD1289 controller.
+
+if LCD_SSD1289
+
+choice
+	prompt "SSD1289 Initialization Profile"
+	default SSD1289_PROFILE1
+
+config SSD1289_PROFILE1
+	bool "Profile 1"
+
+config SSD1289_PROFILE2
+	bool "Profile 2"
+
+config SSD1289_PROFILE3
+	bool "Profile 3"
+
+endchoice
+endif
+
+config LCD_SHARP_MEMLCD
+	bool "Sharp Memory LCD Suite"
+	default n
+	---help---
+		memlcd.c. Driver for Sharp Memory LCD Suite.
+
+if LCD_SHARP_MEMLCD
+
+choice
+	prompt "Memory LCD Model"
+	default MEMLCD_LS013B7DH03
+
+config MEMLCD_LS013B7DH01
+	bool "LS013B7DH01"
+	---help---
+		Selects the LS013B7DH01 model
+
+config MEMLCD_LS013B7DH03
+	bool "LS013B7DH03"
+	---help---
+		Selects the LS013B7DH03 model
+
+endchoice
+
+config MEMLCD_NINTERFACES
+	int "Number of physical Memory LCD devices"
+	default 1
+	range 1 1
+	---help---
+		Specifies the number of physical Memory LCD devices that will
+		be supported.
+
+config MEMLCD_EXTCOMIN_MODE_HW
+	bool "Use hardware mode for EXTCOMIN"
+	default n
+	---help---
+		If use hardware mode to toggle VCOM, we need to send specific
+		command at a constant frequency to trigger the LCD internal
+		hardware logic.  While use software mode, we set up a timer to
+		toggle EXTCOMIN connected IO, basically, it is a hardware
+		timer to ensure a constant frequency.
+
+config MEMLCD_SPI_FREQUENCY
+	int "SPI frequency"
+	default 3500000
+	---help---
+		Define to use a different bus frequency, FIXME DEFAULT VALUE OK?
+
+endif
+
+choice
+	prompt "LCD Orientation"
+	default LCD_LANDSCAPE
+	depends on LCD
+	---help---
+		Some LCD drivers may support displays in different orientations.
+		If the LCD driver supports this capability, than these are configuration
+		options to select that display orientation.
+
+config LCD_LANDSCAPE
+	bool "Landscape orientation"
+	---help---
+		Define for "landscape" orientation support.  Landscape mode refers one
+		of two orientations where the display is wider than it is tall
+		(LCD_RLANDSCAPE is the other).  This is the default orientation.
+
+config LCD_PORTRAIT
+	bool "Portrait orientation"
+	---help---
+		Define for "portrait" orientation support.  Portrait mode refers one
+		of two orientations where the display is taller than it is wide
+		(LCD_RPORTAIT is the other).
+
+config LCD_RPORTRAIT
+	bool "Reverse portrait display"
+	---help---
+		Define for "reverse portrait" orientation support.  Reverse portrait mode
+		refers one of two orientations where the display is taller than it is
+		wide (LCD_PORTAIT is the other).
+
+config LCD_RLANDSCAPE
+	bool "Reverse landscape orientation"
+	---help---
+		Define for "reverse landscape" orientation support.  Reverse landscape mode
+		refers one of two orientations where the display is wider than it is
+		tall (LCD_LANDSCAPE is the other).
+
+endchoice
+
+config LCD_LPM013M091A
+	bool "JDI LPM013M091A LCD Driver"
+	default n
+	---help---
+		JDI LPM013M091A LCD Driver.
+		This driver doesn't support reading data.
+		Recommended to use DMA to transfer data or displayed image would be
+		broken.
+
+config LCD_ILI9340
+	bool "ILI9340 LCD Single Chip Driver"
+	default n
+	---help---
+		LCD Single Chip Driver, ILI9340, ILI Technology Corp.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+config LCD_ILI9340_NINTERFACES
+	int "Number of supported display driver"
+	range 1 2
+	default 1
+	depends on LCD_ILI9340
+	---help---
+		Define the number of supported  displays driven by a ili9340 LCD Single
+		Chip Driver.
+
+config LCD_ILI9340_IFACE0
+	bool "(1) LCD Display"
+	depends on LCD_ILI9340_NINTERFACES = 1 || LCD_ILI9340_NINTERFACES = 2
+	---help---
+		Configure first LCD Display.
+
+if LCD_ILI9340_IFACE0
+choice
+	prompt "LCD Orientation"
+	default LCD_ILI9340_IFACE0_LANDSCAPE
+	---help---
+		Configure display orientation.
+
+config LCD_ILI9340_IFACE0_LANDSCAPE
+	bool "Landscape orientation"
+	---help---
+		Define for "landscape" orientation support.
+
+config LCD_ILI9340_IFACE0_PORTRAIT
+	bool "Portrait orientation"
+	---help---
+		Define for "portrait" orientation support.
+
+config LCD_ILI9340_IFACE0_RLANDSCAPE
+	bool "Reverse landscape orientation"
+	---help---
+		Define for "reverse landscape" orientation support.
+
+config LCD_ILI9340_IFACE0_RPORTRAIT
+	bool "Reverse portrait display"
+	---help---
+		Define for "reverse portrait" orientation support.
+
+endchoice
+
+choice
+	prompt "Color format"
+	default LCD_ILI9340_IFACE0_RGB565
+	---help---
+		LCD color format.
+
+config LCD_ILI9340_IFACE0_RGB565
+	bool "16 bpp RGB565 color format"
+	---help---
+	16 bpp RGB565 color format
+
+endchoice
+endif
+
+config LCD_ILI9340_IFACE1
+	bool "(2) LCD Display"
+	depends on LCD_ILI9340_NINTERFACES = 2
+	---help---
+		Configure second LCD Display.
+
+if LCD_ILI9340_IFACE1
+choice
+	prompt "LCD Orientation"
+	default LCD_ILI9340_IFACE1_LANDSCAPE
+	---help---
+		Configure display orientation.
+
+config LCD_ILI9340_IFACE1_LANDSCAPE
+	bool "Landscape orientation"
+	---help---
+		Define for "landscape" orientation support.
+
+config LCD_ILI9340_IFACE1_PORTRAIT
+	bool "Portrait orientation"
+	---help---
+		Define for "portrait" orientation support.
+
+config LCD_ILI9340_IFACE1_RLANDSCAPE
+	bool "Reverse landscape orientation"
+	---help---
+		Define for "reverse landscape" orientation support.
+
+config LCD_ILI9340_IFACE1_RPORTRAIT
+	bool "Reverse portrait display"
+	---help---
+		Define for "reverse portrait" orientation support.
+
+endchoice
+
+choice
+	prompt "Color format"
+	default LCD_ILI9340_IFACE1_RGB565
+	---help---
+		LCD color format.
+
+config LCD_ILI9340_IFACE1_RGB565
+	bool "16 bpp RGB565 color format"
+	---help---
+		16 bpp RGB565 color format
+
+endchoice
+endif
+
+config LCD_ILI9341
+	bool "ILI9341 LCD Single Chip Driver"
+	default n
+	---help---
+		LCD Single Chip Driver, ILI9341, ILI Technology Corp. Used
+		with the STM32F429i Discovery Board.
+
+		Required LCD driver settings:
+		LCD_MAXCONTRAST should be 255, but any value >0 and <=255 will be accepted.
+		LCD_MAXPOWER should be 1:  0=off, 1=on
+
+config LCD_ILI9341_NINTERFACES
+	int "Number of supported display driver"
+	range 1 2
+	default 1
+	depends on LCD_ILI9341
+	---help---
+		Define the number of supported  displays driven by a ili9341 LCD Single
+		Chip Driver.
+
+config LCD_ILI9341_IFACE0
+	bool "(1) LCD Display"
+	depends on LCD_ILI9341_NINTERFACES = 1 || LCD_ILI9341_NINTERFACES = 2
+	---help---
+		Configure first LCD Display.
+
+if LCD_ILI9341_IFACE0
+choice
+	prompt "LCD Orientation"
+	default LCD_ILI9341_IFACE0_LANDSCAPE
+	---help---
+		Configure display orientation.
+
+config LCD_ILI9341_IFACE0_LANDSCAPE
+	bool "Landscape orientation"
+	---help---
+		Define for "landscape" orientation support.
+
+config LCD_ILI9341_IFACE0_PORTRAIT
+	bool "Portrait orientation"
+	---help---
+		Define for "portrait" orientation support.
+
+config LCD_ILI9341_IFACE0_RLANDSCAPE
+	bool "Reverse landscape orientation"
+	---help---
+		Define for "reverse landscape" orientation support.
+
+config LCD_ILI9341_IFACE0_RPORTRAIT
+	bool "Reverse portrait display"
+	---help---
+		Define for "reverse portrait" orientation support.
+
+endchoice
+
+choice
+	prompt "Color format"
+	default LCD_ILI9341_IFACE0_RGB565
+	---help---
+		LCD color format.
+
+config LCD_ILI9341_IFACE0_RGB565
+	bool "16 bpp RGB565 color format"
+	---help---
+		16 bpp RGB565 color format
+
+endchoice
+endif
+
+config LCD_ILI9341_IFACE1
+	bool "(2) LCD Display"
+	depends on LCD_ILI9341_NINTERFACES = 2
+	---help---
+		Configure second LCD Display.
+
+if LCD_ILI9341_IFACE1
+choice
+	prompt "LCD Orientation"
+	default LCD_ILI9341_IFACE1_LANDSCAPE
+	---help---
+		Configure display orientation.
+
+config LCD_ILI9341_IFACE1_LANDSCAPE
+	bool "Landscape orientation"
+	---help---
+		Define for "landscape" orientation support.
+
+config LCD_ILI9341_IFACE1_PORTRAIT
+	bool "Portrait orientation"
+	---help---
+		Define for "portrait" orientation support.
+
+config LCD_ILI9341_IFACE1_RLANDSCAPE
+	bool "Reverse landscape orientation"
+	---help---
+		Define for "reverse landscape" orientation support.
+
+config LCD_ILI9341_IFACE1_RPORTRAIT
+	bool "Reverse portrait display"
+	---help---
+		Define for "reverse portrait" orientation support.
+
+endchoice
+
+choice
+	prompt "Color format"
+	default LCD_ILI9341_IFACE1_RGB565
+	---help---
+		LCD color format.
+
+config LCD_ILI9341_IFACE1_RGB565
+	bool "16 bpp RGB565 color format"
+	---help---
+		16 bpp RGB565 color format
+
+endchoice
+endif
+
+config LCD_RA8875
+	bool "RA8875 LCD Display Controller"
+	default n
+	---help---
+		LCD controller driver for RA8875 by RAiO Technologies Inc.
+
+if LCD_RA8875
+
+choice
+	prompt "MCU Interface width"
+	default LCD_RA8875_8BIT
+	---help---
+		Bit-width of MCU interface (8 or 16)
+
+config LCD_RA8875_8BIT
+	bool "8 bit"
+
+config LCD_RA8875_16BIT
+	bool "16 bit"
+
+endchoice # MCU Interface width
+
+choice
+	prompt "Colors"
+	default LCD_RA8875_65K
+	---help---
+		Number of colors/color depth
+
+config LCD_RA8875_256
+	bool "256 / 8 bit"
+
+config LCD_RA8875_65K
+	bool "65k / 16 bit"
+
+endchoice # Colors
+
+config LCD_RA8875_EXTENDED
+	bool "Extended drawing interfaces"
+	default n
+	depends on BUILD_FLAT
+	---help---
+		Build in some non-standard, custom drawing interfaces for the RA8875
+		including the following: ra8875_drawrectangle(), ra8875_drawline(),
+		ra8875_drawtriangle(), and ra8875_drawcircle().  NOTE that these
+		will not be accessible by applications in protected or kernel build
+		configurations.
+
+		NOTE: The non-standard ra8875_clear(), ra8875_drawrectangle(),
+		ra8875_drawline() interfaces are always built and available for use
+		because within the OS because these are used internally by the
+		driver anyway.
+
+endif # LCD_RA8875
+
+config LCD_FT80X
+	bool "FTDI FT80x GUI Controller"
+	default n
+	select SCHED_HPWORK
+	---help---
+		Integrated LCD, Audio, Touchscreen controller driver for the FTDI
+		FT80x "EVE" series.
+
+if LCD_FT80X
+
+choice
+	prompt "FTDI FT80x part"
+	default LCD_FT800
+
+config LCD_FT800
+	bool "FT800"
+
+config LCD_FT801
+	bool "FT801"
+
+endchoice # FTDI FT80x part
+
+choice
+	prompt "FTDI FT80x Interface"
+	default LCD_FT80X_SPI
+
+config LCD_FT80X_SPI
+	bool "SPI"
+	select SPI
+
+config LCD_FT80X_I2C
+	bool "I2C"
+	select I2C
+
+endchoice # FTDI FT80x Interface
+
+config LCD_FT801_MULTITOUCH
+	bool "FT801 Multi-touch"
+	default n
+	depends on LCD_FT801
+
+choice
+	prompt "Display size"
+	default LCD_FT80X_WQVGA
+
+config LCD_FT80X_WQVGA
+	bool "WQVGA 480x272"
+
+config LCD_FT80X_QVGA
+	bool "QVGA 320x240"
+
+endchoice # Display size
+
+choice
+	prompt "Audio Shutdown Options"
+	default LCD_FT80X_AUDIO_NOSHUTDOWN
+
+config LCD_FT80X_AUDIO_NOSHUTDOWN
+	bool "No amplifier shutdown control"
+	---help---
+		There is no audio amplifier or the audio amplifier is not under
+		software control.
+
+config LCD_FT80X_AUDIO_MCUSHUTDOWN
+	bool "MCU controls audio shutdown"
+	---help---
+		The audio amplifier is controlled via an MCU GPIO output pin.
+
+config LCD_FT80X_AUDIO_GPIOSHUTDOWN
+	bool "FT80X controls audio shutdown"
+	---help---
+		The audio amplifier is controlled via an FT80x GPIO output pin.
+
+endchoice # Audio Shutdown Option
+
+config LCD_FT80X_AUDIO_GPIO
+	int "FT80x audio shutdown GPIO"
+	default 0
+	range 0 1
+	depends on LCD_FT80X_AUDIO_GPIOSHUTDOWN
+	---help---
+		Identifies the GPIO pin used to control the amplifier shutdown
+		output.
+
+endif # LCD_FT80X
+
+endmenu # LCD Driver selection
+endif # LCD
+
+comment "Character/Segment LCD Devices"
+
+menuconfig SLCD
+	bool "Alphanumeric/Segment LCD Devices"
+	default n
+	---help---
+		Drivers for Alphanumeric ans Segment LCDs (SLCDs).  These
+		drivers support interfaces as defined in include/nuttx/lcd/slcd_ioctl.h
+		amd slcd_codec.h
+
+		This selection is necessary to enable support for SLCD drivers in
+		drivers/lcd as well as for board-specific LCD drivers in the boards/
+		subdirectories.
+
+if SLCD
+
+config SLCD_CONSOLE
+	bool "SLCD console output"
+	default n
+	---help---
+		It is possible to use an SLCD to provide console output.  This option
+		enables that possibility.
+
+		At present, only one architecture supports this option (M16C).
+		However, this feature could be provided by other architectures in
+		the future.
+
+config LCD_LCD1602
+	bool "LCD 1602"
+	default n
+	---help---
+		Enable support for LCD1602 devices.  LCD1602 is based on the Hitachi
+		HD44780U LCD controller.  See also include/nuttx/lcd/hd4478ou.h.
+
+		NOTE:  There is no common implementation of the LCD1602 driver.
+		Rather, there are board-by-board implementations.
+
+config LCD_BACKPACK
+	bool "PCF8574 LCD Backpack"
+	default n
+	depends on I2C
+	select LIB_SLCDCODEC
+	---help---
+		Enable support for PCF8574 LCD Backpack driver. This driver supports
+		an interface board that is based on the PCF8574 io expander and
+		supports the HD44780-based (or compatible) LCD modules.  There are
+		a myriad of different vendors of such, but they are principally the
+		same, save wiring and minor features like jumpers for I2C addresses.
+		This driver supports known and unknown variants.
+
+		See pcf8574_lcd_backpack_readme.txt
+
+config LCD_ST7032
+	bool "ST7032 over I2C (i.e. JLX1602G-390)"
+	default n
+	depends on I2C
+	---help---
+		Enable support for ST7032i on I2C. This driver was tested with
+		JLX1602G-390 that has 10 pins: CAP1N, CAP1P, VOUT, VCC, SHLS,
+		SHLC, GND, SDA, SCL, XRESET. The XRESET pin is connected to a
+		pull-up resistor, then the module automatically executes power-on
+		reset when power is supplied to the module. The pin SHLS is also
+		connected to a pull-up resistor and the pin SHLC is connected to
+		the ground. So only I2C pins SDA and SCL are used by NuttX.
+
+endif # SLCD
+
+comment "Other LCD-related Devices"
+
+config LCD_OTHER
+	bool
+	default n
+
+config LCD_TDA19988
+	bool "TDA19988 HDMI Encoder"
+	default n
+	select LCD_OTHER
+	depends on I2C && EXPERIMENTAL
+	---help---
+		Enable support for the TI TDA19988 HDMI Encoder.  The TDA19988 is a
+		very low power and very small size High-Definition Multimedia
+		Interface (HDMI) 1.4a transmitter.  This device is primarily
+		intended for mobile applications like Digital Video Camera (DVC),
+		Digital Still Camera (DSC), Portable Multimedia Player (PMP), Mobile
+		Phone and Ultra-Mobile Personal Computer (UM PC), new PC tablet and
+		MID where size and power are key for battery autonomy.
+
+endmenu # LCD Driver Support

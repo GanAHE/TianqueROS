@@ -1,0 +1,12 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if ARCH_BOARD_NUCLEO_F302R8
+
+config NUCLEOF302R8_HIGHPRI
+	bool "High priority interrupt test"
+	default n
+
+endif

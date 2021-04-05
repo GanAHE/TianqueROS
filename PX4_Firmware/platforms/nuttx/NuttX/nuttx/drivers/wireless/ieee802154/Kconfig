@@ -1,0 +1,33 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if DRIVERS_IEEE802154
+
+config IEEE802154_MRF24J40
+	bool "Microchip MRF24J40 IEEE 802.15.4 transceiver"
+	default n
+	---help---
+		This selection enables support for the Microchip MRF24J40 device.
+
+source drivers/wireless/ieee802154/mrf24j40/Kconfig
+
+config IEEE802154_AT86RF233
+	bool "ATMEL RF233 IEEE 802.15.4 transceiver"
+	default n
+	depends on EXPERIMENTAL
+	---help---
+		This selection enables support for the Atmel RF233 device.
+
+source drivers/wireless/ieee802154/at86rf23x/Kconfig
+
+config IEEE802154_XBEE
+	bool "XBee IEEE 802.15.4  Radio (w/ MAC)"
+	default n
+	---help---
+		This selection enables support for the XBee Radio device.
+
+source drivers/wireless/ieee802154/xbee/Kconfig
+
+endif # DRIVERS_IEEE802154

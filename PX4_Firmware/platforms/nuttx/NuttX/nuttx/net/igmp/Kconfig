@@ -1,0 +1,17 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config NET_IGMP
+	bool "IGMPv2 client support"
+	default n
+	depends on NET_IPv4
+	select NET_MCASTGROUP
+	select NETDEV_IFINDEX
+	---help---
+		Enable IGMPv2 client support.
+
+if NET_IGMP
+
+endif # NET_IGMP

@@ -1,0 +1,33 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if ARCH_BOARD_FLIPNCLICK_SAM3X
+
+config FLIPNCLICK_SAM3X_SSD1306
+	bool "SSD1306 Click Present"
+	default n
+	depends on LCD_SSD1306
+	select NXSTART_EXTERNINIT if NX
+
+choice
+	prompt "SSD1306 mikroBUS"
+	default FLIPNCLICK_SAM3X_SSD1306_MBA
+	depends on FLIPNCLICK_SAM3X_SSD1306
+
+config FLIPNCLICK_SAM3X_SSD1306_MBA
+	bool "mikroBUS A"
+
+config FLIPNCLICK_SAM3X_SSD1306_MBB
+	bool "mikroBUS B"
+
+config FLIPNCLICK_SAM3X_SSD1306_MBC
+	bool "mikroBUS C"
+
+config FLIPNCLICK_SAM3X_SSD1306_MBD
+	bool "mikroBUS D"
+
+endchoice # SSD1306 mikroBUS
+
+endif

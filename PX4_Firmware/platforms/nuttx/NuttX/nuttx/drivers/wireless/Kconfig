@@ -1,0 +1,127 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if DRIVERS_WIRELESS
+
+config WL_CC1101
+	bool "CC1101 RF transceiver support"
+	default n
+	select SPI
+	select SCHED_HPWORK
+	select SCHED_LPWORK
+
+if WL_CC1101
+
+config CC1101_SPIDEV
+	int "SPI bus number"
+	default 2
+	---help---
+		Selects the SPI bus number identifying that SPI interface that
+		connects the CC1101 to the MCU.
+
+endif
+
+config WL_GS2200M
+	bool "Telit GS2200M Wi-Fi support"
+	default n
+	select SPI
+	select LIBC_SCANSET
+
+if WL_GS2200M
+
+config WL_GS2200M_SPI_FREQUENCY
+	int "SPI frequencey for GS2200M"
+	default 4000000
+	range 4000000 10000000
+
+config WL_GS2200M_DISABLE_DHCPC
+	bool "Disable the internal dhcp client"
+	default n
+
+endif
+
+source drivers/wireless/spirit/Kconfig
+
+menuconfig DRIVERS_IEEE802154
+	bool "IEEE 802.15.4 Device Support"
+	default n
+	---help---
+		Select to enable building of IEEE802.15.4 device drivers.
+
+source drivers/wireless/ieee802154/Kconfig
+
+menuconfig DRIVERS_IEEE80211
+	bool "IEEE 802.11 Device Support"
+	default n
+	---help---
+		Select to enable building of IEEE802.11 device drivers.
+
+source drivers/wireless/ieee80211/Kconfig
+
+menuconfig DRIVERS_BLUETOOTH
+	bool "Bluetooth Device Support"
+	default n
+	depends on WIRELESS_BLUETOOTH
+	---help---
+		Select to enable building of Bluetooth device drivers.
+
+source drivers/wireless/bluetooth/Kconfig
+
+menuconfig DRIVERS_LPWAN
+	bool "LPWAN Device Support"
+	default n
+	---help---
+		Select to enable building of LPWAN device drivers.
+
+source drivers/wireless/lpwan/Kconfig
+
+config WL_NRF24L01
+	bool "nRF24l01+ transceiver support"
+	default n
+	select SPI
+	---help---
+		This options adds driver support for the Nordic nRF24L01+ chip.
+
+if WL_NRF24L01
+
+config WL_NRF24L01_DFLT_ADDR_WIDTH
+	int "Default address width"
+	default 5
+	range 3 5
+	---help---
+		Default address width to be used by the nRF24l01+ driver.
+		Note that this default can be changed through the driver API.
+
+config WL_NRF24L01_CHECK_PARAMS
+	bool "Check call parameters"
+	default y
+	---help---
+		This option adds some sanity check code to parameters given in the
+		driver API functions. If this option is disabled, parameter
+		values are passed 'as is' to the module hardware registers.
+
+config WL_NRF24L01_RXSUPPORT
+	bool "Support messages reception"
+	default y
+	---help---
+		If this option is disabled the driver supports only the transmission of messages.
+		Reception of messages will be disabled (and corresponding functions removed).
+		Note: this option is intended to reduce driver code size for 'transmission
+		only' devices.
+
+if WL_NRF24L01_RXSUPPORT
+
+config WL_NRF24L01_RXFIFO_LEN
+	int "RX fifo length"
+	default 128
+	range 34 2048
+	---help---
+		Length of the software based fifo used to store content of
+		received messages.
+
+endif # WL_NRF24L01_RXSUPPORT
+endif # WL_NRF24L01
+
+endif # DRIVERS_WIRELESS

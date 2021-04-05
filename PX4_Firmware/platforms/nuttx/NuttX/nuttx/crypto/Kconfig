@@ -1,0 +1,84 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config CRYPTO
+	bool "Crypto API support"
+	default n
+	---help---
+		Enable or disable Crypto API features
+
+if CRYPTO
+
+config CRYPTO_AES
+	bool "AES cypher support"
+	default n
+
+config CRYPTO_ALGTEST
+	bool "Perform automatic crypto algorithms test on startup"
+	default n
+
+if CRYPTO_ALGTEST
+
+config CRYPTO_AES128_DISABLE
+	bool "Omit 128-bit AES tests"
+	default n
+
+config CRYPTO_AES192_DISABLE
+	bool "Omit 192-bit AES tests"
+	default n
+
+config CRYPTO_AES256_DISABLE
+	bool "Omit 256-bit AES tests"
+	default n
+
+endif # CRYPTO_ALGTEST
+
+config CRYPTO_CRYPTODEV
+	bool "cryptodev support"
+	default n
+
+config CRYPTO_SW_AES
+	bool "Software AES library"
+	default n
+	---help---
+		Enable the software AES library as described in
+		include/nuttx/crypto/aes.h
+
+		TODO: Adapt interfaces so that they are consistent with H/W AES
+		implementations.  This needs to support up_aesinitialize() and
+		aes_cypher() per include/nuttx/crypto/crypto.h.
+
+config CRYPTO_BLAKE2S
+	bool "BLAKE2s hash algorithm"
+	default n
+	---help---
+		Enable the BLAKE2s hash algorithm
+
+config CRYPTO_RANDOM_POOL
+	bool "Entropy pool and strong randon number generator"
+	default n
+	select CRYPTO_BLAKE2S
+	---help---
+		Entropy pool gathers environmental noise from device drivers,
+		user-space, etc., and returns good random numbers, suitable
+		for cryptographic use. Based on entropy pool design from
+		*BSDs and uses BLAKE2Xs algorithm for CSPRNG output.
+
+		NOTE: May not actually be cyptographically secure, if
+		not enough entropy is made available to the entropy pool.
+
+if CRYPTO_RANDOM_POOL
+
+config CRYPTO_RANDOM_POOL_COLLECT_IRQ_RANDOMNESS
+	bool "Use interrupts to feed timing randomness to entropy pool"
+	default y
+	---help---
+		Feed entropy pool with interrupt randomness from interrupt
+		dispatch function 'irq_dispatch'. This adds some overhead
+		for every interrupt handled.
+
+endif # CRYPTO_RANDOM_POOL
+
+endif # CRYPTO

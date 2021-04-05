@@ -1,0 +1,959 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if ARCH_ARM
+comment "ARM Options"
+
+choice
+	prompt "ARM MCU selection"
+	default ARCH_CHIP_STM32
+
+config ARCH_CHIP_A1X
+	bool "Allwinner A1X"
+	select ARCH_CORTEXA8
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_LOWVECTORS
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_SDRAM
+	select BOOT_RUNFROMSDRAM
+	select ARCH_HAVE_ADDRENV
+	select ARCH_NEED_ADDRENV_MAPPING
+	---help---
+		Allwinner A1X family: A10, A10S (A12), A13 (ARM Cortex-A8)
+
+config ARCH_CHIP_AM335X
+	bool "TI AM335X"
+	select ARCH_CORTEXA8
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_LOWVECTORS
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_SDRAM
+	select BOOT_RUNFROMSDRAM
+	select ARCH_HAVE_ADDRENV
+	select ARCH_NEED_ADDRENV_MAPPING
+	---help---
+		TI AM335X family: AM3356, AM3357, AM3358, AM3359 (ARM Cortex-A8)
+
+config ARCH_CHIP_C5471
+	bool "TMS320 C5471"
+	select ARCH_ARM7TDMI
+	select ARCH_HAVE_LOWVECTORS
+	select OTHER_UART_SERIALDRIVER
+	---help---
+		TI TMS320 C5471, A180, or DA180 (ARM7TDMI)
+
+config ARCH_CHIP_DM320
+	bool "TMS320 DM320"
+	select ARCH_ARM926EJS
+	select ARCH_HAVE_LOWVECTORS
+	---help---
+		TI DMS320 DM320 (ARM926EJS)
+
+config ARCH_CHIP_EFM32
+	bool "Energy Micro EFM32"
+	select ARCH_HAVE_SPI_BITORDER
+	select ARCH_HAVE_FETCHADD
+	---help---
+		Energy Micro EFM32 microcontrollers (ARM Cortex-M).
+
+config ARCH_CHIP_IMX1
+	bool "NXP/Freescale iMX.1"
+	select ARCH_ARM920T
+	select ARCH_HAVE_HEAP2
+	select ARCH_HAVE_LOWVECTORS
+	---help---
+		Freescale iMX.1 architectures (ARM920T)
+
+config ARCH_CHIP_IMX6
+	bool "NXP/Freescale iMX.6"
+	select ARCH_CORTEXA9
+	select ARMV7A_HAVE_L2CC_PL310
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_TRUSTZONE
+	select ARCH_HAVE_LOWVECTORS
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_SDRAM
+	select BOOT_RUNFROMSDRAM
+	select ARCH_HAVE_ADDRENV
+	select ARCH_NEED_ADDRENV_MAPPING
+	---help---
+		Freescale iMX.6 architectures (Cortex-A9)
+
+config ARCH_CHIP_IMXRT
+	bool "NXP/Freescale iMX.RT"
+	select ARCH_CORTEXM7
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_RAMFUNCS
+	select ARCH_HAVE_TICKLESS
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_SPI_CS_CONTROL
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		NXP i.MX RT (ARM Cortex-M7) architectures
+
+config ARCH_CHIP_KINETIS
+	bool "NXP/Freescale Kinetis"
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_RAMFUNCS
+	select ARCH_HAVE_I2CRESET
+	---help---
+		Freescale Kinetis Architectures (ARM Cortex-M4)
+
+config ARCH_CHIP_KL
+	bool "NXP/Freescale Kinetis L"
+	select ARCH_CORTEXM0
+	---help---
+		Freescale Kinetis L Architectures (ARM Cortex-M0+)
+
+config ARCH_CHIP_LC823450
+	bool "ON Semiconductor LC823450"
+	select ARCH_CORTEXM3
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_HEAPCHECK
+	select ARCH_HAVE_MULTICPU
+	select ARCH_HAVE_I2CRESET
+	select ARCH_GLOBAL_IRQDISABLE
+	---help---
+		ON Semiconductor LC823450 architectures (ARM dual Cortex-M3)
+
+config ARCH_CHIP_LM
+	bool "TI/Luminary Stellaris"
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	---help---
+		TI/Luminary Stellaris LMS3 and LM4F architectures (ARM Cortex-M3/4)
+
+config ARCH_CHIP_LPC17XX_40XX
+	bool "NXP LPC17xx/LPC40xx"
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FETCHADD
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		NXP LPC17xx & LPC40xx architectures (ARM Cortex-M3/4)
+
+config ARCH_CHIP_LPC214X
+	bool "NXP LPC214x"
+	select ARCH_ARM7TDMI
+	select ARCH_HAVE_LOWVECTORS
+	---help---
+		NXP LPC2145x architectures (ARM7TDMI)
+
+config ARCH_CHIP_LPC2378
+	bool "NXP LPC2378"
+	select ARCH_ARM7TDMI
+	select ARCH_HAVE_LOWVECTORS
+	---help---
+		NXP LPC2145x architectures (ARM7TDMI)
+
+config ARCH_CHIP_LPC31XX
+	bool "NXP LPC31XX"
+	select ARCH_ARM926EJS
+	select ARCH_HAVE_LOWVECTORS
+	---help---
+		NPX LPC31XX architectures (ARM926EJS).
+
+config ARCH_CHIP_LPC43XX
+	bool "NXP LPC43XX"
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_FETCHADD
+	---help---
+		NPX LPC43XX architectures (ARM Cortex-M4).
+
+config ARCH_CHIP_LPC54XX
+	bool "NXP LPC54XX"
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_FETCHADD
+	---help---
+		NPX LPC54XX architectures (ARM Cortex-M4).
+
+config ARCH_CHIP_MAX326XX
+	bool "Maxim Integrated MAX326XX"
+	select ARCH_HAVE_FETCHADD
+	---help---
+		Maxim Integrated MAX326XX microcontrollers (ARM Cortex-M4F).
+
+config ARCH_CHIP_MOXART
+	bool "MoxART"
+	select ARCH_ARM7TDMI
+	select ARCH_HAVE_RESET
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		MoxART family
+
+config ARCH_CHIP_NRF52
+	bool "Nordic NRF52"
+	select ARCH_CORTEXM4
+	#select ARCH_HAVE_MPU
+	#select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FPU
+	---help---
+		Nordic NRF52 architectures (ARM Cortex-M4).
+
+config ARCH_CHIP_NUC1XX
+	bool "Nuvoton NUC100/120"
+	select ARCH_CORTEXM0
+	---help---
+		Nuvoton NUC100/120 architectures (ARM Cortex-M0).
+
+config ARCH_CHIP_S32K1XX
+	bool "NXP S32K1XX"
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	---help---
+		NPX LPC54XX architectures (ARM Cortex-M0+ and Cortex-M4F).
+
+config ARCH_CHIP_SAMA5
+	bool "Atmel SAMA5"
+	select ARCH_CORTEXA5
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_LOWVECTORS
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_TICKLESS
+	select ARCH_HAVE_ADDRENV
+	select ARCH_NEED_ADDRENV_MAPPING
+	---help---
+		Atmel SAMA5 (ARM Cortex-A5)
+
+config ARCH_CHIP_SAMD2X
+	bool "Microchip/Atmel SAMD2x"
+	select ARCH_CORTEXM0
+	---help---
+		Microchip (formerly Atmel) SAMD2X (ARM Cortex-M0+)
+
+config ARCH_CHIP_SAML2X
+	bool "Microchip/Atmel SAML2x"
+	select ARCH_CORTEXM0
+	---help---
+		Microchip (formerly Atmel) SAML2X (ARM Cortex-M0+)
+
+config ARCH_CHIP_SAMD5X
+	bool "Microchip SAMD5x"
+	select ARCH_CORTEXM4
+	---help---
+		Microchip SAMD5X (ARM Cortex-M4)
+
+config ARCH_CHIP_SAME5X
+	bool "Microchip SAME5x"
+	select ARCH_CORTEXM4
+	---help---
+		Microchip SAME5x (ARM Cortex-M4)
+
+config ARCH_CHIP_SAM34
+	bool "Atmel SAM3/SAM4"
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_RAMFUNCS
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		Atmel SAM3 (ARM Cortex-M3) and SAM4 (ARM Cortex-M4) architectures
+
+config ARCH_CHIP_SAMV7
+	bool "Atmel SAMV7"
+	select ARCH_CORTEXM7
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_RAMFUNCS
+	select ARCH_HAVE_TICKLESS
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_SPI_CS_CONTROL
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		Atmel SAMV7 (ARM Cortex-M7) architectures
+
+config ARCH_CHIP_SIMPLELINK
+	bool "TI SimpleLink"
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FETCHADD
+	depends on EXPERIMENTAL
+	---help---
+		TI SimpleLink CCxxx architectures (ARM Cortex-M3 or M4)
+
+config ARCH_CHIP_STM32
+	bool "STMicro STM32 F1/F2/F3/F4/L1"
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_HEAPCHECK
+	select ARCH_HAVE_PROGMEM
+	select ARCH_HAVE_SPI_BITORDER
+	select ARCH_HAVE_TICKLESS
+	select ARCH_HAVE_TIMEKEEPING
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		STMicro STM32 architectures (ARM Cortex-M3/4).
+
+config ARCH_CHIP_STM32F0
+	bool "STMicro STM32 F0"
+	select ARCH_CORTEXM0
+	---help---
+		STMicro STM32F0 architectures (ARM Cortex-M0).
+
+config ARCH_CHIP_STM32L0
+	bool "STMicro STM32 L0"
+	select ARCH_CORTEXM0
+	---help---
+		STMicro STM32L0 architectures (ARM Cortex-M0).
+
+config ARCH_CHIP_STM32G0
+	bool "STMicro STM32 G0"
+	select ARCH_CORTEXM0
+	---help---
+		STMicro STM32G0 architectures (ARM Cortex-M0).
+
+config ARCH_CHIP_STM32F7
+	bool "STMicro STM32 F7"
+	select ARCH_CORTEXM7
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_HEAPCHECK
+	select ARCH_HAVE_PROGMEM
+	select ARCH_HAVE_SPI_BITORDER
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	select ARCH_HAVE_TICKLESS
+	select ARCH_HAVE_TIMEKEEPING
+	---help---
+		STMicro STM32 architectures (ARM Cortex-M7).
+
+config ARCH_CHIP_STM32H7
+	bool "STMicro STM32 H7"
+	select ARCH_CORTEXM7
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_PROGMEM
+#	select ARCH_HAVE_HEAPCHECK
+	select ARCH_HAVE_SPI_BITORDER
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		STMicro STM32H7 architectures (ARM Cortex-M7).
+
+		BEWARE: This is a work-in-progress and not yet ready for general
+		usage.  See boards/arm/stm32/nucleo-h743zi/README.txt for the
+		current state of the port.
+
+config ARCH_CHIP_STM32L4
+	bool "STMicro STM32 L4"
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_I2CRESET
+	select ARCH_HAVE_HEAPCHECK
+	select ARCH_HAVE_PROGMEM
+	select ARCH_HAVE_SPI_BITORDER
+	select ARCH_HAVE_TICKLESS
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		STMicro STM32 architectures (ARM Cortex-M4).
+
+config ARCH_CHIP_STR71X
+	bool "STMicro STR71x"
+	select ARCH_ARM7TDMI
+	select ARCH_HAVE_LOWVECTORS
+	---help---
+		STMicro STR71x architectures (ARM7TDMI).
+
+config ARCH_CHIP_TMS570
+	bool "TI TMS570"
+	select ENDIAN_BIG
+	select ARCH_HAVE_LOWVECTORS
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_RAMFUNCS
+	select ARMV7R_MEMINIT
+	select ARMV7R_HAVE_DECODEFIQ
+	---help---
+		TI TMS570 family
+
+config ARCH_CHIP_TIVA
+	bool "TI Tiva"
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FETCHADD
+	---help---
+		TI Tiva TM4C architectures (ARM Cortex-M4)
+
+config ARCH_CHIP_XMC4
+	bool "Infineon XMC4xxx"
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_FETCHADD
+	select ARCH_HAVE_RAMFUNCS
+	select ARCH_HAVE_I2CRESET
+	select ARM_HAVE_MPU_UNIFIED
+	select ARMV7M_HAVE_STACKCHECK
+	---help---
+		Infineon XMC4xxx(ARM Cortex-M4) architectures
+
+config ARCH_CHIP_CXD56XX
+	bool "Sony CXD56xx"
+	select ARCH_CORTEXM4
+	select ARCH_HAVE_MPU
+	select ARM_HAVE_MPU_UNIFIED
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_HEAPCHECK
+	select ARCH_HAVE_MULTICPU
+	select ARCH_GLOBAL_IRQDISABLE
+	select ARCH_HAVE_SDIO if MMCSD
+	---help---
+		Sony CXD56XX (ARM Cortex-M4) architectures
+
+endchoice
+
+config ARCH_ARM7TDMI
+	bool
+	default n
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	---help---
+		The Arm7TDMI-S is an excellent workhorse processor capable of a wide
+		array of applications. Traditionally used in mobile handsets, the
+		processor is now broadly in many non-mobile applications.
+
+config ARCH_ARM920T
+	bool
+	default n
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	---help---
+		The ARM9 processor family is built around the ARM9TDMI processor and
+		incorporates the 16-bit Thumb instruction set. The ARM9 Thumb family
+		includes the ARM920T and ARM922T cached processor macrocells:
+
+		- Dual 16k caches for applications running Symbian OS, Palm OS,
+		  Linux and Windows CE,
+		- Dual 8k caches for applications running Symbian OS, Palm OS, Linux
+		  and Windows CE Applications
+
+config ARCH_ARM926EJS
+	bool
+	default n
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	---help---
+		Arm926EJ-S is the entry point processor capable of supporting full
+		Operating Systems including Linux, WindowsCE, and Symbian.
+
+		The ARM9E processor family enables single processor solutions for
+		microcontroller, DSP and Java applications. The ARM9E family of
+		products are DSP-enhanced 32-bit RISC processors, for applications
+		requiring a mix of DSP and microcontroller performance. The family
+		includes the ARM926EJ-S, ARM946E-S, ARM966E-S, and ARM968E-S
+		processor macrocells. They include signal processing extensions to
+		enhance 16-bit fixed point performance using a single-cycle 32 x 16
+		multiply-accumulate (MAC) unit, and implement the 16-bit Thumb
+		instruction set. The ARM926EJ-S processor also includes ARM Jazelle
+		technology which enables the direct execution of Java bytecodes in
+		hardware.
+
+config ARCH_ARM1136J
+	bool
+	default n
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	---help---
+		Arm1136J(F)-S is very similar to Arm926EJ-S, but includes an
+		extended pipeline, basic SIMD (Single Instruction Multiple Data)
+		instructions, and improved frequency and performance.
+
+config ARCH_ARM1156T2
+	bool
+	default n
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	---help---
+		Arm1156T2(F)-S is the highest-performance processor in the real-time
+		Classic Arm family.
+
+config ARCH_ARM1176JZ
+	bool
+	default n
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	---help---
+		Arm1176JZ(F)-S is the highest-performance single-core processor in
+		the Classic Arm family. It also introduced TrustZone technology to
+		enable secure execution outside of the reach of malicious code.
+
+config ARCH_CORTEXM0
+	bool
+	default n
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_RESET
+	select ARCH_HAVE_HARDFAULT_DEBUG
+
+config ARCH_CORTEXM23
+	bool
+	default n
+
+config ARCH_ARMV7M
+	bool
+	default n
+	select ARCH_HAVE_SETJMP if ARCH_TOOLCHAIN_GNU
+
+config ARCH_CORTEXM3
+	bool
+	default n
+	select ARCH_ARMV7M
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_IRQTRIGGER
+	select ARCH_HAVE_RAMVECTORS
+	select ARCH_HAVE_LAZYFPU
+	select ARCH_HAVE_HIPRI_INTERRUPT
+	select ARCH_HAVE_RESET
+	select ARCH_HAVE_TESTSET
+	select ARCH_HAVE_HARDFAULT_DEBUG
+	select ARCH_HAVE_MEMFAULT_DEBUG
+
+config ARCH_CORTEXM33
+	bool
+	default n
+
+config ARCH_CORTEXM4
+	bool
+	default n
+	select ARCH_ARMV7M
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_IRQTRIGGER
+	select ARCH_HAVE_RAMVECTORS
+	select ARCH_HAVE_LAZYFPU
+	select ARCH_HAVE_HIPRI_INTERRUPT
+	select ARCH_HAVE_RESET
+	select ARCH_HAVE_TESTSET
+	select ARCH_HAVE_HARDFAULT_DEBUG
+	select ARCH_HAVE_MEMFAULT_DEBUG
+
+config ARCH_CORTEXM7
+	bool
+	default n
+	select ARCH_ARMV7M
+	select ARCH_HAVE_FPU
+	select ARCH_HAVE_IRQPRIO
+	select ARCH_HAVE_IRQTRIGGER
+	select ARCH_HAVE_RAMVECTORS
+	select ARCH_HAVE_LAZYFPU
+	select ARCH_HAVE_HIPRI_INTERRUPT
+	select ARCH_HAVE_RESET
+	select ARCH_HAVE_TESTSET
+	select ARCH_HAVE_HARDFAULT_DEBUG
+	select ARCH_HAVE_MEMFAULT_DEBUG
+
+config ARCH_ARMV7A
+	bool
+	default n
+
+config ARCH_CORTEXA5
+	bool
+	default n
+	select ARCH_ARMV7A
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_CORTEXA7
+	bool
+	default n
+	select ARCH_ARMV7A
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_CORTEXA8
+	bool
+	default n
+	select ARCH_ARMV7A
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_CORTEXA9
+	bool
+	default n
+	select ARCH_ARMV7A
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MMU
+	select ARCH_USE_MMU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_ARMV7R
+	bool
+	default n
+
+config ARCH_CORTEXR4
+	bool
+	default n
+	select ARCH_ARMV7R
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_CORTEXR5
+	bool
+	default n
+	select ARCH_ARMV7R
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_CORTEXR7
+	bool
+	default n
+	select ARCH_ARMV7R
+	select ARCH_DCACHE
+	select ARCH_ICACHE
+	select ARCH_HAVE_MPU
+	select ARCH_HAVE_TESTSET
+
+config ARCH_FAMILY
+	string
+	default "arm"		if ARCH_ARM7TDMI || ARCH_ARM926EJS || ARCH_ARM920T
+	default "armv6-m"	if ARCH_CORTEXM0
+	default "armv7-a"	if ARCH_ARMV7A
+	default "armv7-m"	if ARCH_ARMV7M
+	default "armv7-r"	if ARCH_ARMV7R
+
+config ARCH_CHIP
+	string
+	default "a1x"		if ARCH_CHIP_A1X
+	default "am335x"	if ARCH_CHIP_AM335X
+	default "c5471"		if ARCH_CHIP_C5471
+	default "dm320"		if ARCH_CHIP_DM320
+	default "efm32"		if ARCH_CHIP_EFM32
+	default "imx1"		if ARCH_CHIP_IMX1
+	default "imx6"		if ARCH_CHIP_IMX6
+	default "imxrt"		if ARCH_CHIP_IMXRT
+	default "kinetis"	if ARCH_CHIP_KINETIS
+	default "kl"		if ARCH_CHIP_KL
+	default "lc823450"	if ARCH_CHIP_LC823450
+	default "tiva"		if ARCH_CHIP_LM || ARCH_CHIP_TIVA || ARCH_CHIP_SIMPLELINK
+	default "lpc17xx_40xx"	if ARCH_CHIP_LPC17XX_40XX
+	default "lpc214x"	if ARCH_CHIP_LPC214X
+	default "lpc2378"	if ARCH_CHIP_LPC2378
+	default "lpc31xx"	if ARCH_CHIP_LPC31XX
+	default "lpc43xx"	if ARCH_CHIP_LPC43XX
+	default "lpc54xx"	if ARCH_CHIP_LPC54XX
+	default "max326xx"	if ARCH_CHIP_MAX326XX
+	default "moxart"	if ARCH_CHIP_MOXART
+	default "nrf52"		if ARCH_CHIP_NRF52
+	default "nuc1xx"	if ARCH_CHIP_NUC1XX
+	default "s32k1xx"	if ARCH_CHIP_S32K1XX
+	default "sama5"		if ARCH_CHIP_SAMA5
+	default "samd2l2"	if ARCH_CHIP_SAMD2X || ARCH_CHIP_SAML2X
+	default "samd5e5"	if ARCH_CHIP_SAMD5X || ARCH_CHIP_SAME5X
+	default "sam34"		if ARCH_CHIP_SAM34
+	default "samv7"		if ARCH_CHIP_SAMV7
+	default "stm32"		if ARCH_CHIP_STM32
+	default "stm32f0l0g0"	if ARCH_CHIP_STM32F0 || ARCH_CHIP_STM32L0 || ARCH_CHIP_STM32G0
+	default "stm32f7"	if ARCH_CHIP_STM32F7
+	default "stm32h7"	if ARCH_CHIP_STM32H7
+	default "stm32l4"	if ARCH_CHIP_STM32L4
+	default "str71x"	if ARCH_CHIP_STR71X
+	default "tms570"	if ARCH_CHIP_TMS570
+	default "xmc4"		if ARCH_CHIP_XMC4
+	default "cxd56xx"	if ARCH_CHIP_CXD56XX
+
+config ARCH_HAVE_TRUSTZONE
+	bool
+	default n
+	---help---
+		Automatically selected to indicate that the ARM CPU supports
+		TrustZone.
+
+choice
+	prompt "TrustZone Configuration"
+	default ARCH_TRUSTZONE_SECURE
+	depends on ARCH_HAVE_TRUSTZONE
+
+config ARCH_TRUSTZONE_SECURE
+	bool "All CPUs operate secure state"
+
+config ARCH_TRUSTZONE_NONSECURE
+	bool "All CPUs operate non-secure state"
+	depends on EXPERIMENTAL
+
+config ARCH_TRUSTZONE_BOTH
+	bool "CPUs operate in both secure and non-secure states"
+	depends on EXPERIMENTAL
+
+endchoice # TrustZone Configuration
+
+config ARM_THUMB
+	bool
+	default n
+	depends on ARCH_ARMV7A
+
+config ARM_HAVE_MPU_UNIFIED
+	bool
+	default n
+	---help---
+		Automatically selected to indicate that the CPU supports a
+		unified MPU for both instruction and data addresses.
+
+config ARM_MPU
+	bool "MPU support"
+	default n
+	depends on ARCH_HAVE_MPU
+	select ARCH_USE_MPU
+	---help---
+		Build in support for the ARM Cortex-M3/4/7 Memory Protection Unit (MPU).
+		Check your chip specifications first; not all Cortex-M3/4/7 chips
+		support the MPU.
+
+config ARM_MPU_NREGIONS
+	int "Number of MPU regions"
+	default 16 if ARCH_CORTEXM7
+	default 8 if !ARCH_CORTEXM7
+	depends on ARM_MPU
+	---help---
+		This is the number of protection regions supported by the MPU.
+
+config ARCH_HAVE_LOWVECTORS
+	bool
+
+config ARCH_LOWVECTORS
+	bool "Vectors in low memory"
+	default n
+	depends on ARCH_HAVE_LOWVECTORS
+	---help---
+		Support ARM vectors in low memory.
+
+config ARCH_ROMPGTABLE
+	bool "ROM page table"
+	default n
+	depends on ARCH_USE_MMU
+	---help---
+		Support a fixed memory mapping use a (read-only) page table in
+		ROM/FLASH.
+
+config ARCH_HAVE_HARDFAULT_DEBUG
+	bool
+	default n
+
+config DEBUG_HARDFAULT_ALERT
+	bool "Hard-Fault Alert Debug"
+	default n
+	depends on ARCH_HAVE_HARDFAULT_DEBUG && DEBUG_ALERT
+	---help---
+		Enables debug alert output to the SYSLOG when a hard fault
+		occurs.  This output is sometimes helpful when debugging difficult
+		hard fault problems.
+
+config DEBUG_HARDFAULT_INFO
+	bool "Hard-Fault Informational Output"
+	default n
+	depends on ARCH_HAVE_HARDFAULT_DEBUG && DEBUG_INFO
+	---help---
+		Enables informational alert output to the SYSLOG when a hard fault
+		occurs.  This output is sometimes helpful when debugging difficult
+		hard fault problems but may be more than you want to see in some
+		cases.
+
+config ARCH_HAVE_MEMFAULT_DEBUG
+	bool
+	default n
+
+config DEBUG_MEMFAULT
+	bool "Verbose Mem-Fault Debug"
+	default n
+	depends on ARCH_HAVE_MEMFAULT_DEBUG && DEBUG_ALERT && ARCH_USE_MPU
+	---help---
+		Enables verbose debug output when a mem fault is occurs.  This verbose
+		output is sometimes helpful when debugging difficult mem fault problems,
+		but may be more than you typically want to see.
+
+config ARM_SEMIHOSTING_SYSLOG
+	bool "Semihosting SYSLOG support"
+	select ARCH_SYSLOG
+	---help---
+		Enable hooks to support semihosting syslog output.
+
+config ARM_SEMIHOSTING_HOSTFS
+	bool "Semihosting HostFS"
+	depends on FS_HOSTFS
+	---help---
+		Mount HostFS through semihosting.
+
+config ARM_LWL_CONSOLE
+	bool "Lightweight Link Console Support"
+	default n
+	depends on DEV_CONSOLE && ARCH_CHIP_STM32
+	---help---
+		Use the lightweight link console which provides console over a
+		debug channel by means of shared memory.  A terminal application
+		for openocd as the debugger is available in tools/ocdconsole.py.
+
+		Currently only available for STM32 architectures, but easily
+		added to other ARM architectures be addd up_low_console.c to the
+		architecture Make.defs file.
+
+if ARCH_CORTEXM0
+source arch/arm/src/armv6-m/Kconfig
+endif
+if ARCH_ARMV7A
+source arch/arm/src/armv7-a/Kconfig
+endif
+if ARCH_ARMV7M
+source arch/arm/src/armv7-m/Kconfig
+endif
+if ARCH_ARMV7R
+source arch/arm/src/armv7-r/Kconfig
+endif
+if ARCH_ARM7TDMI || ARCH_ARM920T || ARCH_ARM926EJS || ARCH_ARM1136J || ARCH_ARM1156T2 || ARCH_ARM1176JZ
+source arch/arm/src/arm/Kconfig
+endif
+if ARCH_CHIP_A1X
+source arch/arm/src/a1x/Kconfig
+endif
+if ARCH_CHIP_AM335X
+source arch/arm/src/am335x/Kconfig
+endif
+if ARCH_CHIP_C5471
+source arch/arm/src/c5471/Kconfig
+endif
+if ARCH_CHIP_DM320
+source arch/arm/src/dm320/Kconfig
+endif
+if ARCH_CHIP_EFM32
+source arch/arm/src/efm32/Kconfig
+endif
+if ARCH_CHIP_IMX1
+source arch/arm/src/imx1/Kconfig
+endif
+if ARCH_CHIP_IMX6
+source arch/arm/src/imx6/Kconfig
+endif
+if ARCH_CHIP_IMXRT
+source arch/arm/src/imxrt/Kconfig
+endif
+if ARCH_CHIP_KINETIS
+source arch/arm/src/kinetis/Kconfig
+endif
+if ARCH_CHIP_KL
+source arch/arm/src/kl/Kconfig
+endif
+if ARCH_CHIP_LC823450
+source arch/arm/src/lc823450/Kconfig
+endif
+if ARCH_CHIP_LM || ARCH_CHIP_TIVA || ARCH_CHIP_SIMPLELINK
+source arch/arm/src/tiva/Kconfig
+endif
+if ARCH_CHIP_LPC17XX_40XX
+source arch/arm/src/lpc17xx_40xx/Kconfig
+endif
+if ARCH_CHIP_LPC214X
+source arch/arm/src/lpc214x/Kconfig
+endif
+if ARCH_CHIP_LPC2378
+source arch/arm/src/lpc2378/Kconfig
+endif
+if ARCH_CHIP_LPC31XX
+source arch/arm/src/lpc31xx/Kconfig
+endif
+if ARCH_CHIP_LPC43XX
+source arch/arm/src/lpc43xx/Kconfig
+endif
+if ARCH_CHIP_LPC54XX
+source arch/arm/src/lpc54xx/Kconfig
+endif
+if ARCH_CHIP_S32K1XX
+source arch/arm/src/s32k1xx/Kconfig
+endif
+if ARCH_CHIP_MAX326XX
+source arch/arm/src/max326xx/Kconfig
+endif
+if ARCH_CHIP_MOXART
+source arch/arm/src/moxart/Kconfig
+endif
+if ARCH_CHIP_NRF52
+source arch/arm/src/nrf52/Kconfig
+endif
+if ARCH_CHIP_NUC1XX
+source arch/arm/src/nuc1xx/Kconfig
+endif
+if ARCH_CHIP_SAMA5
+source arch/arm/src/sama5/Kconfig
+endif
+if ARCH_CHIP_SAMD2X || ARCH_CHIP_SAML2X
+source arch/arm/src/samd2l2/Kconfig
+endif
+if ARCH_CHIP_SAMD5X || ARCH_CHIP_SAME5X
+source arch/arm/src/samd5e5/Kconfig
+endif
+if ARCH_CHIP_SAM34
+source arch/arm/src/sam34/Kconfig
+endif
+if ARCH_CHIP_SAMV7
+source arch/arm/src/samv7/Kconfig
+endif
+if ARCH_CHIP_STM32
+source arch/arm/src/stm32/Kconfig
+endif
+if ARCH_CHIP_STM32F0 || ARCH_CHIP_STM32L0 || ARCH_CHIP_STM32G0
+source arch/arm/src/stm32f0l0g0/Kconfig
+endif
+if ARCH_CHIP_STM32F7
+source arch/arm/src/stm32f7/Kconfig
+endif
+if ARCH_CHIP_STM32H7
+source arch/arm/src/stm32h7/Kconfig
+endif
+if ARCH_CHIP_STM32L4
+source arch/arm/src/stm32l4/Kconfig
+endif
+if ARCH_CHIP_STR71X
+source arch/arm/src/str71x/Kconfig
+endif
+if ARCH_CHIP_TMS570
+source arch/arm/src/tms570/Kconfig
+endif
+if ARCH_CHIP_XMC4
+source arch/arm/src/xmc4/Kconfig
+endif
+if ARCH_CHIP_CXD56XX
+source arch/arm/src/cxd56xx/Kconfig
+endif
+
+endif # ARCH_ARM

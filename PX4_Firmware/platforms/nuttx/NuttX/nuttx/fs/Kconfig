@@ -1,0 +1,94 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+comment "File system configuration"
+
+config DISABLE_MOUNTPOINT
+	bool "Disable support for mount points"
+	default n
+
+config FS_AUTOMOUNTER
+	bool "Auto-mounter"
+	default n
+	depends on !DISABLE_MOUNTPOINT
+	select SCHED_LPWORK
+	---help---
+		The automounter provides an OS-internal mechanism for automatically
+		mounting and unmounting removable media as the media is inserted and
+		removed.  See include/nuttx/fs/automout.h for interfacing details.
+
+config FS_AUTOMOUNTER_DEBUG
+	bool "Auto-mounter debug"
+	default n
+	depends on FS_AUTOMOUNTER && DEBUG_FEATURES
+	---help---
+		Normally, the auto-mounter will generate debug output when sub-system
+		level file system debug is enabled.  This option will select debug
+		output from the logic related to the auto-mount feature even when file
+		system debug is not enable.  This is useful primarily for in vivo
+		unit testing of the auto-mount feature.
+
+config DISABLE_PSEUDOFS_OPERATIONS
+	bool "Disable pseudo-filesystem operations"
+	default y if DEFAULT_SMALL
+	default n if !DEFAULT_SMALL
+	---help---
+		Disable certain operations on pseudo-file systems include mkdir,
+		rmdir, unlink, and rename.  These are necessary for the logical
+		completeness of the illusion created by the pseudo-filesystem.
+		However, in practical embedded system, they are seldom needed and
+		you can save a little FLASH space by disabling the capability.
+
+config PSEUDOFS_SOFTLINKS
+	bool "Pseudo-filesystem soft links"
+	default n
+	depends on !DISABLE_PSEUDOFS_OPERATIONS
+	---help---
+		Enable support for soft links in the pseudo file system.  Soft
+		links are not supported within mounted volumes by any NuttX file
+		system.  However, if this option is selected, then soft links
+		may be add in the pseudo file system.  This might be useful, for
+		to link a directory in the pseudo-file system, such as /bin, to
+		to a directory in a mounted volume, say /mnt/sdcard/bin.
+
+config FS_READABLE
+	bool
+	default n
+	---help---
+		Automatically selected if any readable file system is selected
+
+config FS_WRITABLE
+	bool "Writable file system"
+	default n
+	---help---
+		Automatically selected if any writable file system is selected.  If
+		not selected, support for writing will be disabled in all block
+		drivers and also the block-to-character (BCH) layer and the MTD FTL
+		layer.
+
+		This selection can also be manually selected.  You might want to do
+		this if there are no writable file systems enabled, but you still
+		want support for write access in block drivers and/or FTL.
+
+source fs/aio/Kconfig
+source fs/semaphore/Kconfig
+source fs/mqueue/Kconfig
+source fs/shm/Kconfig
+source fs/mmap/Kconfig
+source fs/partition/Kconfig
+source fs/fat/Kconfig
+source fs/nfs/Kconfig
+source fs/nxffs/Kconfig
+source fs/romfs/Kconfig
+source fs/cromfs/Kconfig
+source fs/tmpfs/Kconfig
+source fs/smartfs/Kconfig
+source fs/binfs/Kconfig
+source fs/procfs/Kconfig
+source fs/spiffs/Kconfig
+source fs/littlefs/Kconfig
+source fs/unionfs/Kconfig
+source fs/userfs/Kconfig
+source fs/hostfs/Kconfig

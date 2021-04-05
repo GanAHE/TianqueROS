@@ -1,0 +1,10 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if DRIVERS_IEEE80211
+
+source drivers/wireless/ieee80211/bcm43xxx/Kconfig
+
+endif # DRIVERS_IEEE80211

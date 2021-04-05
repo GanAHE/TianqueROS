@@ -1,0 +1,52 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if I2C
+
+config I2C_SLAVE
+	bool "I2C Slave"
+	default n
+
+config I2C_POLLED
+	bool "Polled I2C (no interrupts)"
+	default n
+
+config I2C_RESET
+	bool "Support I2C reset interface method"
+	default n
+	depends on ARCH_HAVE_I2CRESET
+
+config I2C_TRACE
+	bool "Enable I2C trace debug"
+	default n
+
+config I2C_NTRACE
+	int "Number of I2C trace records"
+	default 32
+	depends on I2C_TRACE
+
+config I2C_DRIVER
+	bool "I2C character driver"
+	default n
+	---help---
+		Build in support for a character driver at /dev/i2c[N] that may be
+		used to perform I2C bus transfers from applications.  The intent of
+		this driver is to support I2C testing.  It is not suitable for use
+		in any real driver application.
+
+menu "I2C Multiplexer Support"
+
+config I2CMULTIPLEXER_PCA9540BDP
+	bool "PCA9540BDP NXP multiplexer"
+	default n
+	depends on I2C
+	---help---
+		Enable support for the NXP PCA9540BDP i2c multiplexer
+
+# put more i2c mux devices here
+
+endmenu # I2C Multiplexer Support
+
+endif # I2C

@@ -1,0 +1,69 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+if DRIVERS_BLUETOOTH
+
+config BLUETOOTH_UART
+	bool "Bluetooth UART driver"
+	default n
+	select SCHED_HPWORK
+	---help---
+		Enable Bluetooth UART driver.
+
+config BLUETOOTH_UART_GENERIC
+	bool
+	default n
+
+config BLUETOOTH_UART_SHIM
+	bool
+	default n
+
+if BLUETOOTH_UART
+
+choice
+	prompt "Bluetooth UART HCI device"
+	default BLUETOOTH_UART_OTHER
+
+config BLUETOOTH_UART_BT860
+	bool "Laird BT860"
+	select BLUETOOTH_UART_GENERIC
+
+config BLUETOOTH_UART_CC2564
+	bool "TI CC2564"
+	depends on EXPERIMENTAL
+
+config BLUETOOTH_BCM4343X
+	bool "Broadcom (Cypress) BCM4343X device support"
+	select BLUETOOTH_UART_SHIM
+	---help---
+		Enables download support for the bluetooth component of BCM4343X devices.
+		Note that firmware needs to be provided for these devices to operate. In
+		general this firmware is available in the Cypress WICED SDK.
+
+config BLUETOOTH_UART_OTHER
+	bool "Other generic HCI UART device"
+	select BLUETOOTH_UART_GENERIC
+
+endchoice # Bluetooth UART HCI device
+
+config BLUETOOTH_UART_DUMP
+	bool "Dump HCI UART I/O buffers"
+	default n
+	depends on DEBUG_WIRELESS_INFO
+	---help---
+		Dump the full content of all outgoing and incoming messages.
+
+endif # BLUETOOTH_UART
+
+config BLUETOOTH_NULL
+	bool "NULL Bluetooth device"
+	default n
+	---help---
+		A do-nothing Bluetooth device driver to permit some basic testing of
+		the Bluetooth stack on the simulator.  This driver just "closes the
+		loop" and nothing more:  It is a just a bit-bucket for outgoing
+		packets; it generates no incoming packets.
+
+endif # DRIVERS_BLUETOOTH

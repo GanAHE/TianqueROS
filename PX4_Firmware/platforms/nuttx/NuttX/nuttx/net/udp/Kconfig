@@ -1,0 +1,125 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menu "UDP Networking"
+
+config NET_UDP
+	bool "UDP Networking"
+	default n
+	depends on NET
+	---help---
+		Enable or disable UDP networking support.
+
+config NET_UDP_NO_STACK
+	bool "Disable UDP/IP Stack"
+	default n
+	select NET_UDP
+	---help---
+		Build without UDP/IP stack even if UDP networking support enabled.
+
+if NET_UDP
+
+config NET_BROADCAST
+	bool "UDP broadcast Rx support"
+	default n
+	---help---
+		Incoming UDP broadcast support
+
+endif # NET_UDP
+
+if NET_UDP && !NET_UDP_NO_STACK
+
+config NET_UDP_BINDTODEVICE
+	bool "UDP Bind-to-device support"
+	default n
+	select NET_UDPPROTO_OPTIONS
+	select NETDEV_IFINDEX
+	---help---
+		Enable support for the UDP_BINDTODEVICE socket option.
+		Linux has SO_BINDTODEVICE but in NuttX this option is instead
+		specific to the UDP protocol.
+
+config NET_UDP_CHECKSUMS
+	bool "UDP checksums"
+	default y if NET_IPv6
+	default n if !NET_IPv6
+	---help---
+		Enable/disable UDP checksum support.  UDP checksum support is
+		REQUIRED for IPv6.
+
+config NET_UDP_CONNS
+	int "Number of UDP sockets"
+	default 8
+	---help---
+		The maximum amount of open concurrent UDP sockets
+
+config NET_UDP_READAHEAD
+	bool "Enable UDP/IP read-ahead buffering"
+	default y
+	select NET_READAHEAD
+	select MM_IOB
+
+config NET_UDP_WRITE_BUFFERS
+	bool "Enable UDP/IP write buffering"
+	default n
+	select NET_WRITE_BUFFERS
+	select MM_IOB
+	---help---
+		Write buffers allows buffering of ongoing UDP/IP packets, providing
+		for higher performance, streamed output.
+
+		You might want to disable UDP/IP write buffering on a highly memory
+		memory constrained system where there are no performance issues.
+
+if NET_UDP_WRITE_BUFFERS
+
+config NET_UDP_NWRBCHAINS
+	int "Number of pre-allocated I/O buffer chain heads"
+	default 8
+	---help---
+		These tiny nodes are used as "containers" to support queuing of
+		UDP write buffers.  This setting will limit the number of UDP write
+		operations that can be "in-flight" at any give time.  So a good
+		choice for this value would be the same as the maximum number of
+		UDP connections.
+
+config NET_UDP_WRBUFFER_DEBUG
+	bool "Force write buffer debug"
+	default n
+	depends on DEBUG_FEATURES
+	select IOB_DEBUG
+	---help---
+		This option will force debug output from UDP write buffer logic,
+		even without network debug output.  This is not normally something
+		that would want to do but is convenient if you are debugging the
+		write buffer logic and do not want to get overloaded with other
+		network-related debug output.
+
+config NET_UDP_WRBUFFER_DUMP
+	bool "Force write buffer dump"
+	default n
+	depends on DEBUG_NET || NET_UDP_WRBUFFER_DEBUG
+	select IOB_DEBUG
+	---help---
+		Dump the contents of the write buffers.  You do not want to do this
+		unless you really want to analyze the write buffer transfers in
+		detail.
+
+endif # NET_UDP_WRITE_BUFFERS
+
+config UDP_NOTIFIER
+	bool "Support UDP read-ahead notifications"
+	default n
+	depends on SCHED_WORKQUEUE
+	select WQUEUE_NOTIFIER
+	---help---
+		Enable building of UDP read-ahead notifier logic that will execute a
+		worker function on the high priority work queue when read-ahead data
+		is available.  This is is a general purpose notifier, but was
+		developed specifically to support poll() logic where the poll must
+		wait for read-ahead data to become available.
+
+endif # NET_UDP && !NET_UDP_NO_STACK
+endmenu # UDP Networking

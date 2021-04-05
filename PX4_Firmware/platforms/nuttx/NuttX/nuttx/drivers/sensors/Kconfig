@@ -1,0 +1,831 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config SENSORS_APDS9960
+	bool "Avago APDS-9960 Gesture Sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Avago APDS-9960 gesture sensor.
+
+config APDS9960_I2C_FREQUENCY
+	int "APDS-9960 I2C frequency"
+	default 400000
+	depends on SENSORS_APDS9960
+
+config SENSORS_AK09912
+	bool "Asahi AK09911/AK09912 Compass Sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver for AK09911/AK09912 Compass sensor.
+
+config SENSORS_AS5048B
+	bool "AMS AS5048B Magnetic Rotary Encoder support"
+	default n
+	select I2C
+	select SENSORS_QENCODER
+	---help---
+		Enable driver support for the AMS AS5048B magnetic rotary encoder.
+
+config SENSORS_AS726X
+	bool "AMS AS726X Spetral sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the AS726X Spectral Sensor.
+
+config SENSORS_BH1750FVI
+	bool "Rohm BH1750FVI Ambient Light Sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Rohm BH1750FVI light sensor.
+
+config BH1750FVI_I2C_FREQUENCY
+	int "BH1750FVI I2C frequency"
+	default 400000
+	depends on SENSORS_BH1750FVI
+
+config SENSORS_BMG160
+	bool "Bosch BMG160 Gyroscope Sensor support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the Bosch BMG160 gyroscope sensor.
+
+
+config SENSORS_BMI160
+	bool "Bosch BMI160 Inertial Measurement Sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Bosch BMI160 Inertial
+		Measurement sensor
+
+if SENSORS_BMI160
+
+choice
+	prompt "BMI160 Interface"
+	default SENSORS_BMI160_SPI
+
+config SENSORS_BMI160_I2C
+	bool "BMI160 I2C Interface"
+	select I2C
+	---help---
+		Enables support for the I2C interface
+
+config SENSORS_BMI160_SPI
+	bool "BMI160 SPI Interface"
+	select SPI
+	---help---
+		Enables support for the SPI interface
+
+endchoice
+
+choice
+	prompt "I2C Address"
+	default BMI160_I2C_ADDR_68
+
+config BMI160_I2C_ADDR_68
+	bool "0x68"
+	---help---
+		Default address.
+		If SDO pin is pulled to VDDIO, use 0x69
+
+config BMI160_I2C_ADDR_69
+	bool "0x69"
+	---help---
+		If SDO pin is pulled to VDDIO, use 0x69
+
+endchoice
+endif
+
+config SENSORS_BMP180
+	bool "Bosch BMP180 Barometer Sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Bosch BMP180 barometer sensor.
+
+config SENSORS_BMP280
+	bool "Bosch BMP280 Barometic Pressure Sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver for the Bosch BMP280 barometic pressure sensor.
+
+config SENSORS_DHTXX
+	bool "DHTxx humidity/temperature Sensor support"
+	default n
+	---help---
+		Enable driver support for the DHTxx humidity/temperature sensor.
+
+config SENSORS_HCSR04
+	bool "HC-SR04 Distance Measurement Sensor"
+	default n
+	---help---
+		Enable driver support for the HC-SR04 Distance Sensor.
+
+if SENSORS_HCSR04
+
+config HCSR04_DEBUG
+	bool "Debug support for the HC-SR04"
+	default n
+	---help---
+		Enables debug features for the HC-SR04
+
+config HCSR04_NPOLLWAITERS
+	int "Number of waiters to poll"
+	default 1
+	---help---
+		Number of waiters to poll
+
+endif # SENSORS_HCSR04
+
+config SENSORS_ISL29023
+	bool "Renesas ISL29023 ALS sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Renesas ISL29023 ambient light sensor.
+
+if SENSORS_ISL29023
+
+config ISL29023_I2C_FREQUENCY
+	int "ISL29023 I2C frequency"
+	default 400000
+
+endif # SENSORS_ISL29023
+
+config SENSORS_HTS221
+	bool "STMicro HTS221 humidity sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the STMicro HTS221 humidity sensor.
+
+if SENSORS_HTS221
+
+config HTS221_I2C_FREQUENCY
+	int "HTS221 I2C frequency"
+	default 400000
+	range 1 400000
+
+config HTS221_DEBUG
+	bool "Debug support for the HTS221"
+	default n
+	---help---
+		Enables debug features for the HTS221
+
+config HTS221_NPOLLWAITERS
+	int "Number of waiters to poll"
+	default 1
+	---help---
+		Number of waiters to poll
+
+endif # SENSORS_HTS221
+
+config SENSORS_L3GD20
+	bool "STMicro L3GD20 Gyroscope Sensor support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the STMicro L3GD20 gyroscope sensor.
+
+config SENSOR_KXTJ9
+	bool "Kionix KXTJ9 Accelerometer support"
+	default n
+	select I2C
+
+if SENSORS_KXTJ9
+
+config KXTJ9_I2C_BUS_SPEED
+	int "Kionix KXTJ9 Bus Speed in Hz"
+	default 400000
+
+endif # SENSORS_KXTJ9
+
+config SENSORS_LIS2DH
+	bool "STMicro LIS2DH device support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the STMicro LIS2DH accelerometer
+
+if SENSORS_LIS2DH
+
+config LIS2DH_I2C_FREQUENCY
+	int "LIS2DH I2C frequency"
+	default 400000
+	range 1 400000
+
+config LIS2DH_DEBUG
+	bool "Debug support for the LIS2DH"
+	default n
+	---help---
+		Enables debug features for the LIS2DH
+
+config LIS2DH_NPOLLWAITERS
+	int "Number of waiters to poll"
+	default 2
+	---help---
+		Maximum number of threads that can be waiting on poll()
+
+config LIS2DH_DRIVER_SELFTEST
+	bool "Enable selftest in LIS2DH driver"
+	default n
+	---help---
+		Enable selftest in LIS2DH driver
+
+endif # SENSORS_LIS2DH
+
+config LIS3DSH
+	bool "STMicro LIS3DSH 3-Axis accelerometer support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the STMicro LIS3DSH 3-Axis accelerometer.
+
+config LIS3DH
+	bool "STMicro LIS3DH 3-Axis accelerometer support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the STMicro LIS3DH 3-Axis accelerometer.
+
+config LIS331DL
+	bool "STMicro LIS331DL device support"
+	default n
+	select I2C
+
+config LIS331DL_I2C_FREQUENCY
+	int "LIS331DL I2C frequency"
+	default 100000
+	range 1 100000
+	depends on LIS331DL
+
+config SENSORS_LSM330SPI
+	bool "STMicro LSM330 SPI support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the STMicro LSM330 on SPI.
+
+config SENSORS_LSM303AGR
+	bool "STMicro LSM303AGR support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the STMicro LSM303AGR.
+
+config LSM303AGR_I2C_FREQUENCY
+	int "LSM303AGR I2C frequency"
+	default 400000
+	range 1 400000
+	depends on SN_LSM303AGR
+
+config SENSORS_LSM6DSL
+	bool "STMicro LSM6DSL support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the STMicro LSM6DSL.
+
+config LSM6DSL_I2C_FREQUENCY
+	int "LSM6DSL I2C frequency"
+	default 400000
+	range 1 400000
+	depends on SN_LSM6DSL
+
+config SENSORS_LSM9DS1
+	bool "STMicro LSM9DS1 support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the STMicro LSM9DS1.
+
+config LSM9DS1_I2C_FREQUENCY
+	int "LSM9DS1 I2C frequency"
+	default 400000
+	range 1 400000
+	depends on SN_LSM9DS1
+
+config SENSORS_LPS25H
+	bool "STMicro LPS25H pressure sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the STMicro LPS25H barometer sensor.
+
+if SENSORS_LPS25H
+
+config LPS25H_I2C_FREQUENCY
+	int "LPS25H I2C frequency"
+	default 400000
+	range 1 400000
+
+config DEBUG_LPS25H
+	bool "Debug support for the LPS25H"
+	default n
+	---help---
+		Enables debug features for the LPS25H
+
+endif # SENSORS_LPS25H
+
+config SENSORS_LTC4151
+	bool "LTC4151 current and voltage monitor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the LinearTechnology LTC4151 current and voltage monitor.
+
+config LTC4151_I2C_FREQUENCY
+	int "LTC4151 I2C frequency"
+	default 400000
+	depends on SENSORS_LTC4151
+
+config SENSORS_INA219
+	bool "INA219 current and voltage monitor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Texas Instruments INA219 current and voltage monitor.
+
+config INA219_I2C_FREQUENCY
+	int "INA219 I2C frequency"
+	default 400000
+	depends on SENSORS_INA219
+
+config SENSORS_INA226
+	bool "INA226 current and voltage monitor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Texas Instruments INA226 power monitor.
+
+config INA226_I2C_FREQUENCY
+	int "INA226 I2C frequency"
+	default 400000
+	depends on SENSORS_INA226
+
+config SENSORS_INA3221
+	bool "INA3221 current and voltage monitor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Texas Instruments INA3221 current and voltage monitor.
+
+config INA3221_I2C_FREQUENCY
+	int "INA3221 I2C frequency"
+	default 400000
+	depends on SENSORS_INA3221
+
+config SENSORS_MB7040
+	bool "MaxBotix MB7040 Sonar support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the MaxBotix MB7040 sonar.
+
+config MB7040_I2C_FREQUENCY
+	int "MB7040 I2C frequency"
+	default 400000
+	range 1 400000
+	depends on SENSORS_MB7040
+
+config SENSORS_MLX90393
+	bool "MLX90393 3-Axis Magnetometer"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the Melex MLX90393 3-Axis magnetometer.
+
+config SENSORS_MLX90614
+	bool "MLX90614 Infrared Thermometer"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Melexis MLX90614 Infrared Thermometer.
+
+if SENSORS_MLX90614
+config MLX90614_CRC
+	bool "Enable CRC Checking (verify if PEC field is valid)"
+	default n
+	---help---
+		Enable checking of CRC-8 (PEC field) checking to guarantee that
+		read data is valid.
+endif
+
+config SENSORS_MCP9844
+	bool "MCP9844 Temperature Sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the MCP9844 I2C Temperature sensor.
+
+config MCP9844_I2C_FREQUENCY
+	int "MCP9844 I2C frequency"
+	default 400000
+	range 1 400000
+	depends on SENSORS_MCP9844
+
+config SENSORS_MS58XX
+	bool "MEAS MS58XX Altimeter support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for MEAS MS58XX altimeters.
+
+config MS58XX_I2C_FREQUENCY
+	int "MS58XX I2C frequency"
+	default 400000
+	range 1 400000
+	depends on SENSORS_MS58XX
+
+config MS58XX_VDD
+	int "MEAS MS58XX VDD"
+	default 30
+	depends on SENSORS_MS58XX
+
+config SENSORS_MPL115A
+	bool "Freescale MPL115A Barometer Sensor support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the Freescale MPL115A barometer sensor.
+
+config MPL115A_REGDEBUG
+	bool "Debug support for the MPL115A"
+	default n
+	depends on SENSORS_MPL115A
+	---help---
+		Enables register level debug features for the MPL115A
+
+config SENSORS_ADXL345
+	bool "Analog Devices ADXL345 Driver"
+	default n
+	---help---
+		Enables support for the ADXL345 driver
+
+if SENSORS_ADXL345
+
+choice
+	prompt "ADXL345 Interface"
+	default ADXL345_SPI
+
+config ADXL345_SPI
+	bool "ADXL345 SPI Interface"
+	select SPI
+	---help---
+		Enables support for the SPI interface.
+
+config ADXL345_I2C
+	bool "ADXL345 I2C Interface"
+	select I2C
+	---help---
+		Enables support for the I2C interface
+
+endchoice
+
+config ADXL345_ACTIVELOW
+	bool "Active Low Interrupt"
+	default n
+	---help---
+		The ADXL345 interrupt will be inverted. Instead starting low and going
+		high, it will start high and will go low when an interrupt is fired.
+		Default:  Active high/rising edge.
+
+config ADXL345_REGDEBUG
+	bool "Enable Register-Level ADXL345 Debug"
+	default n
+	depends on DEBUG_FEATURES
+	---help---
+		Enable very low register-level debug output.
+
+endif # SENSORS_ADXL345
+
+config SENSORS_ADXL372
+	bool "Analog Devices ADXL372 Sensor support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the Analog Devices ADXL372 Sensor.
+
+config SENSORS_MPU60X0
+	bool "Invensense MPU60x0 Sensor support"
+	default n
+	---help---
+		Enable driver support for Invensense MPU60x0 MotionTracker(tm) device.
+
+if SENSORS_MPU60X0
+
+choice
+	prompt "MPU60x0 Interface"
+	default MPU60X0_SPI
+
+config MPU60X0_SPI
+	bool "MPU6000 SPI Interface"
+	select SPI
+	---help---
+		Enables support for the SPI interface (MPU6000 only)
+
+config MPU60X0_I2C
+	bool "MPU60x0 I2C Interface"
+	select I2C
+	---help---
+		Enables support for the I2C interface (MPU6000
+		or MPU6050, autodetected during driver initialization)
+
+endchoice
+
+config MPU60X0_EXTI
+	bool "Enable interrupts"
+	default n
+	---help---
+		Select this when the MPU60x0's INT pin is connected to an
+		interrupt line on the host processor, and identify the pin
+		during device registration. The driver will use interrupts to
+		manage FIFO-full and/or sample-ready events, depending on how
+		the device is being used. The interface will block until the
+		next sample is ready, which will naturally synchronize the user
+		to the sampling rate chosen during operation.
+		Default:  No interrupts or blocking, i.e. user-driven sampling.
+
+endif # SENSORS_MPU60X0
+
+config SENSORS_MAX44009
+	bool "Maxim MAX44009 ALS sensor"
+	default n
+	select I2C
+	---help---
+		Enables MAX44009 Ambient Light Sensor
+
+if SENSORS_MAX44009
+
+config MAX44009_I2C_FREQUENCY
+	int "MAX44009 I2C frequency"
+	default 400000
+	range 1 400000
+
+config DEBUG_MAX44009
+	bool "Enable debug support for the MAX44009"
+	default n
+	---help---
+		Enables debug support for the MAX44009
+
+config MAX44009_NPOLLWAITERS
+	int "Number of waiters to poll"
+	default 1
+	---help---
+		Number of waiters to poll
+
+endif # SENSORS_MAX44009
+
+config SENSORS_MAX31855
+	bool "Maxim MAX31855 Driver"
+	default n
+	select SPI
+	---help---
+		Enables support for the MAX31855 driver
+
+config SENSORS_MAX6675
+	bool "Maxim MAX6675 Driver"
+	default n
+	select SPI
+	---help---
+		Enables support for the MAX6675 driver
+
+config SENSORS_LIS3MDL
+	bool "STMicro LIS3MDL 3-Axis magnetometer support"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the STMicro LIS3MDL 3-axis magnetometer.
+
+config LM75_I2C
+	bool
+	default y if LM75
+
+config SENSORS_LM75
+	bool "STMicro LM-75 Temperature Sensor support"
+	default n
+	select I2C
+	select LM75_I2C
+	---help---
+		Enable driver support for the STMicro LM-75 temperature sensor.
+		This should also work with compatible temperature sensors such as
+		the TI TMP100/101.
+
+config LM75_I2C_FREQUENCY
+	int "LM75 I2C frequency"
+	default 100000
+	range 1 100000
+	depends on LM75_I2C
+
+config SENSORS_LM92
+	bool "TI LM92 Temperature Sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the TI LM92 Temperature Sensor.
+
+config LM92_I2C_FREQUENCY
+	int "LM92 I2C frequency"
+	default 400000
+	range 1 400000
+	depends on LM92
+
+config SENSORS_SCD30
+	bool "Sensirion SCD30 CO2, humidity and temperature sensor"
+	default n
+	---help---
+		Enable driver support for the Sensirion SCD30 CO₂, humidity and
+		temperature sensor.
+
+if SENSORS_SCD30
+
+config SCD30_I2C
+	bool "Sensirion SCD30 I2C mode"
+	default y
+	select I2C
+
+config SCD30_I2C_FREQUENCY
+	int "SCD30 I2C frequency"
+	default 100000
+	range 1 100000
+	depends on SCD30_I2C
+	---help---
+		I2C frequency for SCD30. Note, maximum supported frequency for
+		this sensor is 100kHz.
+
+config SCD30_DEBUG
+	bool "Debug support for the SCD30"
+	default n
+	---help---
+		Enables debug features for the SCD30
+
+endif # SENSORS_SCD30
+
+config SENSORS_SGP30
+	bool "Sensirion SGP30 Gas Platform sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Sensirion SCD30 CO₂ and TVOC gas sensor.
+
+if SENSORS_SGP30
+
+config SGP30_I2C_FREQUENCY
+	int "SGP30 I2C frequency"
+	default 400000
+	range 1 400000
+
+config SGP30_DEBUG
+	bool "Debug support for the SGP30"
+	default n
+	---help---
+		Enables debug features for the SGP30
+
+endif # SENSORS_SGP30
+
+config SENSORS_SHT21
+	bool "Sensirion SHT21 temperature and humidity sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Sensirion SHT20 and SHT21 temperature
+		and humidity sensors. SHT20 is a budget model with limited humidity
+		precision.
+
+if SENSORS_SHT21
+
+config SHT21_I2C_FREQUENCY
+	int "SHT21 I2C frequency"
+	default 400000
+	range 1 400000
+
+config SHT21_DEBUG
+	bool "Debug support for the SHT21"
+	default n
+	---help---
+		Enables debug features for the SHT21
+
+endif # SENSORS_SHT21
+
+config SENSORS_SHT3X
+	bool "Sensirion SHT3x temperature and humidity sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Sensirion SHT3x temperature
+		and humidity sensors.
+
+if SENSORS_SHT3X
+
+config SHT3X_I2C_FREQUENCY
+	int "SHT3x I2C frequency"
+	default 400000
+	range 1 400000
+
+config SHT3X_I2C_ADDR
+	hex "SHT3x I2C addr"
+	default 0x44
+	range 0x44 0x45
+
+config SHT3X_DEBUG
+	bool "Debug support for the SHT3x"
+	default n
+	---help---
+		Enables debug features for the SHT3x
+
+endif # SENSORS_SHT3X
+
+config SENSORS_SPS30
+	bool "Sensirion SPS30 particulate matter sensor"
+	default n
+	---help---
+		Enable driver support for the Sensirion SPS30 particulate matter sensor
+		sensor.
+
+if SENSORS_SPS30
+
+config SPS30_I2C
+	bool "Sensirion SPS30 I2C mode"
+	default y
+	select I2C
+
+config SPS30_I2C_FREQUENCY
+	int "SPS30 I2C frequency"
+	default 100000
+	range 1 100000
+	depends on SPS30_I2C
+	---help---
+		I2C frequency for SPS30. Note, maximum supported frequency for
+		this sensor is 100kHz.
+
+config SPS30_DEBUG
+	bool "Debug support for the SPS30"
+	default n
+	---help---
+		Enables debug features for the SPS30
+
+endif # SENSORS_SPS30
+
+config SENSORS_T67XX
+	bool "Telair T6713 carbon dioxide sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Telair T6713 and T6703 carbon
+		dioxide sensors.
+
+config SENSORS_QENCODER
+	bool "Qencoder"
+	default n
+
+config SENSORS_VEML6070
+	bool "Vishay VEML6070 UV-A Light Sensor support"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the Vishay VEML6070 UV-A light sensor.
+
+config VEML6070_I2C_FREQUENCY
+	int "VEML6070 I2C frequency"
+	default 100000
+	depends on SENSORS_VEML6070
+
+config SENSORS_VL53L1X
+	bool "ST VL53L1X TOF sensor"
+	default n
+	select I2C
+	---help---
+		Enable driver support for the VL53L1X Time Of Flight sensor.
+
+config SENSORS_XEN1210
+	bool "Sensixs XEN1210 Magnetometer"
+	default n
+	select SPI
+	---help---
+		Enable driver support for the Sensixs XEN1210 Magnetometer.
+
+config XEN1210_REGDEBUG
+	bool "Debug support for the XEN1210"
+	default n
+	depends on SENSORS_XEN1210
+	---help---
+		Enables register level debug features for the XEN1210
+
+config SENSORS_ZEROCROSS
+	bool "Zero Cross Sensor"
+	default n
+
+config SENSORS_ADT7320
+	bool "Analog Devices ADT7320 Driver"
+	default n
+	select SPI
+	---help---
+		Enables support for the ADT7320 Driver

@@ -1,0 +1,58 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menu "Network Device Operations"
+
+config NETDEV_IOCTL
+	bool
+	default n
+
+config NETDEV_PHY_IOCTL
+	bool "Enable PHY ioctl()"
+	default n
+	select NETDEV_IOCTL
+	---help---
+		Enable support for ioctl() commands to access PHY registers
+
+config NETDEV_CAN_BITRATE_IOCTL
+	bool "Enable CAN bitrate ioctl()"
+	default n
+	select NETDEV_IOCTL
+	depends on NET_CAN
+	---help---
+		Enable support for ioctl() commands to change CAN bitrate
+		
+config NETDEV_WIRELESS_IOCTL
+	bool "Enable Wireless ioctl()"
+	default n
+	select NETDEV_IOCTL
+	depends on DRIVERS_WIRELESS
+	---help---
+		Enable support for wireless device ioctl() commands
+
+config NETDEV_IFINDEX
+	bool "Enable IF index support"
+	default n
+	---help---
+		Enable support for references devices by an interface index.
+
+		This feature is automatically enabled when raw, PACKET sockets
+		are enabled.
+
+		When enabled, these option also enables the user interfaces:
+		if_nametoindex() and if_indextoname().
+
+config NETDOWN_NOTIFIER
+	bool "Support network down notifications"
+	default n
+	depends on SCHED_WORKQUEUE
+	select WQUEUE_NOTIFIER
+	---help---
+		Enable building of logic that will execute on the low priority work
+		thread when the network is taken down.  This is is a general purpose
+		notifier, but was developed specifically to support SIGHUP poll()
+		logic.
+
+endmenu # Network Device Operations

@@ -1,0 +1,619 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config DEV_LOWCONSOLE
+	bool "Low-level console support"
+	default n
+	depends on ARCH_LOWPUTC && DEV_CONSOLE
+	---help---
+		Use the simple, low-level, write-only serial console driver (minimal support)
+
+config SERIAL_PM_ACTIVITY_DOMAIN
+	int "PM activity domain"
+	default 0
+	depends on PM
+	---help---
+		When characters are received on a console device, pm_activity()
+		will be called with this PM domain.
+
+config SERIAL_PM_ACTIVITY_PRIORITY
+	int "PM activity priority when receive character"
+	default 6
+	depends on PM
+	---help---
+		When characters are received on a console device, pm_activity()
+		will be called with this PM priority.
+
+config SERIAL_REMOVABLE
+	bool
+	default n
+
+config SERIAL_CONSOLE
+	bool
+	default n
+
+menuconfig 16550_UART
+	bool "16550 UART Chip support"
+	select ARCH_HAVE_SERIAL_TERMIOS
+	default n
+
+if 16550_UART
+source drivers/serial/Kconfig-16550
+endif
+
+#
+# MCU serial peripheral driver?
+#
+
+config OTHER_UART_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config MCU_SERIAL
+	bool
+	default n
+
+config RPMSG_UART
+	bool "UART rpmsg support"
+	default n
+	depends on OPENAMP
+	select ARCH_HAVE_SERIAL_TERMIOS
+	select SERIAL_RXDMA
+	select SERIAL_TXDMA
+	select SERIAL_REMOVABLE
+	select SERIAL_IFLOWCONTROL
+
+config RPMSG_SERIALINIT
+	bool "Add dummy up_serialinit for UART rpmsg"
+	default !16550_UART && !CMSDK_UART && !MCU_SERIAL
+	depends on RPMSG_UART
+
+#
+# Standard serial driver configuration
+#
+
+config STANDARD_SERIAL
+	bool "Enable standard \"upper-half\" serial driver"
+	default y if MCU_SERIAL
+	default n if !MCU_SERIAL
+	depends on !DEV_LOWCONSOLE
+	---help---
+		Enable the standard, upper-half serial driver used by most MCU serial peripherals.
+
+config SERIAL_NPOLLWAITERS
+	int "Number of poll threads"
+	default 2
+	depends on STANDARD_SERIAL
+	---help---
+		Maximum number of threads than can be waiting for POLL events.
+		Default: 2
+
+config SERIAL_IFLOWCONTROL
+	bool
+	default n
+
+config SERIAL_RS485CONTROL
+	bool
+	default n
+	---help---
+		Use RTS pin to control RS485 direction (Asserted while transmitting).
+
+config SERIAL_OFLOWCONTROL
+	bool
+	default n
+
+config SERIAL_TXDMA
+	bool
+	default n
+
+config SERIAL_RXDMA
+	bool
+	default n
+
+config SERIAL_IFLOWCONTROL_WATERMARKS
+	bool "RX flow control watermarks"
+	default n
+	depends on SERIAL_IFLOWCONTROL
+	---help---
+		Call the "lower half" rxflowcontrol method whenever the number of
+		characters in the serial RX buffer falls above an upper water mark
+		level or below a lower watermark level.  The default behavior is to
+		call the rxflowcontrol method only when the RX buffer is empty or
+		full.
+
+if SERIAL_IFLOWCONTROL_WATERMARKS
+
+config SERIAL_IFLOWCONTROL_LOWER_WATERMARK
+	int "RX lower Watermark (percent)"
+	default 10
+	range 1 99
+	---help---
+		Call the rxflowcontrol method then there are this amount (or or less)
+		data buffered in the serial drivers RX buffer.  This is expressed
+		as a percentage of the total size of the RX buffer which may vary
+		from instance-to-instance.
+
+config SERIAL_IFLOWCONTROL_UPPER_WATERMARK
+	int "RX upper Watermark (percent)"
+	default 90
+	range 1 99
+	---help---
+		Call the rxflowcontrol method then there are this amount (or more)
+		data buffered in the serial drivers RX buffer.  This is expressed
+		as a percentage of the total size of the RX buffer which may vary
+		from instance-to-instance.
+
+endif # SERIAL_IFLOWCONTROL_WATERMARKS
+
+config SERIAL_TIOCSERGSTRUCT
+	bool "Support TIOCSERGSTRUCT"
+	default n
+	depends on DEBUG_FEATURES && (MCU_SERIAL || 16550_UART)
+	---help---
+		As a debug option, many serial bottom half drivers support the TIOCSERGSTRUCT
+		that allows you to get the internal driver data structure.  By default, this
+		IOCTL is not supported in order to reduce footprint.  But if (1) the driver
+		supports the TIOCSERGSTRUCT ioctl, and (2) this option is selected, then
+		support for the TIOCSERGSTRUCT will be enabled.
+
+config ARCH_HAVE_SERIAL_TERMIOS
+	bool
+	default n
+
+config SERIAL_TERMIOS
+	bool "Serial TERMIOS support"
+	depends on ARCH_HAVE_SERIAL_TERMIOS
+	default n
+	---help---
+		Serial driver supports termios.h interfaces (tcsetattr, tcflush, etc.).
+		If this is not defined, then the terminal settings (baud, parity, etc).
+		are not configurable at runtime; serial streams cannot be flushed, etc..
+
+config TTY_SIGINT
+	bool "Support SIGINT"
+	default n
+	select SIG_SIGKILL_ACTION
+	depends on SERIAL_TERMIOS
+	---help---
+		Whether support Ctrl-c/x event.  Enabled automatically for console
+		devices.  May be enabled for other serial devices using the ISIG bit
+		in the Termios c_lflag.
+
+		REVISIT:  This implementation is compliant but incomplete.  The
+		c_lflag ISIG bit normally enables/disables INTR, QUIT, SUSP, and
+		DSUSP character processing.  The relationship between these names,
+		standard signals, and typical key presses are as follows:
+
+		  INTR   SIGINT   Ctrl-C  ETX(0x03) Interrupt
+		  KILL   SIGKILL  Ctrl-U  NAK(0x15) Kill
+		  QUIT   SIGQUIT  Ctrl-\  FS (0x1c) Quit
+		  SUSP   SIGSTP   Ctrl-Z  SUB(0x1a) Suspend
+		  DSUSP  SIGSTP   Ctrl-Y  EM (0x19) Delayed suspend
+
+		Additional requirements:
+		  - SIGKILL cannot be caught or ignored.  Compared to SIGTERM which
+		    is like SIGKILL but can be caught or ignored.
+		  - SIGQUIT is like SIGINT but causes generation of a core dump
+		  - SIGSTOP cannot be caught or ignored.  SIGSTP is like SIGSTOP but
+		    can be caught or ignored ignored.
+		  - The delayed suspend (DSUSD) is like suspend (SUPD), except that
+		    the suspension is delayed until the next read operation
+
+		Ctrl-D (EOT 0x04) normally should not generate a signal but, instead,
+		should cause an immediate End-of-File result.
+
+config TTY_SIGINT_CHAR
+	hex "Serial parse SIGINT characters"
+	default 0x03 if SERIAL_CONSOLE
+	default 0x04 if !SERIAL_CONSOLE
+	depends on TTY_SIGINT
+	---help---
+		Use ASCII 0x03 (Ctrl-c) or 0x04 (ctrl-d) inputs to determine whether
+		to send a SIGINT event.  Other characters may also be selected.
+
+		REVISIT:  Traditionally Ctrl-C would generate SIGINT.  Ctrl-D is the
+		End-of-File character that should close the stream.
+
+config TTY_SIGSTP
+	bool "Support SIGSTP"
+	default n
+	select CONFIG_SIG_SIGSTOP_ACTION
+	depends on SERIAL_TERMIOS
+	---help---
+		Whether support Ctrl-z event.  Enabled automatically for console
+		devices.  May be enabled for other serial devices using the ISIG bit
+		in the Termios c_lflag.
+
+		REVISIT:  This implementation is compliant but incomplete.  The
+		c_lflag ISIG bit normally enables/disables INTR, QUIT, SUSP, and
+		DSUSP character processing.  The relationship between these names,
+		standard signals, and typical key presses are as follows:
+
+		  INTR   SIGINT   Ctrl-C  ETX(0x03) Interrupt
+		  KILL   SIGKILL  Ctrl-U  NAK(0x15) Kill
+		  QUIT   SIGQUIT  Ctrl-\  FS (0x1c) Quit
+		  SUSP   SIGSTP   Ctrl-Z  SUB(0x1a) Suspend
+		  DSUSP  SIGSTP   Ctrl-Y  EM (0x19) Delayed suspend
+
+		Additional requirements:
+		  - SIGKILL cannot be caught or ignored.  Compared to SIGTERM which
+		    is like SIGKILL but can be caught or ignored.
+		  - SIGQUIT is like SIGINT but causes generation of a core dump
+		  - SIGSTOP cannot be caught or ignored.  SIGSTP is like SIGSTOP but
+		    can be caught or ignored ignored.
+		  - The delayed suspend (DSUSD) is like suspend (SUPD), except that
+		    the suspension is delayed until the next read operation
+
+config TTY_SIGSTP_CHAR
+	hex "Serial parse SIGSTP characters"
+	default 0x1a
+	depends on TTY_SIGSTP
+	---help---
+		Use ASCII 0x1a (Ctrl-z) input to determine whether to send a SIGSTP
+		event.  Other characters may also be selected.
+
+#
+# Serial console selection
+#
+
+choice
+	prompt "Serial console"
+	default NO_SERIAL_CONSOLE if !OTHER_UART_SERIALDRIVER
+	default OTHER_SERIAL_CONSOLE if OTHER_UART_SERIALDRIVER
+	depends on MCU_SERIAL
+	#depends on DEV_CONSOLE - We may have serial console with no file system at all
+
+config UART_SERIAL_CONSOLE
+	bool "UART"
+	depends on UART_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART0_SERIAL_CONSOLE
+	bool "UART0"
+	depends on UART0_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART0_SERIAL_CONSOLE
+	bool "USART0"
+	depends on USART0_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART1_SERIAL_CONSOLE
+	bool "UART1"
+	depends on UART1_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART1_SERIAL_CONSOLE
+	bool "USART1"
+	depends on USART1_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART2_SERIAL_CONSOLE
+	bool "UART2"
+	depends on UART2_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART2_SERIAL_CONSOLE
+	bool "USART2"
+	depends on USART2_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART3_SERIAL_CONSOLE
+	bool "UART3"
+	depends on UART3_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART3_SERIAL_CONSOLE
+	bool "USART3"
+	depends on USART3_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART4_SERIAL_CONSOLE
+	bool "UART4"
+	depends on UART4_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART4_SERIAL_CONSOLE
+	bool "USART4"
+	depends on USART4_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART5_SERIAL_CONSOLE
+	bool "UART5"
+	depends on UART5_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART5_SERIAL_CONSOLE
+	bool "USART5"
+	depends on USART5_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART6_SERIAL_CONSOLE
+	bool "UART6"
+	depends on UART6_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART6_SERIAL_CONSOLE
+	bool "USART6"
+	depends on USART6_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART7_SERIAL_CONSOLE
+	bool "UART7"
+	depends on UART7_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART7_SERIAL_CONSOLE
+	bool "USART7"
+	depends on USART7_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config UART8_SERIAL_CONSOLE
+	bool "UART8"
+	depends on UART8_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART8_SERIAL_CONSOLE
+	bool "USART8"
+	depends on USART8_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config USART9_SERIAL_CONSOLE
+	bool "USART8"
+	depends on USART9_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART0_SERIAL_CONSOLE
+	bool "LPUART0"
+	depends on LPUART0_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART1_SERIAL_CONSOLE
+	bool "LPUART1"
+	depends on LPUART1_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART2_SERIAL_CONSOLE
+	bool "LPUART2"
+	depends on LPUART2_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART3_SERIAL_CONSOLE
+	bool "LPUART3"
+	depends on LPUART3_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART4_SERIAL_CONSOLE
+	bool "LPUART4"
+	depends on LPUART4_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART5_SERIAL_CONSOLE
+	bool "LPUART5"
+	depends on LPUART5_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART6_SERIAL_CONSOLE
+	bool "LPUART6"
+	depends on LPUART6_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART7_SERIAL_CONSOLE
+	bool "LPUART7"
+	depends on LPUART7_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config LPUART8_SERIAL_CONSOLE
+	bool "LPUART8"
+	depends on LPUART8_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI0_SERIAL_CONSOLE
+	bool "SCI0"
+	depends on SCI0_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI1_SERIAL_CONSOLE
+	bool "SCI1"
+	depends on SCI1_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI2_SERIAL_CONSOLE
+	bool "SCI2"
+	depends on SCI2_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI3_SERIAL_CONSOLE
+	bool "SCI3"
+	depends on SCI3_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI4_SERIAL_CONSOLE
+	bool "SCI4"
+	depends on SCI4_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI5_SERIAL_CONSOLE
+	bool "SCI5"
+	depends on SCI5_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI6_SERIAL_CONSOLE
+	bool "SCI6"
+	depends on SCI6_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI7_SERIAL_CONSOLE
+	bool "SCI7"
+	depends on SCI7_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI8_SERIAL_CONSOLE
+	bool "SCI8"
+	depends on SCI8_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI9_SERIAL_CONSOLE
+	bool "SCI9"
+	depends on SCI9_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI10_SERIAL_CONSOLE
+	bool "SCI10"
+	depends on SCI10_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI11_SERIAL_CONSOLE
+	bool "SCI11"
+	depends on SCI11_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config SCI12_SERIAL_CONSOLE
+	bool "SCI12"
+	depends on SCI12_SERIALDRIVER
+	select SERIAL_CONSOLE
+
+config OTHER_SERIAL_CONSOLE
+	bool "Other serial console"
+	select SERIAL_CONSOLE
+
+config NO_SERIAL_CONSOLE
+	bool "No serial console"
+
+endchoice
+
+#
+# U[S]ARTn_XYZ settings for MCU serial drivers
+#
+
+menu "UART Configuration"
+	depends on UART_SERIALDRIVER
+
+config UART_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config UART_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config UART_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the UART.
+
+config UART_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config UART_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config UART_2STOP
+	int "use 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+
+config UART_IFLOWCONTROL
+	bool "UART RTS flow control"
+	default n
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable UART RTS flow control
+
+config UART_OFLOWCONTROL
+	bool "UART CTS flow control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable UART CTS flow control
+
+config UART_TXDMA
+	bool "UART Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on UART
+
+config UART_RXDMA
+	bool "UART Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on UART
+
+endmenu
+
+source drivers/serial/Kconfig-uart
+source drivers/serial/Kconfig-lpuart
+source drivers/serial/Kconfig-usart
+source drivers/serial/Kconfig-sci
+
+menuconfig PSEUDOTERM
+	bool "Pseudo-Terminal (PTY) support"
+	default n
+	select PIPES
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Enable support support for master and slave pseudo-terminal devices.
+
+if PSEUDOTERM
+
+choice
+	prompt "PTY model"
+	default PSEUDOTERM_BSD if DISABLE_PSEUDOFS_OPERATIONS
+	default PSEUDOTERM_SUSV1 if !DISABLE_PSEUDOFS_OPERATIONS
+
+config PSEUDOTERM_BSD
+	bool "BSD style"
+	---help---
+		Deprecated BSD style PTYs.
+
+		Master: /dev/ptyN
+		Slave: /dev/ttypN
+
+		Where N is the minor number
+
+config PSEUDOTERM_SUSV1
+	bool "SUSv1 style"
+	depends on !DISABLE_PSEUDOFS_OPERATIONS
+	---help---
+		PTYs as specified in the Single Unix Specification (SUSv1).
+
+		Master: /dev/ptmx (multiplexor)
+		Slave: /dev/pts/N
+
+		Where N is the minor number
+
+endchoice # PTY model
+
+config PSEUDOTERM_RXBUFSIZE
+	int "Pseudo-Terminal Rx buffer size"
+	default 256
+	---help---
+		Master-to-slave pipe buffer size.  Default: 256
+
+config PSEUDOTERM_TXBUFSIZE
+	int "Pseudo-Terminal Tx buffer size"
+	default 256
+	---help---
+		Slave-to-master pipe buffer size.  Default: 256
+
+endif # PSEUDOTERM

@@ -1,0 +1,15 @@
+indent=spaces=4
+style=java
+pad-oper
+pad-header
+unpad-paren
+lineend=linux
+add-braces
+indent-switches
+max-code-length=100
+keep-one-line-blocks
+keep-one-line-statements
+attach-namespaces
+max-continuation-indent=80
+max-code-length=100
+break-after-logical

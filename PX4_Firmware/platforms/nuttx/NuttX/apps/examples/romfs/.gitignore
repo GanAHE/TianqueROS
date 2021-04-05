@@ -1,0 +1,14 @@
+/Make.dep
+/.depend
+/.built
+/testdir
+/testdir.img
+/romfs_testdir.h
+/*.asm
+/*.obj
+/*.rel
+/*.lst
+/*.sym
+/*.adb
+/*.lib
+/*.src

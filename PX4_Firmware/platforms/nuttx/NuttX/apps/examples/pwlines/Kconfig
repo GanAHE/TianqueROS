@@ -1,0 +1,137 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config EXAMPLES_PWLINES
+	tristate "NX Per-Window Framebuffer Graphics Example"
+	default n
+	depends on NX
+	select LIB_BOARDCTL
+	select NX_RAMBACKED
+	---help---
+		Enable the NX per-window framebuffer example
+
+if EXAMPLES_PWLINES
+
+config EXAMPLES_PWLINES_DEFAULT_COLORS
+	bool "Use Default Colors"
+	default y
+
+if !EXAMPLES_PWLINES_DEFAULT_COLORS
+
+config EXAMPLES_PWLINES_BGCOLOR
+	hex "Background Color"
+	---help---
+		The color of the background.  Default depends on config EXAMPLES_PWLINES_BPP.
+
+config EXAMPLES_PWLINES_COLOR1
+	hex "Color of Window 1"
+	---help---
+		The color of window 1. Default depends on config EXAMPLES_PWLINES_BPP.
+
+config EXAMPLES_PWLINES_COLOR2
+	hex "Color of Window 2"
+	---help---
+		The color of window 2. Default depends on config EXAMPLES_PWLINES_BPP.
+
+config EXAMPLES_PWLINES_COLOR3
+	hex "Color of Window 3"
+	---help---
+		The color of window 3. Default depends on config EXAMPLES_PWLINES_BPP.
+
+config EXAMPLES_PWLINES_BORDERCOLOR
+	hex "Circle border Color"
+	---help---
+		The color of the circular border drawn in the window.  Default depends
+		on EXAMPLES_PWLINES_BPP.
+
+config EXAMPLES_PWLINES_FACECOLOR
+	hex "Circle face Color"
+	---help---
+		The color of the circular region filled in the window. Default depends
+		on EXAMPLES_PWLINES_BPP.
+
+config EXAMPLES_PWLINES_LINECOLOR
+	hex "Line Color"
+	---help---
+		The color of the central lines drawn in the window.  Default depends
+		on EXAMPLES_PWLINES_BPP.
+
+endif
+
+config EXAMPLES_PWLINES_BPP
+	int "Bits-Per-Pixel"
+	default 32
+	---help---
+		Pixels per pixel to use.  Valid options include 2, 4, 8, 16, 24,
+		and 32.  Default is 32.
+
+config EXAMPLES_PWLINES_LINEWIDTH
+	int "Line Width"
+	default 8
+	---help---
+		Selects the width of the lines in pixels (default: 16)
+
+config EXAMPLES_PWLINES_BORDERWIDTH
+	int "Border Width"
+	default 8
+	---help---
+		The width of the circular border drawn in the background window. (default: 16).
+
+config EXAMPLES_PWLINES_RATECONTROL
+	int "Frame rate control"
+	default 100
+	range 0 1000
+	---help---
+		This is the inter-frame period in milliseconds that is used to
+		control the framerate.  A value of zero will disable frame controls
+		and the rendering will occur as fast as is possible.
+
+		If you run this example with high frame rates, it becomes unstable.
+		This is probably a bug in the example:  It may not be accounting
+		for for some asynchronous behaviors.
+
+config EXAMPLES_PWLINES_VERBOSE
+	bool "Verbose output"
+	default n
+
+comment "Tasking options"
+
+config EXAMPLES_PWLINES_PROGNAME
+	string "Program name"
+	default "pwlines"
+	---help---
+		This is the name of the program that will be used when the NSH ELF
+		program is installed.
+
+config EXAMPLES_PWLINES_CLIENT_STACKSIZE
+	int "Example Main Stack Size"
+	default 2048
+	---help---
+		The stacksize to use when starting the example main(). 
+		Default 2048
+
+config EXAMPLES_PWLINES_CLIENT_PRIO
+	int "Client Priority"
+	default 90
+	---help---
+		The priority to use when staring the example main().  This priority
+		should be lower than both the listener and server priorities (See
+		CONFIG_NXSTART_SERVERPRIO).  Default: 90
+
+config EXAMPLES_PWLINES_LISTENER_STACKSIZE
+	int "Listener Stack Size"
+	default 2048
+	---help---
+		The stacksize to use when creating the NX server.  Default 2048
+
+config EXAMPLES_PWLINES_LISTENER_PRIO
+	int "Listener Priority"
+	default 100
+	---help---
+		The priority of the event listener thread.  This priority should be
+		above the client priority but below the server priority (See
+		CONFIG_NXSTART_SERVERPRIO).  Default 100.
+
+endif

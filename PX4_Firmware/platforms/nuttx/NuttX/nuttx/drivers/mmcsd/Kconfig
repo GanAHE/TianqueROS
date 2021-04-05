@@ -1,0 +1,120 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config MMCSD_NSLOTS
+	int "Number of MMC/SD slots"
+	default 1
+	---help---
+		Number of MMC/SD slots supported by the
+		driver. Default is one.
+
+config MMCSD_READONLY
+	bool "Disable MMC/SD write access"
+	default n
+	---help---
+		Provide read-only access.  Default is
+		Read/Write
+
+config MMCSD_MULTIBLOCK_DISABLE
+	bool "Disable MMC/SD multiblock transfer"
+	default n
+	---help---
+		Use only the single block transfer method.
+		This setting is used to work around buggy SDIO drivers that cannot handle
+		multiple block transfers.
+
+config MMCSD_MMCSUPPORT
+	bool "MMC cards support"
+	default y
+	---help---
+		Enable support for MMC cards
+
+config MMCSD_HAVE_CARDDETECT
+	bool "MMC/SD card detect pin"
+	default y
+	---help---
+		SDIO driver card present detection is supported.
+
+config MMCSD_HAVE_WRITEPROTECT
+	bool "MMC/SD write protect pin"
+	default y
+	---help---
+		SDIO driver write protection detection is supported.
+
+config MMCSD_SPI
+	bool "MMC/SD SPI transfer support"
+	default y
+	depends on SPI
+
+if MMCSD_SPI
+
+config MMCSD_SPICLOCK
+	int "MMC/SD maximum SPI clock"
+	default 20000000
+	depends on MMCSD_SPI
+	---help---
+		Maximum SPI clock to drive MMC/SD card.
+		Default is 20MHz.
+
+config MMCSD_SPIMODE
+	int "MMC/SD SPI mode"
+	default 0
+	---help---
+		Should be mode 0.  However, sometimes this is useful for experimenting.
+
+endif
+
+config SDIO_DMA
+	bool
+	default n
+
+config MMCSD_SDIO
+	bool "MMC/SD SDIO transfer support"
+	default n
+	depends on ARCH_HAVE_SDIO
+
+if MMCSD_SDIO
+
+config SDIO_MUXBUS
+	bool "SDIO bus share support"
+	default n
+	---help---
+		Set this SDIO interface if the SDIO interface
+		or hardware resources are shared with other drivers.
+
+config MMCSD_SDIOWAIT_WRCOMPLETE
+	bool "Use D0 Busy to detect Write Complete"
+	default n
+	depends on ARCH_HAVE_SDIOWAIT_WRCOMPLETE
+	---help---
+		SDIO driver will use D0 Busy signalling to detect Write Complete.
+		This option when selected, will enable the MMCSD driver to use the
+		underlying SDIO drivers implementation of the SD specification's
+		D0 Busy signalling to detect Write Complete.  This will avoid
+		potentially very long (600Ms+) busy waiting in the MMCSD driver.
+
+		To implement D0 Busy signalling, the underlying driver must
+		be capable of switching the D0 GPIO to be a rising edge sensitive
+		interrupt pin. It must then, condition that pin to detect the rising edge
+		on receipt of SDWAIT_WRCOMPLETE in the SDIO_WAITENABLE call and
+		return it back to regular SDIO mode, when either the ISR fires or pin is
+		found to be high in the SDIO_EVENTWAIT call.
+
+config SDIO_WIDTH_D1_ONLY
+	bool "SDIO 1-bit transfer"
+	default n
+	---help---
+		Select 1-bit transfer mode.  Default:
+		4-bit transfer mode.
+
+config SDIO_BLOCKSETUP
+	bool "SDIO block setup"
+	default n
+	---help---
+		Some hardware needs to be informed of the selected blocksize and the
+		number of blocks.  Others just work on the byte stream.  This option
+		enables the block setup method in the SDIO vtable.
+
+endif

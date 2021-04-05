@@ -1,0 +1,14 @@
+/arch
+/apps
+/avr
+/math.h
+/float.h
+/stdarg.h
+/setjmp.h
+/features.h
+/uClibc++
+/libcxx
+/machine
+/openamp
+/metal
+

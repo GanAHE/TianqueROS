@@ -1,0 +1,225 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+comment "LC823450 Configuration Options"
+
+menu "LC823450 Peripheral Support"
+
+config LC823450_IPL2
+	bool "IPL2"
+	default n
+
+config LC823450_UART0
+	bool "UART0"
+	select UART0_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	default n
+
+config LC823450_UART1
+	bool "UART1"
+	select UART1_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	default n
+
+config LC823450_UART2
+	bool "UART2"
+	select UART2_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	default n
+
+config LC823450_WDT
+	bool "Watchdog"
+	default n
+	select WATCHDOG
+
+config LC823450_SPIFI
+	bool "SPI Flash Interface (SPIFI)"
+	default n
+
+if LC823450_SPIFI
+config LC823450_SPIFI_QUADIO
+	bool "SPIFI 4bit access"
+	default y
+config LC823450_SPIFI_BOOT
+	bool "Boot from an external SPI flash"
+	default n
+endif
+
+config LC823450_SDIF
+	bool "SD/eMMC driver"
+	default y
+
+if LC823450_SDIF
+
+config LC823450_SDIF_PATCH
+	bool "SD/eMMC driver patch support"
+	default n
+
+config LC823450_SDIF_SDC
+	bool "SD card support"
+	default n
+
+config LC823450_SDC_DMA
+	bool "DMA support for eMMC/SD"
+	default y
+	select ARCH_DMA
+
+endif
+
+config LC823450_MTD
+	bool "LC823450 MTD devices"
+	default n
+	select MTD_PARTITION
+	---help---
+		Build support for LC823450 MTD eMMC/uSD
+
+if LC823450_MTD
+
+config MTD_DEV_MAX
+	int "Max MTD devices"
+	default 2
+
+config MTD_DEVNO_EMMC
+	int "Device No. for eMMC"
+	default 0
+
+config MTD_DEVNO_SDC
+	int "Device No. for SD"
+	default 1
+
+config MTD_DEVPATH0
+	string "Device path for eMMC"
+	default "/dev/mtdblock0"
+
+config MTD_DEVPATH1
+	string "Device path for SD"
+	default "/dev/mtdblock1"
+
+config MTD_CONFIG_DEVPATH
+	string "Device path for config"
+	default "/dev/mtdblock0p2"
+
+config MTD_RECOVERY_DEVPATH
+	string "Device path for recovery"
+	default "/dev/mtdblock0p3"
+
+config MTD_KERNEL_DEVPATH
+	string "Device path for kernel"
+	default "/dev/mtdblock0p4"
+
+config MTD_ETC_DEVPATH
+	string "Device path for etc"
+	default "/dev/mtdblock0p5"
+
+config MTD_SYSTEM_DEVPATH
+	string "Device path for system"
+	default "/dev/mtdblock0p6"
+
+config MTD_LOG_DEVPATH
+	string "Device path for log"
+	default "/dev/mtdblock0p7"
+
+config MTD_CACHE_DEVPATH
+	string "Device path for cache"
+	default "/dev/mtdblock0p9"
+
+config MTD_CP_DEVPATH
+	string "Device path for content on eMMC"
+	default "/dev/mtdblock0p10"
+
+config MTD_CP_STARTBLOCK
+	int "Start block for content on eMMC"
+	default 602112
+
+endif # LC823450 MTD
+
+config LC823450_I2C_TIMEOSEC
+	int "I2C timeout (sec)"
+	default 1
+	range 0 2
+	depends on I2C
+
+config LC823450_I2C_TIMEOMS
+	int "I2C timeout (msec)"
+	default 500
+	range 0 999
+	depends on I2C
+
+config LC823450_I2C0
+	bool "I2C0"
+	default n
+	depends on I2C
+
+config LC823450_I2C1
+	bool "I2C1"
+	default n
+	depends on I2C
+
+config LC823450_I2S0
+	bool "I2S0"
+	default n
+	depends on I2S
+
+config LC823450_SPI_DMA
+	bool "DMA for SPI"
+	default n
+	select ARCH_DMA
+
+if PWM
+
+config LC823450_PWM0_CH0
+	bool "MTM0-Ch0 PWM device"
+	default n
+
+config LC823450_PWM0_CH1
+	bool "MTM0-Ch1 PWM device"
+	default n
+
+config LC823450_PWM1_CH0
+	bool "MTM1-Ch0 PWM device"
+	default y
+
+config LC823450_PWM1_CH1
+	bool "MTM1-Ch1 PWM device"
+	default n
+
+endif
+
+choice
+	prompt "HS driver current boost"
+
+config LC823450_USBDEV_CUSTOM_HSDSEL_0
+	bool "normal"
+
+config LC823450_USBDEV_CUSTOM_HSDSEL_5
+	bool "5% boost"
+
+config LC823450_USBDEV_CUSTOM_HSDSEL_10
+	bool "10% boost"
+
+endchoice
+
+config LC823450_LSISTBY
+	bool "LSI Standby"
+	default n
+
+config LC823450_MTM0_TICK
+	bool "use MTM0 for tick"
+	default n
+
+config LC823450_SLEEP_MODE
+	bool "sleep mode"
+	default n
+
+
+config HRT_TIMER
+	bool "High resolution timer"
+	default n
+
+config DVFS
+	bool "Dynamic Voltage and Frequencey Scaling"
+	default n
+
+endmenu

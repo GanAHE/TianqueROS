@@ -1,0 +1,1238 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+comment "Kinetis Configuration Options"
+
+choice
+	prompt "Kinetis Chip Selection"
+	default ARCH_CHIP_MK60N512VMD100
+	depends on ARCH_CHIP_KINETIS
+
+config ARCH_CHIP_MK20DN32VLH5
+	bool "MK20DN32VLH5"
+	select ARCH_FAMILY_K20
+
+config ARCH_CHIP_MK20DX32VLH5
+	bool "MK20DX32VLH5"
+	select ARCH_FAMILY_K20
+
+config ARCH_CHIP_MK20DN64VLH5
+	bool "MK20DN64VLH5"
+	select ARCH_FAMILY_K20
+
+config ARCH_CHIP_MK20DX64VLH5
+	bool "MK20DX64VLH5"
+	select ARCH_FAMILY_K20
+
+config ARCH_CHIP_MK20DN128VLH5
+	bool "MK20DN128VLH5"
+	select ARCH_FAMILY_K20
+
+config ARCH_CHIP_MK20DX128VLH5
+	bool "MK20DX128VLH5"
+	select ARCH_FAMILY_K20
+
+config ARCH_CHIP_MK20DX64VLH7
+	bool "MK20DX64VLH7"
+	select ARCH_FAMILY_K20
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK20DX128VLH7
+	bool "MK20DX128VLH7"
+	select ARCH_FAMILY_K20
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK20DX256VLH7
+	bool "MK20DX256VLH7"
+	select ARCH_FAMILY_K20
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK28FN2M0VMI15
+	bool "MK28FN2M0VMI15"
+	select ARCH_FAMILY_K28
+
+config ARCH_CHIP_MK28FN2M0CAU15R
+	bool "MK28FN2M0CAU15R"
+	select ARCH_FAMILY_K28
+
+config ARCH_CHIP_MK40N512VLQ100
+	bool "MK40N512VLQ100"
+	select ARCH_FAMILY_K40
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK40N512VMD100
+	bool "MK40N512VMD100"
+	select ARCH_FAMILY_K40
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK40X128VLQ100
+	bool "MK40X128VLQ100"
+	select ARCH_FAMILY_K40
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK40X128VMD100
+	bool "MK40X128VMD100"
+	select ARCH_FAMILY_K40
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK40X256VLQ100
+	bool "MK40X256VLQ100"
+	select ARCH_FAMILY_K40
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK40X256VMD100
+	bool "MK40X256VMD100"
+	select ARCH_FAMILY_K40
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK60N256VLQ100
+	bool "MK60N256VLQ100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+
+config ARCH_CHIP_MK60N256VMD100
+	bool "MK60N256VMD100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK60N512VLL100
+	bool "MK60N512VLL100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK60N512VLQ100
+	bool "MK60N512VLQ100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK60N512VMD100
+	bool "MK60N512VMD100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK60X256VLQ100
+	bool "MK60X256VLQ100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK60X256VMD100
+	bool "MK60X256VMD100"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK60FN1M0VLQ12
+	bool "MK60FN1M0VLQ12"
+	select ARCH_FAMILY_K60
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+
+config ARCH_CHIP_MK64FN1M0VLL12
+	bool "MK64FN1M0VLL12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK64FX512VLL12
+	bool "MK64FX512VLL12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK64FX512VDC12
+	bool "MK64FX512VDC12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK64FN1M0VDC12
+	bool "MK64FN1M0VDC12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK64FX512VLQ12
+	bool "MK64FX512VLQ12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK64FX512VMD12
+	bool "MK64FX512VMD12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK64FN1M0VMD12
+	bool "MK64FN1M0VMD12"
+	select ARCH_FAMILY_K64
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK66FX1M0VMD18
+	bool "MK66FX1M0VMD18"
+	select ARCH_FAMILY_K66
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_I2C3
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK66FN2M0VMD18
+	bool "MK66FN2M0VMD18"
+	select ARCH_FAMILY_K66
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_I2C3
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK66FX1M0VLQ18
+	bool "MK66FX1M0VLQ18"
+	select ARCH_FAMILY_K66
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_I2C3
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+config ARCH_CHIP_MK66FN2M0VLQ18
+	bool "MK66FN2M0VLQ18"
+	select ARCH_FAMILY_K66
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_I2C2
+	select KINETIS_HAVE_I2C3
+	select KINETIS_HAVE_SPI1
+	select KINETIS_HAVE_SPI2
+
+endchoice
+
+# These "hidden" settings determine is a peripheral option is available for
+# the selection MCU
+
+config KINETIS_HAVE_UART5
+	bool
+	default n
+
+config KINETIS_HAVE_LPUART0
+	bool
+	default n
+
+config KINETIS_HAVE_LPUART1
+	bool
+	default n
+
+config KINETIS_HAVE_LPUART2
+	bool
+	default n
+
+config KINETIS_HAVE_LPUART3
+	bool
+	default n
+
+config KINETIS_HAVE_LPUART4
+	bool
+	default n
+
+# When there are multiple instances of a device, these "hidden" settings
+# will automatically be selected and will represent the 'OR' of the
+# instances selected.
+
+config KINETIS_SERIALDRIVER
+	bool
+	default n
+
+config KINETIS_LPUART
+	bool
+	default n
+	select MCU_SERIAL
+
+config KINETIS_UART
+	bool
+	default n
+	select MCU_SERIAL
+
+# Chip families
+
+config ARCH_FAMILY_K20
+	bool
+	default n
+	select KINETIS_HAVE_UART5
+
+config ARCH_FAMILY_K28
+	bool
+	default n
+	select KINETIS_HAVE_I2C1
+	select KINETIS_HAVE_FTM3
+	select KINETIS_HAVE_LPUART0
+	select KINETIS_HAVE_LPUART1
+	select KINETIS_HAVE_LPUART2
+	select KINETIS_HAVE_LPUART3
+	select KINETIS_HAVE_LPUART4
+	select KINETIS_HAVE_TPM1
+	select KINETIS_HAVE_TPM2
+
+config ARCH_FAMILY_K40
+	bool
+	default n
+	select KINETIS_HAVE_UART5
+
+config ARCH_FAMILY_K60
+	bool
+	default n
+	select KINETIS_HAVE_UART5
+
+config ARCH_FAMILY_K64
+	bool
+	default n
+	select KINETIS_HAVE_FTM3
+	select KINETIS_HAVE_UART5
+
+config ARCH_FAMILY_K66
+	bool
+	default n
+	select KINETIS_HAVE_FTM3
+	select KINETIS_HAVE_LPUART0
+	select KINETIS_HAVE_TPM1
+	select KINETIS_HAVE_TPM2
+	select KINETIS_HAVE_DMA
+	select KINETIS_HAVE_FLEXCAN0
+	select KINETIS_HAVE_FLEXCAN1
+
+menu "Kinetis Peripheral Support"
+
+config KINETIS_HAVE_FTM3
+	bool
+	default n
+
+config KINETIS_HAVE_DMA
+	bool
+	default n
+
+config KINETIS_HAVE_I2C1
+	bool
+	default n
+
+config KINETIS_HAVE_I2C2
+	bool
+	default n
+
+config KINETIS_HAVE_I2C3
+	bool
+	default n
+
+config KINETIS_HAVE_SPI1
+	bool
+	default n
+
+config KINETIS_HAVE_SPI2
+	bool
+	default n
+
+config KINETIS_HAVE_TPM1
+	bool
+	default n
+
+config KINETIS_HAVE_TPM2
+	bool
+	default n
+
+config KINETIS_HAVE_FLEXCAN0
+	bool
+	default n
+
+config KINETIS_HAVE_FLEXCAN1
+	bool
+	default n
+
+config KINETIS_TRACE
+	bool "Trace"
+	default n
+	---help---
+		Enable trace clocking on power up.
+
+config KINETIS_FLEXBUS
+	bool "FlexBus"
+	default n
+	---help---
+		Enable flexbus clocking on power up.
+
+config KINETIS_UART0
+	bool "UART0"
+	default n
+	select UART0_SERIALDRIVER
+	select KINETIS_UART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support UART0
+
+config KINETIS_UART1
+	bool "UART1"
+	default n
+	select UART1_SERIALDRIVER
+	select KINETIS_UART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support UART1
+
+config KINETIS_UART2
+	bool "UART2"
+	default n
+	select UART2_SERIALDRIVER
+	select KINETIS_UART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support UART2
+
+config KINETIS_UART3
+	bool "UART3"
+	default n
+	select UART3_SERIALDRIVER
+	select KINETIS_UART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support UART3
+
+config KINETIS_UART4
+	bool "UART4"
+	default n
+	select UART4_SERIALDRIVER
+	select KINETIS_UART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support UART4
+
+config KINETIS_UART5
+	bool "UART5"
+	default n
+	depends on KINETIS_HAVE_UART5
+	select UART5_SERIALDRIVER
+	select KINETIS_UART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support UART5
+
+config KINETIS_LPUART0
+	bool "Low power LPUART0"
+	default n
+	depends on KINETIS_HAVE_LPUART0
+	select LPUART0_SERIALDRIVER
+	select KINETIS_LPUART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support the low power UART0
+
+config KINETIS_LPUART1
+	bool "Low power LPUART1"
+	default n
+	depends on KINETIS_HAVE_LPUART1
+	select LPUART1_SERIALDRIVER
+	select KINETIS_LPUART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support the low power UART1
+
+config KINETIS_LPUART2
+	bool "Low power LPUART2"
+	default n
+	depends on KINETIS_HAVE_LPUART2
+	select LPUART2_SERIALDRIVER
+	select KINETIS_LPUART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support the low power UART2
+
+config KINETIS_LPUART3
+	bool "Low power LPUART3"
+	default n
+	depends on KINETIS_HAVE_LPUART3
+	select LPUART3_SERIALDRIVER
+	select KINETIS_LPUART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support the low power UART3
+
+config KINETIS_LPUART4
+	bool "Low power LPUART4"
+	default n
+	depends on KINETIS_HAVE_LPUART4
+	select LPUART4_SERIALDRIVER
+	select KINETIS_LPUART
+	select KINETIS_SERIALDRIVER
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Support the low power UART4
+
+config KINETIS_ENET
+	bool "Ethernet"
+	default n
+	depends on ARCH_FAMILY_K60 || ARCH_FAMILY_K64 || ARCH_FAMILY_K66
+	select ARCH_HAVE_PHY
+	select ARCH_HAVE_NETDEV_STATISTICS
+	select NET
+	select NETDEVICES
+	---help---
+		Support Ethernet (K6x only)
+
+config KINETIS_RNGB
+	bool "Random number generator"
+	default n
+	depends on ARCH_FAMILY_K60 || ARCH_FAMILY_K64 || ARCH_FAMILY_K66
+	select ARCH_HAVE_RNG
+	---help---
+		Support the random number generator(K6x only)
+		
+config KINETIS_FLEXCAN
+	bool
+	default n
+
+config KINETIS_FLEXCAN0
+	bool "FLEXCAN0"
+	select KINETIS_FLEXCAN
+	select NET_CAN_HAVE_TX_DEADLINE
+	default n
+	---help---
+		Support FlexCAN0
+
+config KINETIS_FLEXCAN1
+	bool "FLEXCAN1"
+	select KINETIS_FLEXCAN
+	select NET_CAN_HAVE_TX_DEADLINE
+	default n
+	---help---
+		Support FlexCAN1
+
+config KINETIS_SPI0
+	bool "SPI0"
+	default n
+	select SPI
+	---help---
+		Support SPI0
+
+config KINETIS_SPI1
+	bool "SPI1"
+	default n
+	select SPI
+	depends on KINETIS_HAVE_SPI1
+	---help---
+		Support SPI1
+
+config KINETIS_SPI2
+	bool "SPI2"
+	default n
+	select SPI
+	depends on KINETIS_HAVE_SPI2
+	---help---
+		Support SPI2
+
+config KINETIS_I2C0
+	bool "I2C0"
+	default n
+	select I2C
+	---help---
+		Support I2C0
+
+config KINETIS_I2C1
+	bool "I2C1"
+	default n
+	select I2C
+	depends on KINETIS_HAVE_I2C1
+	---help---
+		Support I2C1
+
+config KINETIS_I2C2
+	bool "I2C2"
+	default n
+	select I2C
+	depends on KINETIS_HAVE_I2C2
+	---help---
+		Support I2C2
+
+config KINETIS_I2C3
+	bool "I2C3"
+	default n
+	select I2C
+	depends on KINETIS_HAVE_I2C3
+	---help---
+		Support I2C3
+
+config KINETIS_I2S
+	bool "I2S"
+	default n
+	---help---
+		Support I2S
+
+config KINETIS_DAC0
+	bool "DAC0"
+	default n
+	---help---
+		Support DAC0
+
+config KINETIS_DAC1
+	bool "DAC1"
+	default n
+	---help---
+		Support DAC1
+
+config KINETIS_ADC0
+	bool "ADC0"
+	default n
+	---help---
+		Support ADC0
+
+config KINETIS_ADC1
+	bool "ADC1"
+	default n
+	---help---
+		Support ADC1
+
+config KINETIS_CMP
+	bool "CMP"
+	default n
+	---help---
+		Support CMP
+
+config KINETIS_VREF
+	bool "VREF"
+	default n
+	---help---
+		Support VREF
+
+config KINETIS_SDHC
+	bool "SDHC"
+	default n
+	select ARCH_HAVE_SDIO
+	---help---
+		Support SD host controller
+
+config KINETIS_FTM0
+	bool "FTM0"
+	default n
+	---help---
+		Support FlexTimer 0
+
+config KINETIS_FTM1
+	bool "FTM1"
+	default n
+	---help---
+		Support FlexTimer 1
+
+config KINETIS_FTM2
+	bool "FTM2"
+	default n
+	---help---
+		Support FlexTimer 2
+
+config KINETIS_FTM3
+	bool "FTM3"
+	default n
+	depends on KINETIS_HAVE_FTM3
+	---help---
+		Support FlexTimer 3
+
+config KINETIS_TPM1
+	bool "TPM1"
+	default n
+	depends on KINETIS_HAVE_TPM1
+	---help---
+		Support TPM module 1
+
+config KINETIS_TPM2
+	bool "TPM2"
+	default n
+	depends on KINETIS_HAVE_TPM2
+	---help---
+		Support TPM module 2
+
+config KINETIS_LPTMR0
+	bool "Low power timer 0 (LPTMR0)"
+	default n
+	---help---
+		Support the low power timer 0
+
+config KINETIS_LPTMR1
+	bool "Low power timer 0 (LPTMR1)"
+	default n
+	depends on KINETIS_HAVE_LPTMR1
+	---help---
+		Support the low power timer 1
+
+config KINETIS_RTC
+	bool "RTC"
+	default n
+	---help---
+		Support RTC
+
+config KINETIS_SLCD
+	bool "Segment LCD (SLCD)"
+	default n
+	depends on ARCH_FAMILY_K40
+	---help---
+		Support the segment LCD (K40 only)
+
+config KINETIS_EWM
+	bool "External watchdog (WVM)"
+	default n
+	---help---
+		Support the external watchdog
+
+config KINETIS_CMT
+	bool "Carrier modulator transmitter (CMT)"
+	default n
+	---help---
+		Support Carrier Modulator Transmitter
+
+config KINETIS_USBOTG
+	bool "USB OTG"
+	default n
+	---help---
+		Support USB OTG (see also USBHOST and USBDEV)
+
+config KINETIS_USBDCD
+	bool "USB device controller"
+	default n
+	---help---
+		Support the USB Device Charger Detection module
+
+config KINETIS_LLWU
+	bool "Low leakage wake-up unit (LLWU)"
+	default n
+	---help---
+		Support the Low Leakage Wake-Up Unit
+
+config KINETIS_TSI
+	bool "Touchscreen interface (TSI)"
+	default n
+	---help---
+		Support the touch screeen interface
+
+config KINETIS_FTFL
+	bool "FLASH (FTFL)"
+	default n
+	---help---
+		Support FLASH
+
+config KINETIS_DMA
+	bool "DMA"
+	default n
+	depends on KINETIS_HAVE_DMA
+	select ARCH_DMA
+	---help---
+		Support DMA
+
+config KINETIS_CRC
+	bool "CRC"
+	default n
+	---help---
+		Support CRC
+
+config KINETIS_PDB
+	bool "Programmable delay block (PDB)"
+	default n
+	---help---
+		Support the Programmable Delay Block
+
+config KINETIS_PIT
+	bool "Programmable interval timer (PIT)"
+	default n
+	---help---
+		Support Programmable Interval Timers
+
+endmenu
+
+menu "Kinetis FTM PWM Configuration"
+	depends on KINETIS_FTM0 || KINETIS_FTM1 || KINETIS_FTM2 || KINETIS_FTM3
+
+config KINETIS_FTM0_PWM
+	bool "FTM0 PWM"
+	default n
+	depends on KINETIS_FTM0
+	---help---
+		Reserve timer 0 for use by PWM
+
+		Timer devices may be used for different purposes.  One special
+		purpose is to generate modulated outputs for such things as motor
+		control.  If KINETIS_FTM0 is defined then THIS following may also be
+		defined to indicate that the timer is intended to be used for pulsed
+		output modulation.
+
+config KINETIS_FTM0_CHANNEL
+	int "FTM0 PWM Output Channel"
+	default 0
+	range 0 7
+	depends on KINETIS_FTM0_PWM
+	---help---
+		If FTM0 is enabled for PWM usage, you also need specifies the timer output
+		channel {0,..,7}
+
+config KINETIS_FTM1_PWM
+	bool "FTM1 PWM"
+	default n
+	depends on KINETIS_FTM1
+	---help---
+		Reserve timer 1 for use by PWM
+
+		Timer devices may be used for different purposes.  One special purpose is
+		to generate modulated outputs for such things as motor control.  If KINETIS_FTM1
+		is defined then THIS following may also be defined to indicate that
+		the timer is intended to be used for pulsed output modulation.
+
+config KINETIS_FTM1_CHANNEL
+	int "FTM1 PWM Output Channel"
+	default 0
+	range 0 1
+	depends on KINETIS_FTM1_PWM
+	---help---
+		If FTM1 is enabled for PWM usage, you also need specifies the timer output
+		channel {0,..,1}
+
+config KINETIS_FTM2_PWM
+	bool "FTM2 PWM"
+	default n
+	depends on KINETIS_FTM2
+	---help---
+		Reserve timer 2 for use by PWM
+
+		Timer devices may be used for different purposes.  One special purpose is
+		to generate modulated outputs for such things as motor control.  If KINETIS_FTM2
+		is defined then THIS following may also be defined to indicate that
+		the timer is intended to be used for pulsed output modulation.
+
+config KINETIS_FTM2_CHANNEL
+	int "FTM2 PWM Output Channel"
+	default 0
+	range 0 1
+	depends on KINETIS_FTM2_PWM
+	---help---
+		If FTM2 is enabled for PWM usage, you also need specifies the timer output
+		channel {0,..,1}
+
+config KINETIS_FTM3_PWM
+	bool "FTM3 PWM"
+	default n
+	depends on KINETIS_FTM3
+	---help---
+		Reserve timer 3 for use by PWM
+
+		Timer devices may be used for different purposes.  One special purpose is
+		to generate modulated outputs for such things as motor control.  If KINETIS_FTM3
+		is defined then THIS following may also be defined to indicate that
+		the timer is intended to be used for pulsed output modulation.
+
+config KINETIS_FTM3_CHANNEL
+	int "FTM3 PWM Output Channel"
+	default 0
+	range 0 7
+	depends on KINETIS_FTM3_PWM
+	---help---
+		If FTM3 is enabled for PWM usage, you also need specifies the timer output
+		channel {0,..,7}
+
+endmenu # Kinetis FTM PWM Configuration
+
+menu "Kinetis GPIO Interrupt Configuration"
+
+config KINETIS_GPIOIRQ
+	bool "GPIO pin interrupts"
+	---help---
+		Enable support for interrupting GPIO pins
+
+if KINETIS_GPIOIRQ
+
+config KINETIS_PORTAINTS
+	bool "GPIOA interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port A pins
+
+config KINETIS_PORTBINTS
+	bool "GPIOB interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port B pins
+
+config KINETIS_PORTCINTS
+	bool "GPIOC interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port C pins
+
+config KINETIS_PORTDINTS
+	bool "GPIOD interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port D pins
+
+config KINETIS_PORTEINTS
+	bool "GPIOE interrupts"
+	---help---
+		Enable support for 32 interrupts from GPIO port E pins
+
+endif
+endmenu # Kinetis GPIO Interrupt Configuration
+
+menu "Kinetis Ethernet Configuration"
+	depends on KINETIS_ENET
+
+config KINETIS_ENETENHANCEDBD
+	bool "Use enhanced buffer descriptors"
+	default n
+	---help---
+		Use enhanced, 32-byte buffer descriptors
+
+config KINETIS_ENETNETHIFS
+	int "Number of Ethernet interfaces"
+	default 1
+	---help---
+		Number of Ethernet interfaces supported by the hardware.  Must be
+		one for now.
+
+config KINETIS_ENETNRXBUFFERS
+	int "Number of Ethernet Rx buffers"
+	default 6
+	---help---
+		Number of Ethernet Rx buffers to use.  The size of one buffer is
+		determined by NET_BUFSIZE
+
+config KINETIS_ENETNTXBUFFERS
+	int "Number of Ethernet Tx buffers"
+	default 2
+	---help---
+		Number of Ethernet Tx buffers to use. The size of one buffer is
+		determined by NET_BUFSIZE
+
+config KINETIS_ENETUSEMII
+	bool "Use MII interface"
+	default n
+	---help---
+		The the MII PHY interface.  Default:  Use RMII interface
+
+config KINETIS_ENET_MDIOPULLUP
+	bool "MDIO pull-up"
+	default n
+	---help---
+		If there is no on-board pull-up resister on the MII/RMII MDIO line,
+		then this option may be selected in order to configure an internal
+		pull-up on MDIO.
+
+config KINETIS_ENET_NORXER
+	bool "Suppress RXER"
+	default n
+	---help---
+		If selected, then the MII/RMII RXER output will be configured as a
+		GPIO and pulled low.
+		
+choice
+	prompt "RMII Clock Source"
+	default KINETIS_EMAC_RMIICLKEXTAL
+	depends on !KINETIS_ENETUSEMII && (ARCH_FAMILY_K64 || ARCH_FAMILY_K66)
+	---help---
+		The RMII clock can be selected between EXTAL or ENET_1588_CLKIN
+
+config KINETIS_EMAC_RMIICLKEXTAL
+	bool "Use EXTAL for RMII Clock"
+
+config KINETIS_EMAC_RMIICLK1588CLKIN
+	bool "Use ENET_1588_CLKIN for RMII Clock"
+
+endchoice # RMII Clock Source
+endmenu # Kinetis Ethernet Configuration
+
+menu "Kinetis FLEXCAN0 Configuration"
+	depends on KINETIS_FLEXCAN0
+
+config FLEXCAN0_BITRATE
+	int "CAN bitrate"
+	depends on !NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN0_SAMPLEP
+	int "CAN sample point"
+	depends on !NET_CAN_CANFD
+	default 75
+	
+config FLEXCAN0_ARBI_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN0_ARBI_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN0_DATA_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 4000000
+	
+config FLEXCAN0_DATA_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 90
+	
+endmenu # KINETIS_FLEXCAN0
+
+menu "Kinetis FLEXCAN1 Configuration"
+	depends on KINETIS_FLEXCAN1
+
+config FLEXCAN1_BITRATE
+	int "CAN bitrate"
+	depends on !NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN1_SAMPLEP
+	int "CAN sample point"
+	depends on !NET_CAN_CANFD
+	default 75
+	
+config FLEXCAN1_ARBI_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 1000000
+	
+config FLEXCAN1_ARBI_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 80
+	
+config FLEXCAN1_DATA_BITRATE
+	int "CAN FD Arbitration phase bitrate"
+	depends on NET_CAN_CANFD
+	default 4000000
+	
+config FLEXCAN1_DATA_SAMPLEP
+	int "CAN FD Arbitration phase sample point"
+	depends on NET_CAN_CANFD
+	default 90
+	
+endmenu # KINETIS_FLEXCAN1
+
+menu "Kinetis SDHC Configuration"
+	depends on KINETIS_SDHC
+
+config KINETIS_SDHC_DMA
+	bool "Support DMA data transfers"
+	default y
+	select SDIO_DMA
+	---help---
+		Support DMA data transfers.
+		Enable SD card DMA data transfers.  This is marginally optional.
+		For most usages, SD accesses will cause data overruns if used without
+		DMA.
+
+config KINETIS_SDHC_PULLUP
+	bool "Enable internal Pull-Ups"
+	default n
+	---help---
+		If you are using an external SDCard module that does not have the
+		pull-up resistors for the SDIO interface (like the Gadgeteer SD Card
+		Module) then enable this option to activate the internal pull-up
+		resistors.
+
+config KINETIS_SDHC_WIDTH_D1_ONLY
+	bool "Use D1 only"
+	default n
+	---help---
+		Select 1-bit transfer mode.  Default: 4-bit transfer mode.
+
+config KINETIS_SDHC_ABSFREQ
+	bool "Custom transfer frequencies"
+	default n
+	---help---
+		Select SDCLK frequencies corresponding to various modes of operation.
+		These values may be provided in either the NuttX configuration file
+		or in the board.h file
+
+		NOTE:  These settings are not currently used.  Since there are only
+		four frequencies, it makes more sense to just "can" the fixed
+		frequency prescaler and divider values.
+
+if KINETIS_SDHC_ABSFREQ
+
+config KINETIS_IDMODE_FREQ
+	int "ID mode frequency"
+	default 400000
+	---help---
+		Initial, ID mode SD frequency
+
+config KINETIS_MMCXFR_FREQ
+	int "MMC transfer frequency"
+	default 20000000
+	---help---
+		Frequency to use for transferring data to/from an MMC card
+
+config KINETIS_SD1BIT_FREQ
+	int "SD 1-bit transfer frequency"
+	default 20000000
+	depends on KINETIS_SDHC_WIDTH_D1_ONLY
+	---help---
+		Frequency to use for transferring data to/from an SD card using on a single data liune.
+
+config KINETIS_SD4BIT_FREQ
+	int "SD 4-bit transfer frequency"
+	default 20000000
+	depends on !KINETIS_SDHC_WIDTH_D1_ONLY
+	---help---
+		Frequency to use for transferring data to/from an SD card using all four data lines.
+
+endif
+endmenu # Kinetis SDHC Configuration
+
+#
+# MCU serial peripheral driver?
+#
+
+menu "Kinetis UART Configuration"
+if KINETIS_SERIALDRIVER || OTHER_SERIALDRIVER
+
+comment "Serial Driver Configuration"
+
+config KINETIS_UART_BREAKS
+	bool "Add TIOxSBRK to support sending Breaks"
+	depends on KINETIS_UART || KINETIS_LPUART
+	default n
+	---help---
+		Add TIOCxBRK routines to send a line break per the Kinetis manual, the
+		break will be a pulse based on the value M. This is not a BSD compatible
+		break.
+
+config KINETIS_UART_EXTEDED_BREAK
+	bool  "Selects a longer transmitted break character length"
+	depends on KINETIS_UART_BREAKS
+	default n
+	---help---
+		Sets BRK13 to send a longer transmitted break character.
+
+config KINETIS_SERIALBRK_BSDCOMPAT
+	bool "BSD compatible break the break asserted until released"
+	depends on (KINETIS_UART || KINETIS_LPUART) && KINETIS_UART_BREAKS
+	default n
+	---help---
+		Enable using a BSD compatible break: TIOCSBRK will start the break
+		and TIOCCBRK will end the break.
+
+config KINETIS_UART_SINGLEWIRE
+	bool "Single Wire Support"
+	default n
+	depends on KINETIS_UART || KINETIS_LPUART
+	---help---
+		Enable single wire UART and LPUART support. The option enables support
+		for the TIOCSSINGLEWIRE ioctl in the Kinetis serial drivers.
+
+config KINETIS_UART_INVERT
+	bool "Signal Invert Support"
+	default n
+	depends on KINETIS_UART || KINETIS_LPUART
+	---help---
+		Enable signal inversion UART support. The option enables support for the
+		TIOCSINVERT ioctl in the Kinetis serial driver.
+
+endif # KINETIS_SERIALDRIVER || OTHER_SERIALDRIVER
+
+config KINETIS_UARTFIFOS
+	bool "Enable UART0 FIFO"
+	default n
+	depends on KINETIS_UART0
+
+config KINETIS_UART0_RXDMA
+	bool "UART0 Rx DMA"
+	default n
+	depends on KINETIS_UART0 && KINETIS_DMA
+	---help---
+		In high data rate usage, Rx DMA may eliminate Rx overrun errors
+
+config KINETIS_UART1_RXDMA
+	bool "UART1 Rx DMA"
+	default n
+	depends on KINETIS_UART1 && KINETIS_DMA
+	---help---
+		In high data rate usage, Rx DMA may eliminate Rx overrun errors
+
+config KINETIS_UART2_RXDMA
+	bool "UART2 Rx DMA"
+	default n
+	depends on KINETIS_UART2 && KINETIS_DMA
+	---help---
+		In high data rate usage, Rx DMA may eliminate Rx overrun errors
+
+config KINETIS_UART3_RXDMA
+	bool "UART3 Rx DMA"
+	default n
+	depends on KINETIS_UART3 && KINETIS_DMA
+	---help---
+		In high data rate usage, Rx DMA may eliminate Rx overrun errors
+
+config KINETIS_UART4_RXDMA
+	bool "UART4 Rx DMA"
+	default n
+	depends on KINETIS_UART4 && KINETIS_DMA
+	---help---
+		In high data rate usage, Rx DMA may eliminate Rx overrun errors
+
+config KINETIS_UART5_RXDMA
+	bool "UART5 Rx DMA"
+	default n
+	depends on KINETIS_UART5 && KINETIS_DMA
+	---help---
+		In high data rate usage, Rx DMA may eliminate Rx overrun errors
+
+config KINETIS_SERIAL_RXDMA_BUFFER_SIZE
+	int "Rx DMA buffer size"
+	default 32
+	depends on UART1_RXDMA || UART2_RXDMA || UART3_RXDMA || UART4_RXDMA || UART5_RXDMA
+	---help---
+		The DMA buffer size when using RX DMA to emulate a FIFO.
+
+		When streaming data, the generic serial layer will be called
+		every time the FIFO receives half this number of bytes.
+
+		Value given here will be rounded up to next multiple of 32 bytes.
+
+endmenu # Kinetis UART Configuration
+
+config KINETIS_MERGE_TTY
+	bool "Kinetis Merge TTY names for LPUARTS"
+	default n
+	depends on KINETIS_LPUART
+	---help---
+		Enable the merging of the TTY names when both LPUARTs and UARTs
+		are defined.  When enabled, all both LPUARTS and UART types will be
+		listed as dev/ttySn. When disabled, LPUARTS willbe listed as
+		/dev/ttyLPn and UARTs as /dev/ttySn see also (KINETS_LPUART_LOWEST)
+
+config KINETS_LPUART_LOWEST
+	bool "Kinetis Order ttySn LPUARTs before UARTS"
+	default n
+	depends on KINETIS_LPUART && KINETIS_UART
+	depends on KINETIS_MERGE_TTY
+	---help---
+		Used with KINETIS_MERGE_TTY, will set the order of ttySn assignments
+		Enabled will order the LPUART's before the UARTS.

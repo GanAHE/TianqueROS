@@ -1,0 +1,920 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config LPUART_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART0_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART1_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART2_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART3_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART4_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART5_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART6_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART7_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+config LPUART8_SERIALDRIVER
+	bool
+	default n
+	select MCU_SERIAL
+
+#####################################################################################
+
+menu "LPUART0 Configuration"
+	depends on LPUART0_SERIALDRIVER
+
+config LPUART0_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART0_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART0_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART0_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART0_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART0_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART0_NOIFLOWCONTROL
+
+config LPUART0_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART0_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART0_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART0_INVERTIFLOWCONTROL
+	depends on LPUART0_RS485RTSCONTROL || LPUART0_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART0_OFLOWCONTROL
+	depends on !LPUART0_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART0_RXDMA
+	bool "LPUART0 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART0
+
+config LPUART0_TXDMA
+	bool "LPUART0 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART0
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART1 Configuration"
+	depends on LPUART1_SERIALDRIVER
+
+config LPUART1_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART1_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART1_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART1_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART1_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART1_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART1_NOIFLOWCONTROL
+
+config LPUART1_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART1_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART1_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART1_INVERTIFLOWCONTROL
+	depends on LPUART1_RS485RTSCONTROL || LPUART1_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART1_OFLOWCONTROL
+	depends on !LPUART1_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART1_RXDMA
+	bool "LPUART1 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART1
+
+config LPUART1_TXDMA
+	bool "LPUART1 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART1
+
+endmenu
+
+#####################################################################################
+
+#####################################################################################
+
+menu "LPUART2 Configuration"
+	depends on LPUART2_SERIALDRIVER
+
+config LPUART2_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART2_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART2_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART2_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART2_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART2_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART2_NOIFLOWCONTROL
+
+config LPUART2_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART2_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART2_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART2_INVERTIFLOWCONTROL
+	depends on LPUART2_RS485RTSCONTROL || LPUART2_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART2_OFLOWCONTROL
+	depends on !LPUART2_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART2_RXDMA
+	bool "LPUART2 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART2
+
+config LPUART2_TXDMA
+	bool "LPUART2 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART2
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART3 Configuration"
+	depends on LPUART3_SERIALDRIVER
+
+config LPUART3_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART3_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART3_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART3_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART3_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART3_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART3_NOIFLOWCONTROL
+
+config LPUART3_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART3_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART3_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART3_INVERTIFLOWCONTROL
+	depends on LPUART3_RS485RTSCONTROL || LPUART3_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART3_OFLOWCONTROL
+	depends on !LPUART3_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART3_RXDMA
+	bool "LPUART3 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART3
+
+config LPUART3_TXDMA
+	bool "LPUART3 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART3
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART4 Configuration"
+	depends on LPUART4_SERIALDRIVER
+
+config LPUART4_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART4_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART4_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART4_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART4_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART4_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART4_NOIFLOWCONTROL
+
+config LPUART4_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART4_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART4_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART4_INVERTIFLOWCONTROL
+	depends on LPUART4_RS485RTSCONTROL || LPUART4_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART4_OFLOWCONTROL
+	depends on !LPUART4_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART4_RXDMA
+	bool "LPUART4 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART4
+
+config LPUART4_TXDMA
+	bool "LPUART4 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART4
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART5 Configuration"
+	depends on LPUART5_SERIALDRIVER
+
+config LPUART5_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART5_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART5_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART5_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART5_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART5_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART5_NOIFLOWCONTROL
+
+config LPUART5_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART5_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART5_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART5_INVERTIFLOWCONTROL
+	depends on LPUART5_RS485RTSCONTROL || LPUART5_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART5_OFLOWCONTROL
+	depends on !LPUART5_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART5_RXDMA
+	bool "LPUART5 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART5
+
+config LPUART5_TXDMA
+	bool "LPUART5 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART5
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART6 Configuration"
+	depends on LPUART6_SERIALDRIVER
+
+config LPUART6_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART6_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART6_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART6_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART6_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART6_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART6_NOIFLOWCONTROL
+
+config LPUART6_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART6_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART6_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART6_INVERTIFLOWCONTROL
+	depends on LPUART6_RS485RTSCONTROL || LPUART6_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART6_OFLOWCONTROL
+	depends on !LPUART6_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART6_RXDMA
+	bool "LPUART6 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART6
+
+config LPUART6_TXDMA
+	bool "LPUART6 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART6
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART7 Configuration"
+	depends on LPUART7_SERIALDRIVER
+
+config LPUART7_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART7_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART7_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART7_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART7_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART7_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART7_NOIFLOWCONTROL
+
+config LPUART7_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART7_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART7_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART7_INVERTIFLOWCONTROL
+	depends on LPUART7_RS485RTSCONTROL || LPUART7_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART7_OFLOWCONTROL
+	depends on !LPUART7_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART7_RXDMA
+	bool "LPUART7 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART7
+
+config LPUART7_TXDMA
+	bool "LPUART7 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART7
+
+endmenu
+
+#####################################################################################
+
+menu "LPUART8 Configuration"
+	depends on LPUART8_SERIALDRIVER
+
+config LPUART8_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config LPUART8_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config LPUART8_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the LPUART.
+
+config LPUART8_BITS
+	int "Character size"
+	default 8
+	---help---
+		The number of bits.  Must be either 7 or 8.
+
+config LPUART8_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+config LPUART8_2STOP
+	int "Uses 2 stop bits"
+	default 0
+	---help---
+		1=Two stop bits
+choice
+	prompt "IFLOW Control"
+	default LPUART8_NOIFLOWCONTROL
+
+config LPUART8_NOIFLOWCONTROL
+	bool "No IFLOW control"
+	---help---
+		No IFLOW control
+
+config LPUART8_RS485RTSCONTROL
+	bool "RTS for RS485 Direction"
+	select SERIAL_RS485CONTROL
+	---help---
+		 Use RTS pin for RS485 direction switching
+
+config LPUART8_IFLOWCONTROL
+	bool "RTS for IFLOW control"
+	select SERIAL_IFLOWCONTROL
+	---help---
+		Enable RTS flow control
+endchoice
+
+config LPUART8_INVERTIFLOWCONTROL
+	depends on LPUART8_RS485RTSCONTROL || LPUART8_IFLOWCONTROL
+	bool "Invert sense of RTS bit"
+	default n
+	---help---
+		Make RTS bit active high rather than active low
+
+config LPUART8_OFLOWCONTROL
+	depends on !LPUART8_RS485RTSCONTROL
+	bool "CTS OFLOW control"
+	default n
+	select SERIAL_OFLOWCONTROL
+	---help---
+		Enable CTS flow control
+
+config LPUART8_RXDMA
+	bool "LPUART8 Rx DMA support"
+	default n
+	select SERIAL_RXDMA
+	---help---
+		Enable Rx DMA transfers on LPUART8
+
+config LPUART8_TXDMA
+	bool "LPUART8 Tx DMA support"
+	default n
+	select SERIAL_TXDMA
+	---help---
+		Enable Tx DMA transfers on LPUART8
+
+endmenu

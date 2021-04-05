@@ -1,0 +1,1045 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+comment "MTD Configuration"
+
+config MTD_PARTITION
+	bool "Support MTD partitions"
+	default n
+	---help---
+		MTD partitions are build as MTD drivers that manage a sub-region
+		of the FLASH memory.  The contain the original FLASH MTD driver and
+		simply manage all accesses to assure that (1) FLASH accesses are
+		always offset to the beginning of the partition, and (2) that FLASH
+		accesses do not extend outside of the partition.
+
+		A FLASH device may be broken up into several partitions managed,
+		each managed by a separate MTD driver.  The MTD partition interface
+		is described in:
+
+			include/nuttx/mtd/mtd.h
+			FAR struct mtd_dev_s *mtd_partition(FAR struct mtd_dev_s *mtd, off_t offset, off_t nblocks);
+
+		Each call to mtd_partition() will create a new MTD driver instance
+		managing the sub-region of flash beginning at 'offset' (in blocks)
+		and of size 'nblocks' on the device specified by 'mtd'.
+
+config FTL_WRITEBUFFER
+	bool "Enable write buffering in the FTL layer"
+	default n
+	depends on DRVR_WRITEBUFFER && FS_WRITABLE
+
+config FTL_READAHEAD
+	bool "Enable read-ahead buffering in the FTL layer"
+	default n
+	depends on DRVR_READAHEAD
+
+config MTD_SECT512
+	bool "512B sector conversion"
+	default n
+	---help---
+		If enabled, a MTD driver will be created that will convert the
+		sector size of any other MTD driver to a 512 byte "apparent" sector
+		size.  The managed MTD driver in this case must have an erase block
+		size that is greater than 512B and an even multiple of 512B.
+
+if MTD_SECT512
+
+config MTD_SECT512_ERASED_STATE
+	hex "Erased state of the FLASH"
+	default 0xff
+
+config MTD_SECT512_READONLY
+	bool "512B read-only"
+	default n
+
+endif # MTD_SECT512
+
+config MTD_PARTITION_NAMES
+	bool "Support MTD partition naming"
+	depends on FS_PROCFS
+	depends on MTD_PARTITION
+	default n
+	---help---
+		MTD partitions can be assigned a name for reporting via the procfs
+		file system interface.  This adds an API which must be called to
+		specify the partition name.
+
+config MTD_BYTE_WRITE
+	bool "Byte write"
+	default n
+	---help---
+		Some devices (such as the EON EN25F80) support writing an arbitrary
+		number of bytes to FLASH. This setting enables MTD interfaces to
+		support such writes.  The SMART file system can take advantage of
+		this option if it is enabled.
+
+config MTD_WRBUFFER
+	bool "Enable MTD write buffering"
+	default n
+	depends on DRVR_WRITEBUFFER
+	select DRVR_INVALIDATE
+	select DRVR_READBYTES
+	---help---
+		Build the mtd_rwbuffer layer and enable support for write buffering.
+
+if MTD_WRBUFFER
+
+config MTD_NWRBLOCKS
+	int "MTD write buffer size"
+	default 4
+	---help---
+		The size of the MTD write buffer (in blocks)
+
+endif # MTD_WRBUFFER
+
+config MTD_READAHEAD
+	bool "Enable MTD read-ahead buffering"
+	default n
+	depends on DRVR_READAHEAD
+	select DRVR_INVALIDATE
+	select DRVR_READBYTES
+	---help---
+		Build the mtd_rwbuffer layer and enable support for read-ahead buffering.
+
+if MTD_READAHEAD
+
+config MTD_NRDBLOCKS
+	int "MTD read-head buffer size"
+	default 4
+	---help---
+		The size of the MTD read-ahead buffer (in blocks)
+
+endif # MTD_READAHEAD
+
+config MTD_PROGMEM
+	bool "Enable on-chip program FLASH MTD device"
+	default n
+	---help---
+		Enable to support an MTD device that supports the on-chip FLASH
+		using the interfaces defined in include/nuttx/progmem.  Those
+		interfaces must be exported by chip-specific logic.
+
+config MTD_CONFIG
+	bool "Enable Dev Config (MTD based) device"
+	default n
+	---help---
+		Provides a /dev/config device for saving / restoring application
+		configuration data to a standard MTD device or partition.
+
+if MTD_CONFIG
+
+config MTD_CONFIG_RAM_CONSOLIDATE
+	bool "Always use RAM consolidation method (work in progress)"
+	default n
+	---help---
+		When the MTD device used for /dev/config contains more than one
+		erase block, the "unused entry" consolidation reserves one erase
+		block by default for cleanup purposes.  This consumes the minimum
+		amount of RAM, however it "wastes" one erase block on the device.
+		(For configurations that have only a single erase block assigned
+		to the config device, RAM consolidation is the ONLY option.)
+
+		Another approach is to allow the driver to use the entire MTD
+		device (or partition) to save config data, and then allocate a
+		RAM buffer (the size of one erase block) to perform the
+		consolidation.  Enabling this feature basically trades off RAM
+		usage for FLASH usage.  If the MTD device used for config data
+		has small erase sizes (4K, etc.) and there is plenty of free RAM
+		available, then this is probably a good option.
+
+		Another benefit of this option is it reduces code space a bit
+		since the "reserved block" consolidate routine is not needed.
+
+config MTD_CONFIG_ERASEDVALUE
+	hex "Erased value of bytes on the MTD device"
+	default 0xff
+	---help---
+		Specifies the value of the erased state of the MTD FLASH.  For
+		most FLASH parts, this is 0xff, but could also be zero depending
+		on the device.
+
+config MTD_CONFIG_NAMED
+	bool "Use item NAMES instead of ID/enumeration in Dev Config device"
+	default n
+	---help---
+		Changes config item identification from ID/INST to NAMED values.
+
+config MTD_CONFIG_NAME_LEN
+	int "Dev Config item max name length"
+	default 24
+	depends on MTD_CONFIG_NAMED
+	---help---
+		Sets the maximum length of config item names.
+
+endif # MTD_CONFIG
+
+comment "MTD Device Drivers"
+
+menuconfig MTD_NAND
+	bool "MTD NAND support"
+	default n
+	---help---
+		Enable support for NAND FLASH devices.
+
+if MTD_NAND
+
+config MTD_NAND_MAXNUMBLOCKS
+	int "Max blocks"
+	default 1024
+	---help---
+		Maximum number of blocks in a device
+
+config MTD_NAND_MAXNUMPAGESPERBLOCK
+	int "Max pages per block"
+	default 256
+	---help---
+		Maximum number of pages in one block
+
+config MTD_NAND_MAXPAGEDATASIZE
+	int "Max page size"
+	default 4096
+	---help---
+		Maximum size of the data area of one page, in bytes.
+
+config MTD_NAND_MAXPAGESPARESIZE
+	int "Max size of spare area"
+	default 256
+	---help---
+		Maximum size of the spare area of one page, in bytes.
+
+config MTD_NAND_MAXSPAREECCBYTES
+	int "Max number of ECC bytes"
+	default 48
+	---help---
+		Maximum number of ECC bytes stored in the spare for one single page.
+
+config MTD_NAND_BLOCKCHECK
+	bool "Block check"
+	default y
+	---help---
+		Enable support for ECC and bad block checking.
+
+config MTD_NAND_SWECC
+	bool "Software ECC support"
+	default n if ARCH_NAND_HWECC
+	default y if !ARCH_NAND_HWECC
+	---help---
+		Build in logic to support software calculation of ECC.
+
+config MTD_NAND_HWECC
+	bool "Hardware ECC support"
+	default n
+	depends on ARCH_NAND_HWECC
+	---help---
+		Build in logic to support hardware calculation of ECC.
+
+config MTD_NAND_MAXSPAREEXTRABYTES
+	int "Max extra free bytes"
+	default 206
+	---help---
+		Maximum number of extra free bytes inside the spare area of a page.
+
+config MTD_NAND_EMBEDDEDECC
+	bool "Support devices with Embedded ECC"
+	default n
+	---help---
+		Some NAND devices have internal, embedded ECC function.  One (the
+		only one supported) is Micron, 4-bit ECC, device size = 1Gb or 2Gb
+		or 4Gb.
+
+endif # MTD_NAND
+
+config RAMMTD
+	bool "RAM-based MTD driver"
+	default n
+	---help---
+		Build support for a RAM-based MTD driver.
+
+if RAMMTD
+
+config RAMMTD_BLOCKSIZE
+	int "RAM MTD block size"
+	default 512
+
+config RAMMTD_ERASESIZE
+	int "RAM MTD erase block size"
+	default 4096
+
+config RAMMTD_ERASESTATE
+	hex "Simulated erase state"
+	default 0xff
+
+config RAMMTD_FLASHSIM
+	bool "RAM MTD FLASH Simulation"
+	default n
+	---help---
+		RAMMTD_FLASHSIM will add some extra logic to improve the level of
+		FLASH simulation.
+
+endif # RAMMTD
+
+config FILEMTD
+	bool "File-based MTD driver"
+	default n
+	---help---
+		Build support for a File-based MTD driver.
+
+if FILEMTD
+
+config FILEMTD_BLOCKSIZE
+	int "File MTD block size"
+	default 512
+
+config FILEMTD_ERASESIZE
+	int "File MTD erase block size"
+	default 4096
+
+config FILEMTD_ERASESTATE
+	hex "Simulated erase state"
+	default 0xff
+
+endif # FILEMTD
+
+config MTD_AT24XX
+	bool "I2C-based AT24xx eeprom"
+	default n
+	select I2C
+	---help---
+		Build support for I2C-based AT24CXX EEPROM(at24c32, at24c64,
+		at24c128, at24c256)
+
+if MTD_AT24XX
+
+config AT24XX_MULTI
+	bool "Multiple AT24XX devices"
+	default n
+	---help---
+		Build in additional support for multiple AT24XX devices, each with
+		dynamically allocated device structures with a separate I2C
+		addresses (but otherwise identical -- support for multiple, different
+		AT24xx, devices not yet supported).
+
+config AT24XX_SIZE
+	int "AT24xx size (Kbit)"
+	default 64
+	---help---
+		This is the XX in the AT24Cxx part number.  For example, if you have a
+		AT 24C512, then the correct value is 512.  This value is also the capacity
+		of the part in kilobits.  For example, the 24C512 supports 512 Kbits or
+		512 /8 = 64 KiB.
+
+config AT24XX_ADDR
+	hex "AT24XX I2C address"
+	default 0x50
+	range 0x50 0x57
+	depends on !AT24XX_MULTI
+	---help---
+		The I2C address of the FLASH part.  This is should be 0b01010aaa
+		(where aaa is determined by board/pin configuration).
+
+		For accesses to "extended memory" accesses, the driver will set
+		bit 3 of this address using 0xb01011aaa as the I2C address.
+
+config AT24XX_EXTENDED
+	bool "Extended memory"
+	default n
+	---help---
+		If the device supports extended memory, then this operation may be set
+		to enabled the MTDIOC_EXTENDED ioctl() operation.  When the
+		extended operation is selected, calls to the driver read method will
+		return data from the extended memory region.
+
+config AT24XX_EXTSIZE
+	int "Extended memory size (bytes)"
+	default 0
+	depends on AT24XX_EXTENDED
+	---help---
+		If the device supports extended memory, then this option provides
+		the size of the memory in bytes.
+
+		Other, block-oriented access are not effected by this setting
+
+config AT24XX_FREQUENCY
+	int "AT24xx I2C bus frequency"
+	default 100000
+	---help---
+		Set the I2C frequency to use when accessing the AT24CXX EEPROM. This value
+		must represent a valid I2C speed (normally less than 400.000) or the driver
+		might fail.
+
+endif # MTD_AT24XX
+
+config MTD_AT25
+	bool "SPI-based AT25 FLASH"
+	default n
+	select SPI
+
+if MTD_AT25
+
+config AT25_SPIMODE
+	int "AT25 SPI Mode"
+	default 0
+
+config AT25_SPIFREQUENCY
+	int "AT25 SPI Frequency"
+	default 20000000
+
+endif # MTD_AT25
+
+config MTD_AT45DB
+	bool "SPI-based AT45DB flash"
+	default n
+	select SPI
+
+if MTD_AT45DB
+
+config AT45DB_FREQUENCY
+	int "AT45DB frequency"
+	default 1000000
+
+config AT45DB_PREWAIT
+	bool "Enable higher performance write logic"
+	default y
+
+config AT45DB_PWRSAVE
+	bool "Enable power save"
+	default n
+
+endif # MTD_AT45DB
+
+config MTD_IS25XP
+	bool "SPI-based IS25XP FLASH"
+	default n
+	select SPI
+
+if MTD_IS25XP
+
+config IS25XP_SPIMODE
+	int "IS25 SPI Mode"
+	default 0
+
+config IS25XP_SPIFREQUENCY
+	int "IS25 SPI Frequency"
+	default 20000000
+
+endif # MTD_IS25XP
+
+config MTD_M25P
+	bool "SPI-based M25P/MT25Q FLASH"
+	default n
+	select SPI
+
+if MTD_M25P
+
+config M25P_SPIMODE
+	int "M25P SPI mode"
+	default 0
+
+config M25P_SPIFREQUENCY
+	int "M25P SPI Frequency"
+	default 20000000
+
+config M25P_MANUFACTURER
+	hex "M25P manufacturers ID"
+	default 0x20
+	---help---
+		Various manufacturers may have produced the parts.  0x20 is the manufacturer ID
+		for the STMicro MP25x serial FLASH.  If, for example, you are using the a Macronix
+		International MX25 serial FLASH, the correct manufacturer ID would be 0xc2.
+
+config M25P_MEMORY_TYPE
+	hex "M25P memory type ID"
+	default 0x20
+	---help---
+		The memory type for M25 "P" series is 0x20, but the driver also supports "F" series
+		devices, such as the EON EN25F80 part which adds a 4K sector erase capability.  The
+		memory type for "F" series parts from EON is 0x31.  The 4K sector erase size will
+		automatically be enabled when filesystems that can use it are enabled, such as SMART.
+
+config MT25Q_MEMORY_TYPE
+	hex "MT25Q memory type ID"
+	default 0xBA
+	---help---
+		The memory type for MT25 "Q" series is 0xBA.
+
+config M25P_SUBSECTOR_ERASE
+	bool "Sub-Sector Erase"
+	default n
+	---help---
+		Some devices (such as the EON EN25F80) support a smaller erase block
+		size (4K vs 64K).  This option enables support for sub-sector erase.
+		The SMART file system can take advantage of this option if it is enabled.
+
+endif # MTD_M25P
+
+config MTD_MX25L
+	bool "SPI-based MX25L3233F / MX25L6433F"
+	default n
+	select SPI
+	---help---
+		SPI-based driver for Macronix MX25L3233F or MX25L6433F.
+
+if MTD_MX25L
+
+config MX25L_SPIMODE
+	int "MX25L SPI mode"
+	default 0
+
+config MX25L_SPIFREQUENCY
+	int "MX25L SPI Frequency"
+	default 20000000
+
+config MX25L_SECTOR512
+	bool "Simulate 512 byte Erase Blocks"
+	default n
+
+config MX25L_SUBSECTOR_ERASE
+	bool "Sub-Sector Erase"
+	default n
+	---help---
+		Some devices (such as the EON EN25F80) support a smaller erase block
+		size (4K vs 64K).  This option enables support for sub-sector erase.
+		The SMART file system can take advantage of this option if it is enabled.
+
+config MX25L_DEBUG
+	bool "Enable driver debug features"
+	default n
+
+endif # MTD_MX25L
+
+config MTD_MX35
+	bool "SPI-based MX35LF1GE4AB / MX35LF2GE4AB"
+	default n
+	select SPI
+	---help---
+		SPI-based driver for Macronix MX35LF1GE4AB or MX35LF2GE4AB.
+
+if MTD_MX35
+
+config MX35_SPIMODE
+	int "MX35 SPI mode"
+	default 0
+
+config MX35_SPIFREQUENCY
+	int "MX35 SPI Frequency"
+	default 104000000
+	---help---
+		SPI frequency for MX35 is 104 MHz.
+
+endif # MTD_MX35
+
+config MTD_S25FL1
+	bool "QuadSPI-based S25FL1 FLASH"
+	default n
+
+if MTD_S25FL1
+
+config S25FL1_QSPIMODE
+	int "S25FL1 QuadSPI Mode"
+	default 0
+
+config S25FL1_QSPI_FREQUENCY
+	int "S25FL1 QuadSPI Frequency"
+	default 108000000
+	---help---
+		Per data sheet:
+		– Normal Read (Serial):
+			– 50 MHz clock rate (-40°C to +85°C/105°C)
+			– 45 MHz clock rate (-40°C to +125°C)
+		– Fast Read (Serial):
+			– 108 MHz clock rate (-40°C to +85°C/105°C)
+			– 97 MHz clock rate (-40°C to +125°C)
+		– Dual Read:
+			– 108 MHz clock rate (-40°C to +85°C/105°C)
+			– 97 MHz clock rate (-40°C to +125°C)
+		– Quad Read:
+			– 108 MHz clock rate (-40°C to +85°C/105°C)
+			– 97 MHz clock rate for S25FL164K (-40°C to +125°C)
+
+		- Clock frequency for all SPI commands except for Read Data
+		  command (0x03) and Fast Read command (0x0b): 108 MHz
+		- Clock frequency for Read Data command (0x03): 50 MHz
+		- Clock frequency for all Fast Read commands SIO and MIO: 108 MHz
+
+		In this implementation, only "Quad" reads are performed.
+
+config S25FL1_SECTOR512
+	bool "Simulate 512 byte Erase Blocks"
+	default n
+
+config S25FL1_SCRAMBLE
+	bool "Scramble data"
+	default n
+	---help---
+		Requires driver support for data scrambling/descrambling.
+
+config S25FL1_SCRAMBLE_KEY
+	hex "Scramble key"
+	default 0x0baddead
+	depends on S25FL1_SCRAMBLE
+
+endif # MTD_S25FL1
+
+config MTD_N25QXXX
+	bool "QuadSPI-based Micron N25QXXX family FLASH"
+	default n
+	---help---
+		Support the N25Q016A, N25Q032A, N25Q064A, N25Q128A, N25Q256A
+
+if MTD_N25QXXX
+
+config N25QXXX_QSPIMODE
+	int "N25QXXX QuadSPI Mode"
+	default 0
+	---help---
+		This device can operate in SPI mode 0 or 3.
+
+config N25QXXX_QSPI_FREQUENCY
+	int "N25QXXX QuadSPI Frequency"
+	default 108000000
+	---help---
+		- Clock frequency for all SPI commands except for Read Data
+		  command (0x03)
+		- Clock frequency for Read Data command (0x03): 54 MHz
+		In this implementation, only "Quad" reads are performed.
+
+config N25QXXX_SECTOR512
+	bool "Simulate 512 byte Erase Blocks"
+	default n
+
+endif # MTD_N25QXXX
+
+config MTD_MX25RXX
+	bool "QuadSPI-based Macronix MX25RXX family FLASH"
+	default n
+	---help---
+		Support the MX25R6435F chip
+
+if MTD_MX25RXX
+
+config MX25RXX_QSPIMODE
+	int "MX25RXX QuadSPI Mode"
+	default 0
+	---help---
+		This device can operate in SPI mode 0 or 3.
+
+config MX25RXX_QSPI_FREQUENCY
+	int "MX25RXX QuadSPI Frequency"
+	default 33000000
+	---help---
+		Clock frequency for all SPI commands except for Read Data
+		command. Dual and Quad read methods need different frequency
+		in low power mode (Only Quad read is supported in this driver).
+
+config MX25RXX_QSPI_READ_FREQUENCY
+	int "MX25RXX QuadSPI Read command frequency"
+	default 8000000
+	---help---
+		Clock frequency for read data command.
+		Only Quad read is supported in this driver.
+
+config MX25RXX_SECTOR512
+	bool "Simulate 512 byte Erase Blocks"
+	default n
+
+endif # MTD_MX25RXX
+
+config MTD_SMART
+	bool "Sector Mapped Allocation for Really Tiny (SMART) Flash support"
+	default n
+	---help---
+		The MP25x series of Flash devices are typically very small and have a very large
+		erase block size.  This causes issues with the standard Flash Translation Layer
+		block driver since it tries to allocate a RAM block the size of a flash erase
+		block, which is typically 64K.  This block driver uses a different approach
+		to sacrifice performance for RAM memory footprint by saving data in sectors
+		(typically 2K - 4K based on memory size) and relocating sectors as needed when
+		an erase block needs to be erased.
+
+if MTD_SMART
+
+config SMART_DEV_LOOP
+	bool "Enable SMART loop device"
+	select FILEMTD
+	default n
+	---help---
+		Supports a smart loop device that can be used to export a
+		file (or character device) as a SMART block device.
+
+config MTD_SMART_SECTOR_SIZE
+	int "SMART Device sector size"
+	default 1024
+	---help---
+		Sets the size of a single allocation on the SMART device.  Larger sector sizes
+		reduce overhead per sector, but cause more wasted space with a lot of smaller
+		files.
+
+config MTD_SMART_WRITEBUFFER
+	bool "Enable SMART write buffering"
+	default n
+	depends on DRVR_WRITEBUFFER
+
+config MTD_SMART_READAHEAD
+	bool "Enable SMART read-ahead buffering"
+	default n
+	depends on DRVR_READAHEAD
+
+config MTD_SMART_WEAR_LEVEL
+	bool "Support FLASH wear leveling"
+	depends on MTD_SMART
+	default y
+	---help---
+		Adds extra logic and RAM to guarantee equal wear leveling of the FLASH
+		device by recording and monitoring erase block operations and selecting
+		sector allocations to ensure all erase blocks are worn evenly.  This will
+		evenly wear both dynamic and static data on the device.
+
+if MTD_SMART_WEAR_LEVEL && !SMART_CRC_16
+
+config MTD_SMART_CONVERT_WEAR_FORMAT
+	bool "Convert existing non wear leveling FLASH to wear leveling"
+	default n
+	---help---
+		Adds a little extra code which detects an existing SMART format on a device
+		that was created prior to the wear leveling implementation.  This conversion
+		only works if either no CRC is being used or if CRC-8 is being used as other
+		CRC versions use a different header format and require a mksmartfs on the
+		device even if an existing format is there.
+
+endif # MTD_SMART_WEAR_LEVEL && !SMART_CRC_16
+
+config MTD_SMART_ENABLE_CRC
+	bool "Enable Sector CRC error detection"
+	depends on MTD_SMART
+	default n
+	---help---
+		Enables logic to compute and validate a CRC for logical sectors.  The
+		CRC is calculated for all bytes in the logical sector.  The CRC size is
+		selectable (8-bit, 16-bit, 32-bit).  For added protection, larger CRCs should
+		be used with larger (2K - 4K) sector sizes.  Enabling CRC protection will
+		cause increased sector relocation and increased erase block erasures since
+		directory and wear-level status updates can no longer be performed in-place
+		and mandate re-writing the information to a new sector.
+
+		An 8-bit CRC protection scheme can be added to an existing non-CRC formatted
+		SMART volume without needing to reformat the drive.  As sectors are re-written
+		or relocated, they will be converted to CRC protected sectors.
+
+choice
+	prompt "CRC level selection"
+	depends on MTD_SMART_ENABLE_CRC
+	default SMART_CRC_8
+	---help---
+		Select the level of CRC protection implemented in the SMART MTD layer.
+		Smaller CRC selection uses less overhead per logical sectors, but also has
+		a higher probability of not detecting multiple bit errors.  Devices with
+		larger logical sector sizes should use a larger CRC.
+
+config SMART_CRC_8
+	bool "CRC-8"
+
+config SMART_CRC_16
+	bool "CRC-16"
+
+endchoice # CRC level selection
+
+config MTD_SMART_MINIMIZE_RAM
+	bool "Minimize SMART RAM usage using logical sector cache"
+	depends on MTD_SMART
+	default 0
+	---help---
+		Reduces RAM usage in the SMART MTD layer by replacing the 1-for-1 logical to
+		physical sector map with a smaller cache-based structure.  This can save a
+		considerable amount of RAM on devices with a large sector count, but at the
+		expense of increased read/write times when a cache miss occurs.  If the
+		requested logical sector has not been cached, then the device will need to be
+		scanned to located it on the physical medium.
+
+config MTD_SMART_SECTOR_CACHE_SIZE
+	int "Number of entries in the SMART logical sector cache"
+	depends on MTD_SMART_MINIMIZE_RAM
+	default 512
+	---help---
+		Sets the size of the cache used for logical to physical sector mapping.  A
+		larger number allows larger files to be "seek"ed randomly without encountering
+		cache misses.  Any files larger than CACH_SIZE * SECTOR_SIZE that are seeked
+		start to end will cause the cache to flush forcing manual scanning of the
+		MTD device to find the logical to physical mappings.
+
+config MTD_SMART_SECTOR_PACK_COUNTS
+	bool "Pack free and release counts when possible"
+	depends on MTD_SMART_MINIMIZE_RAM
+	default y
+	---help---
+		For volumes with 16 sectors per erase block or less, this option causes the
+		free sector and released sector counts used for allocation and garbage
+		collection to be packed such that two values are stored per byte.  For
+		volumes with 16 sectors per erase block, the 4 LSBs are packed and all of
+		the high-order bits are packed separately (8 per byte).  This squeezes even
+		more RAM out.
+
+config MTD_SMART_SECTOR_ERASE_DEBUG
+	bool "Track Erase Block erasure counts"
+	depends on MTD_SMART
+	default n
+	---help---
+		Allocates an Erase Block erase count array and keeps track of the number
+		of erases per erase block.  This data is then presented on the procfs
+		interface.
+
+config MTD_SMART_ALLOC_DEBUG
+	bool "RAM Allocation Debug"
+	depends on MTD_SMART
+	default n
+	---help---
+		Records all SMART MTD layer allocations for debug purposes and makes them
+		accessible from the ProcFS interface if it is enabled.
+
+endif # MTD_SMART
+
+config MTD_RAMTRON
+	bool "SPI-based RAMTRON NVRAM Devices FM25V10"
+	default n
+	select SPI
+	---help---
+		SPI-based RAMTRON NVRAM Devices FM25V10
+
+if MTD_RAMTRON
+
+config RAMTRON_WRITEWAIT
+	bool "Wait after write"
+	default n
+	---help---
+		Wait after performing a RAMTRON write operation to assure that the
+		write completed error-free.  The default behavior is to wait for the
+		previous write to complete BEFORE starting the next write.  This
+		option, if selected, forces the driver to wait for the write to
+		complete AFTER each write.  This is a tradoeff:  Selecting this
+		option will significantly reduce RAMTRON performance but has the
+		advantage that it will correctly associate a write failure with a
+		specific write operation.
+
+		One RAMTRON read operations, this option also enables some additional
+		status checking to check for device failures during the read.
+
+config RAMTRON_SETSPEED
+	bool "Adjustable bus speed"
+	default n
+	---help---
+		Select an option to provide an ioctl, MTDIOC_SETSPEED call that
+		supports dynamic selection of the RAMTRON bus speed.
+
+config RAMTRON_CHUNKING
+	bool "Support chunked writes"
+	default n
+	---help---
+		Some Re-RAMs like MB85AS4MT have write buffer size limitation and
+		require smaller, "chunked" writes.
+
+endif # MTD_RAMTRON
+
+config MTD_SST25
+	bool "SPI-based SST25 FLASH"
+	default n
+	select SPI
+
+if MTD_SST25
+
+config SST25_SPIMODE
+	int "SST25 SPI Mode"
+	default 0
+
+config SST25_SPIFREQUENCY
+	int "SST25 SPI Frequency"
+	default 20000000
+
+config SST25_READONLY
+	bool "SST25 Read-Only FLASH"
+	default n
+
+config SST25_SECTOR512
+	bool "Simulate 512 byte Erase Blocks"
+	default n
+
+config SST25_SLOWWRITE
+	bool
+	default n
+	---help---
+		There used to be a bug in the current code when using the higher speed AAI
+		write sequence. The nature of the bug is that the WRDI instruction is not
+		working. At the end of the AAI sequence, the status register continues to
+		report that the SST25 is write enabled (WEL bit) and in AAI mode (AAI
+		bit).  This has been fixed by David Sidrane!
+
+config SST25_SLOWREAD
+	bool
+	default n
+
+endif # MTD_SST25
+
+config MTD_SST25XX
+	bool "SPI-based SST25XX FLASH (64-MBit and larger)"
+	default n
+	select SPI
+	---help---
+		With the 64 MBit and larger parts, SST changed the write mechanism to
+		support page write instead of byte/word write like the smaller parts.
+		As a result, the SST25 driver is not compatible with the larger density
+		parts, and the SST25XX driver must be used instead.
+
+if MTD_SST25XX
+
+config SST25XX_SPIMODE
+	int "SST25 SPI Mode"
+	default 0
+
+config SST25XX_SPIFREQUENCY
+	int "SST25 SPI Frequency"
+	default 20000000
+
+config SST25XX_MANUFACTURER
+	hex "Manufacturers ID"
+	default 0xBF
+	---help---
+		Various manufacturers may have produced the parts.  0xBF is the manufacturer ID
+		for the parts manufactured by SST.
+
+config SST25XX_MEMORY_TYPE
+	hex "Memory type ID"
+	default 0x25
+	---help---
+		The memory type for SST25VF065 series is 0x25, but this can be modified if needed
+		to support compatible devices from different manufacturers.
+
+endif # MTD_SST25XX
+
+config MTD_SST26
+	bool "SPI/QSPI-based SST26XX FLASHes (16,32,64-MBit)"
+	default n
+	select SPI
+	---help---
+		These part are also different from SST25 and SST25XX, they support both SPI and QSPI.
+
+if MTD_SST26
+
+config SST26_SPIMODE
+	int "SST26 (Q)SPI Mode"
+	default 0
+
+config SST26_SPIFREQUENCY
+	int "SST26 (Q)SPI Frequency"
+	default 64000000
+
+config SST26_MANUFACTURER
+	hex "Manufacturers ID"
+	default 0xBF
+	---help---
+		Various manufacturers may have produced the parts.  0xBF is the manufacturer ID
+		for the parts manufactured by SST.
+
+config SST26_MEMORY_TYPE
+	hex "Memory type ID"
+	default 0x26
+	---help---
+		The memory type for SST26VF0xx series is 0x26, but this can be modified if needed
+		to support compatible devices from different manufacturers.
+
+config SST26_DEBUG
+	bool "Debug output from the SST26 driver"
+	depends on DEBUG_FS
+	default n
+
+endif # MTD_SST26
+
+config MTD_SST39FV
+	bool "SST39FV NOR FLASH"
+	default n
+	---help---
+		Selects 16-bit SST NOR FLASH.  This includes support for:
+
+		SST39FV1601/SST39FV1602:  2Mb
+		SST39FV3201/SST39FV3202:  4Mb
+
+if MTD_SST39FV
+
+config SST39VF_BASE_ADDRESS
+	hex "SST39FV bass address"
+	default 0x00000000
+	---help---
+		This is the address where the SST29VF FLASH can be found in memory.
+
+endif # MTD_SST39FV
+
+config MTD_W25
+	bool "SPI-based W25 FLASH"
+	default n
+	select SPI
+
+if MTD_W25
+
+config W25_SPIMODE
+	int "W25 SPI Mode"
+	default 0
+
+config W25_SPIFREQUENCY
+	int "W25 SPI Frequency"
+	default 20000000
+
+config W25_READONLY
+	bool "W25 Read-Only FLASH"
+	default n
+
+config W25_SECTOR512
+	bool "Simulate 512 byte Erase Blocks"
+	default n
+
+config W25_SLOWREAD
+	bool
+	default n
+
+endif # MTD_W25
+
+config MTD_GD25
+	bool "SPI-based GD25 FLASH"
+	default n
+	select SPI
+
+if MTD_GD25
+
+config GD25_SPIMODE
+	int "GD25 SPI Mode"
+	default 0
+
+config GD25_SPIFREQUENCY
+	int "GD25 SPI Frequency"
+	default 20000000
+
+config GD25_READONLY
+	bool "GD25 Read-Only FLASH"
+	default n
+
+config GD25_SLOWREAD
+	bool
+	default n
+
+endif # MTD_GD25
+
+config MTD_GD5F
+	bool "SPI-based GD5F nand FLASH"
+	default n
+	select SPI
+
+if MTD_GD5F
+
+config GD5F_SPIMODE
+	int "GD5F SPI Mode"
+	default 0
+
+config GD5F_SPIFREQUENCY
+	int "GD5F SPI Frequency"
+	default 20000000
+
+endif # MTD_GD5F
