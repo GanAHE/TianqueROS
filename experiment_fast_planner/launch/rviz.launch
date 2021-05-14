@@ -1,0 +1,3 @@
+<launch>
+  <node name="rvizvisualisation_fast_planner" pkg="rviz" type="rviz" output="log" args="-d $(find experiment_fast_planner)/rviz/rviz.rviz" />
+</launch>

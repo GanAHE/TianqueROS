@@ -1,0 +1,10 @@
+<launch>
+    <arg name="config_yaml" value="$(find vins)/config/xtdrone_sitl/px4_sitl_stereo_imu_config.yaml" />
+    
+    <node pkg="vins" type="vins_fusion" name="vins_fusion_node"  output="screen" arg="$(config_yaml)">
+    <rosparam command="load" file="$(config_yaml)"/>
+    </node>
+
+
+
+</launch>
