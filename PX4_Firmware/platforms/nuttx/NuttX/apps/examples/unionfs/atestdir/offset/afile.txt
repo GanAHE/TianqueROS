@@ -1,1 +1,0 @@
-This is a file in the offset/ directory on file system 1

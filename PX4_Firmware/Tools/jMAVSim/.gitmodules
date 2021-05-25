@@ -1,4 +1,0 @@
-[submodule "jMAVlib"]
-	path = jMAVlib
-	url = https://github.com/PX4/jMAVlib.git
-	branch = master
