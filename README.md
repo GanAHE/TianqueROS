@@ -5,5 +5,12 @@
 The complete operation function package of ROS-based drones and other robots, including autonomous navigation and obstacle avoidance of drones, path planning, track tracking, visual SLAM, laser SLAM, etc., and more functions continue to be built...
 
 
-## Config
+## 1. Config
+
+### 1.1 install PX4_Firware
+
+### 1.2 install requirements
+
+## 2. TianqueROS
+
 

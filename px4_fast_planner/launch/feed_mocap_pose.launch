@@ -1,0 +1,15 @@
+<launch>
+	<arg name="vehicle" default="zadrone"/>
+
+	<include file="$(find mavros)/launch/px4.launch">
+		<arg name="fcu_url" value="/dev/ttyUSB0:921600" />
+		<arg name="gcs_url" value="udp://@192.168.0.107:14550" />
+	</include>
+	<include file="$(find vrpn_client_ros)/launch/sample.launch" >
+		<arg name="server" value="192.168.0.101" />
+	</include>
+
+	<node name="mocap_topic_relay" pkg="topic_tools" type="relay" args="/vrpn_client_node/$(arg vehicle)/pose mavros/vision_pose/pose" output="screen">
+	</node>
+
+</launch>
