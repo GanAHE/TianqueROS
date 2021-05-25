@@ -4,9 +4,9 @@
   <arg name="map_size_y" default="40.0"/>
   <arg name="map_size_z" default=" 5.0"/>
 
-  <arg name="odom_topic" default="/mavros/local_position/odom" />
-  <arg name="camera_pose_topic" default="/camera/pose"/>
-  <arg name="depth_topic" default="/camera/depth/image_raw"/>
+  <arg name="odom_topic" default="/vins_estimator/odometry"/>
+  <arg name="camera_pose_topic" default="/mavros/vision_pose/pose"/>
+  <arg name="depth_topic" default="/camera/depth/image_rect_raw"/>
 
   <arg name="max_vel" default="1.0" />
   <arg name="max_acc" default="2.5" />
