@@ -228,7 +228,7 @@ void geometricCtrl::cmdloopCallback(const ros::TimerEvent &event) {
       node_state = MISSION_EXECUTION;
       break;
 
-    case MISSION_EXECUTION:
+    case MISSION_EXECUTION: //takeoff etc. 
       if (!feedthrough_enable_) computeBodyRateCmd(cmdBodyRate_, targetPos_, targetVel_, targetAcc_);
       pubReferencePose(targetPos_, q_des);
       pubRateCommands(cmdBodyRate_, q_des);
