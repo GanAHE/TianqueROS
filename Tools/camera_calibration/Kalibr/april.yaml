@@ -1,5 +1,0 @@
-target_type: 'April' #gridtype
-targetCols: 4               #number of internal chessboard corners
-targetRows: 5               #number of internal chessboard corners
-rowSpacingMeters: 0.028      #size of one chessboard square [m]
-colSpacingMeters: 0.028      #size of one chessboard square [m]
