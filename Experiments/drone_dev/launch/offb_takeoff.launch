@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="drone_dev" type="offboard_takeoff_node" name="offboard_takeoff_node" output="screen">
+	</node>
+</launch>
