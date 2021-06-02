@@ -12,8 +12,8 @@ output_path: "/home/ganahe/DJI/"
 
 cam0_calib: "left.yaml"
 cam1_calib: "right.yaml"
-image_width: 640
-image_height: 480
+image_width: 1280
+image_height: 720
    
 
 # Extrinsic parameter between IMU and Camera.
