@@ -155,6 +155,10 @@ add_executable(offboard_takeoff_node src/offboard_takeoff.cpp)
 target_link_libraries(offboard_takeoff_node ${catkin_LIBRARIES})
 
 
+
+add_executable(mavros_position_control_node src/mavros_position_control.cpp)
+target_link_libraries(mavros_position_control_node ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############
