@@ -17,15 +17,15 @@ from cv_bridge import CvBridgeError
 #import os
 #import sys
     
-rgb_path = '/home/ganahe/D435i/track_image/'   #已经建立好的存储rgb彩色图文件的目录
+rgb_path = '/home/ganahe/TianqueROS/Tools/camera_calibration/Kalibr_calibration_scripts/stereo_1280_720_png/right/'   #已经建立好的存储rgb彩色图文件的目录
 depth_path= '/home/ganahe/D435i/right/' # 已经建立好的存储深度图文件的目录
     
 class ImageCreator():
     def __init__(self):
         self.bridge = CvBridge()
-        with rosbag.Bag('/home/ganahe/experiment.bag', 'r') as bag:  #要读取的bag文件；
+        with rosbag.Bag('/home/ganahe/TianqueROS/Tools/camera_calibration/Kalibr_calibration_scripts/stereo_1280_720.bag', 'r') as bag:  #要读取的bag文件；
             for topic,msg,t in bag.read_messages():
-                if topic == "/vins_estimator/image_track": #图像的topic；
+                if topic == "/infra_right": #图像的topic；
                     try:
                         cv_image = self.bridge.imgmsg_to_cv2(msg,"bgr8")
                     except CvBridgeError as e:
