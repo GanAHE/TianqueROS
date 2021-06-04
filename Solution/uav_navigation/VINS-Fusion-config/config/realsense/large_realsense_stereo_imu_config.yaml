@@ -10,10 +10,10 @@ image0_topic: "/camera/infra1/image_rect_raw"
 image1_topic: "/camera/infra2/image_rect_raw"
 output_path: "/home/ganahe/DJI/"
 
-cam0_calib: "left.yaml"
-cam1_calib: "right.yaml"
-image_width: 640
-image_height: 480
+cam0_calib: "large_left.yaml"
+cam1_calib: "large_right.yaml"
+image_width: 1280
+image_height: 720
    
 
 # Extrinsic parameter between IMU and Camera.
