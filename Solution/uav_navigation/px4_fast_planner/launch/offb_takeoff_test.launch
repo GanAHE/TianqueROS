@@ -1,5 +1,0 @@
-<launch>
-	<rosparam command="load" file="$(find px4_indoor_navigation)/config/takeoff_test_params.yaml" />
-	<node pkg="px4_indoor_navigation" type="px4_offbaord_test.py" name="offboard_takeoff_test" required="false" output="screen">
-	</node>
-</launch>
