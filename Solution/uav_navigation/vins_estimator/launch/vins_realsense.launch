@@ -1,8 +1,0 @@
-<launch>
- <!--  Camera -->
-    <include file="$(find realsense2_camera)/launch/rs_d435i.launch"> </include>
-
-  <!-- VINS-Fusion -->
-    <include file="$(find vins)/launch/vins_rviz.launch"> </include>
-
-</launch>
