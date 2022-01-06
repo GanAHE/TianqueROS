@@ -1,0 +1,1 @@
+sudo cp ../../Solution/uav_navigation/ ~/catkin_ws/src/

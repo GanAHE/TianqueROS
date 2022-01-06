@@ -1,8 +1,0 @@
-<launch>
-	<arg name="ns" default="/"/>
-	<group ns="$(arg ns)">
-        <rosparam command="load" file="$(find px4_indoor_navigation)/config/alt_vxy_params.yaml" />
-        <node pkg="px4_indoor_navigation" type="altitude_vxy_controller.py" name="altitude_vxy_controller" required="false" output="screen">
-        </node>
-	</group>
-</launch>

@@ -1,0 +1,39 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/ganahe/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/bspline/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/bspline_opt/include/**",
+        "/home/ganahe/catkin_ws/src/VINS-Fusion/camera_models/include/**",
+        "/home/ganahe/catkin_ws/src/mavros_controllers/controller_msgs/include/**",
+        "/home/ganahe/catkin_ws/src/experiment_fast_planner/include/**",
+        "/home/ganahe/catkin_ws/src/mavros_controllers/geometric_controller/include/**",
+        "/home/ganahe/catkin_ws/src/mav_comm/mav_msgs/include/**",
+        "/home/ganahe/catkin_ws/src/mav_comm/mav_planning_msgs/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/Utils/multi_map_server/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/path_searching/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/plan_env/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/plan_manage/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/poly_traj/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/Utils/pose_utils/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/Utils/quadrotor_msgs/include/**",
+        "/home/ganahe/catkin_ws/src/realsense-ros/realsense2_camera/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/so3_control/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/so3_disturbance_generator/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/so3_quadrotor_simulator/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/fast_planner/traj_utils/include/**",
+        "/home/ganahe/catkin_ws/src/mavros_controllers/trajectory_publisher/include/**",
+        "/home/ganahe/catkin_ws/src/Fast-Planner/uav_simulator/Utils/uav_utils/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
